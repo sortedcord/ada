@@ -12,3 +12,4 @@ postgres-data/
 redis-data/
 backups/
 .DS_Store
+.codegraph/
