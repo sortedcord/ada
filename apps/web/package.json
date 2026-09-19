@@ -1,0 +1,41 @@
+{
+  "name": "@ada/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests --config ../../vitest.config.ts",
+    "test:e2e": "playwright test --config ../../playwright.config.ts",
+    "test:a11y": "playwright test --config ../../playwright.config.ts e2e/a11y.spec.ts"
+  },
+  "dependencies": {
+    "@ada/config": "workspace:*",
+    "@radix-ui/react-select": "^2.3.7",
+    "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-router": "^1.170.36",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.46.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.88.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.1.7"
+  }
+}

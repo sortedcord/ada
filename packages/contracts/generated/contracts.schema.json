@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schemas": {
+    "apiError": {
+      "$ref": "#/definitions/apiError",
+      "definitions": {
+        "apiError": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "maxLength": 500
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                },
+                "required": ["path", "message"],
+                "additionalProperties": false
+              },
+              "maxItems": 100,
+              "default": []
+            },
+            "requestId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "retryable": {
+              "type": "boolean"
+            }
+          },
+          "required": ["code", "message", "requestId", "retryable"],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "conflictResponse": {
+      "$ref": "#/definitions/conflictResponse",
+      "definitions": {
+        "conflictResponse": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "const": "conflict"
+            },
+            "message": {
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "retryable": {
+              "type": "boolean",
+              "const": false
+            },
+            "currentVersion": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": ["code", "message", "requestId", "retryable", "currentVersion"],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "healthResponse": {
+      "$ref": "#/definitions/healthResponse",
+      "definitions": {
+        "healthResponse": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["ok", "degraded", "unavailable"]
+            },
+            "service": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          "required": ["status", "service", "version"],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "listQuery": {
+      "$ref": "#/definitions/listQuery",
+      "definitions": {
+        "listQuery": {
+          "type": "object",
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            },
+            "sort": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "default": "createdAt"
+            },
+            "direction": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "includeArchived": {
+              "type": "boolean",
+              "default": false
+            },
+            "search": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "tag": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "status": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "scenarioExport": {
+      "$ref": "#/definitions/scenarioExport",
+      "definitions": {
+        "scenarioExport": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "scenario"
+            },
+            "schemaVersion": {
+              "type": "string",
+              "const": "scenario.v1"
+            },
+            "scenarioId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "revision": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "exportedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "contentChecksum": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "aggregate": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": ["kind", "schemaVersion", "scenarioId", "revision", "aggregate"],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "sseEvent": {
+      "$ref": "#/definitions/sseEvent",
+      "definitions": {
+        "sseEvent": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "turn.accepted",
+                "turn.stage_changed",
+                "turn.narration_started",
+                "turn.narration_delta",
+                "turn.narration_completed",
+                "turn.background_status",
+                "turn.completed",
+                "turn.failed",
+                "turn.cancelled",
+                "heartbeat"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": ["id", "type", "data"],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  }
+}

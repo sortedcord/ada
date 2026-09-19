@@ -1,0 +1,32 @@
+{
+  "name": "@ada/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests --config ../../vitest.config.ts",
+    "test:integration": "vitest run --passWithNoTests --config ../../vitest.config.ts",
+    "db:migrate": "bash ../../scripts/db-migrate.sh",
+    "db:check": "drizzle-kit check --config drizzle.config.ts && node dist/index.js check",
+    "db:seed": "bash ../../scripts/db-seed.sh",
+    "db:reset": "bash ../../scripts/dev-reset.sh"
+  },
+  "dependencies": {
+    "@ada/domain": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10"
+  }
+}

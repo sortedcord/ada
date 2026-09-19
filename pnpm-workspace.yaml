@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - '!apps/task-tracker'
+  - packages/*
+
+allowBuilds:
+  cpu-features: true
+  esbuild: true
+  msgpackr-extract: true
+  protobufjs: true
+  ssh2: true
+  unrs-resolver: true

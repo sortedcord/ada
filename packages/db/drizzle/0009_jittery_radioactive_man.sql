@@ -1,0 +1,1 @@
+ALTER TABLE "inner_thoughts" ADD COLUMN "decay_rate" real DEFAULT 0 NOT NULL;

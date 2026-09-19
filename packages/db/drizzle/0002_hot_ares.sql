@@ -1,0 +1,2 @@
+ALTER TABLE "retrieval_chunks" ALTER COLUMN "search_vector" SET DATA TYPE tsvector USING "search_vector"::tsvector;--> statement-breakpoint
+CREATE INDEX "retrieval_chunks_search_idx" ON "retrieval_chunks" USING gin ("search_vector");

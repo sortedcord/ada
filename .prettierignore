@@ -1,0 +1,11 @@
+node_modules
+dist
+.turbo
+coverage
+playwright-report
+pnpm-lock.yaml
+LUNA_IMPLEMENTATION_TASKS.md
+ai-dungeon-clone-plan.md
+MODEL_INFO.md
+packages/db/drizzle
+apps/task-tracker

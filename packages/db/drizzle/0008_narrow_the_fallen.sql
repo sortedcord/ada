@@ -1,0 +1,1 @@
+ALTER TABLE "turns" ADD COLUMN "cancellation_requested" boolean DEFAULT false NOT NULL;
