@@ -99,3 +99,18 @@ If implementation is blocked:
 - Do not hold a database transaction open while waiting for an AI provider.
 - Generated mutable content remains versioned, attributable, auditable, and reversible.
 - Never commit credentials, secrets, raw private prompts, private provider responses, or database dumps.
+
+## Project Code Navigation
+
+Prefer CodeGraph tools over direct code-file reading whenever possible for architecture, control-flow, impact, and symbol navigation:
+
+- `codegraph_search` — find symbols by name.
+- `codegraph_node` — inspect a symbol's signature, location, source, callers, and callees.
+- `codegraph_files` — inspect the indexed project file tree.
+- `codegraph_callers` — find functions or methods that call a symbol.
+- `codegraph_callees` — find functions or methods called by a symbol.
+- `codegraph_impact` — analyze the impact radius of changing a symbol.
+- `codegraph_explore` — explore related symbols, files, or terms grouped by file.
+- `codegraph_status` — check index health and pending synchronization.
+
+Use CodeGraph before `read`, `grep`, `rg`, or other direct file access. Direct file access is appropriate when editing exact text, inspecting non-code assets/configuration, or when CodeGraph lacks the required information. If symbol search returns no result, try `codegraph_explore`, `codegraph_files`, or `codegraph_node` before falling back to literal text search.
