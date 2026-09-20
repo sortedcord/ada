@@ -248,6 +248,17 @@ export const api = {
       errors: Array<{ path: string; message: string; section: string }>;
       warnings: Array<{ path: string; message: string; section: string }>;
     }>(`/scenarios/${encodeURIComponent(id)}/validate`, { method: 'POST' }),
+  continuityReview: (id: string) =>
+    request<{
+      valid: boolean;
+      findings: Array<{
+        path: string;
+        message: string;
+        severity: 'error' | 'warning';
+        section: string;
+        resourceId?: string;
+      }>;
+    }>(`/scenarios/${encodeURIComponent(id)}/continuity-review`),
   duplicateResource: (
     id: string,
     collection: string,

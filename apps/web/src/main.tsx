@@ -1560,6 +1560,12 @@ function ScenarioBuilder(): React.JSX.Element {
     onSuccess: (result) =>
       setNotice(result.valid ? 'Scenario is valid.' : `${result.errors.length} validation errors`),
   });
+  const continuityReview = useMutation({
+    mutationFn: () => api.continuityReview(scenarioId),
+    onSuccess: (result) =>
+      setNotice(result.findings.length ? `${result.findings.length} continuity finding(s)` : 'Continuity review passed'),
+    onError: (error) => setNotice(`Continuity review error: ${error.message}`),
+  });
 
   const knowledge = useMutation({
     mutationFn: (entityId: string) => api.knowledgePreview(scenarioId, entityId),
@@ -2012,6 +2018,28 @@ function ScenarioBuilder(): React.JSX.Element {
                       {createProposal.isPending ? 'Validating…' : 'Create Proposal'}
                     </Button>
                     <Badge variant="outline">base revision {scenario.data.revision.version}</Badge>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-background/40 p-4 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="font-semibold text-sm">Continuity check</div>
+                        <p className="text-[11px] text-muted-foreground">Ask the same authoring workflow to find orphaned references, contradictions, and visibility problems before you apply a proposal.</p>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => continuityReview.mutate()} disabled={continuityReview.isPending}>
+                        {continuityReview.isPending ? 'Reviewing…' : 'Run continuity review'}
+                      </Button>
+                    </div>
+                    {continuityReview.data && (
+                      <div className="space-y-2">
+                        {continuityReview.data.findings.length === 0 && <p className="text-xs text-emerald-400">No structural continuity findings.</p>}
+                        {continuityReview.data.findings.map((finding, index) => (
+                          <div key={`${finding.path}-${index}`} className={`rounded-lg border p-2.5 text-xs ${finding.severity === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-amber-500/30 bg-amber-500/10 text-amber-200'}`}>
+                            <div className="font-mono text-[10px] opacity-80">{finding.path}</div>
+                            <p className="mt-1">{finding.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
