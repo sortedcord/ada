@@ -690,7 +690,7 @@ export function buildApp(
       ? new FakeGenerationProvider()
       : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
     const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
-    const prompt = promptRegistry.get(`${promptName}@1`);
+    const prompt = promptRegistry.get(`${promptName}@2`);
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
     const rendered = prompt.render({ brief, constraints: body.constraints ?? [], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, counts: Object.fromEntries(Object.entries(aggregate).map(([key, value]) => [key, Array.isArray(value) ? value.length : undefined])) }) });
     const generated = await provider.generateObject({
@@ -722,7 +722,7 @@ export function buildApp(
     const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
     const kind = body.kind ?? 'scenario';
     const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
-    const prompt = promptRegistry.get(`${promptName}@1`);
+    const prompt = promptRegistry.get(`${promptName}@2`);
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
     const historyText = (body.history ?? []).slice(-12).map((item) => `${item.role}: ${item.content}`).join('\n');
     const rendered = prompt.render({ brief: `${historyText}\nuser: ${message}`, constraints: ['Ask clarifying questions when a safe typed proposal cannot be constructed.', 'Never apply changes directly.'], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }) });
