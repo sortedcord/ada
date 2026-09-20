@@ -83,6 +83,48 @@ Use conventional commit prefixes: `feat`, `fix`, `docs`, `test`, `refactor`, `ch
 
 ---
 
+## Docker Storage Maintenance
+
+Docker build cache and container logs must be kept bounded. On development machines, configure Docker with BuildKit garbage collection and rotated local container logs:
+
+```json
+{
+  "builder": {
+    "gc": {
+      "enabled": true,
+      "defaultKeepStorage": "8GB"
+    }
+  },
+  "log-driver": "local",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+```
+
+This configuration belongs in `/etc/docker/daemon.json` on Linux. After changing it, restart Docker and verify it is active:
+
+```bash
+sudo systemctl restart docker
+docker info --format 'Logging={{.LoggingDriver}}'
+```
+
+Run targeted cleanup rather than routinely using `docker system prune -a`:
+
+```bash
+docker builder prune --force --filter until=24h --keep-storage 8GB
+docker image prune --force --filter until=168h
+```
+
+Daily maintenance should be scheduled through `/etc/cron.d/docker-maintenance`. The scheduled cleanup must never prune Docker volumes because this project uses volumes for PostgreSQL and Redis data. Inspect storage with `docker system df -v` and `docker buildx du` when investigating disk usage.
+
+When the Docker logging configuration changes, recreate existing project containers so they receive the new logging settings:
+
+```bash
+docker compose up --build -d --force-recreate
+```
+
 ## Key Invariants to Preserve
 
 - The database owns canon. Never parse prose to reconstruct state.
