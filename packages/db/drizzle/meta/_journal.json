@@ -71,6 +71,13 @@
       "when": 1789640358757,
       "tag": "0009_jittery_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789889373209,
+      "tag": "0013_repair_unjournaled_schema",
+      "breakpoints": true
     }
   ]
 }

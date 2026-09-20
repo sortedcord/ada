@@ -163,11 +163,14 @@ describe('Live Scenario Multi-Turn & Long-Run Verification', () => {
     const { scenarioId } = (await createRes.json()) as { scenarioId: string };
 
     // 2. Publish scenario revision
-    const pubRes = await fetch(`http://127.0.0.1:4173/api/v1/scenarios/${scenarioId}/publish-revision`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({}),
-    });
+    const pubRes = await fetch(
+      `http://127.0.0.1:4173/api/v1/scenarios/${scenarioId}/publish-revision`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      },
+    );
     expect(pubRes.ok).toBe(true);
     const pubData = (await pubRes.json()) as { id?: string };
     const revisionId = pubData.id || revId;

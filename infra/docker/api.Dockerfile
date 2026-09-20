@@ -24,8 +24,7 @@ COPY packages/domain packages/domain
 COPY packages/observability packages/observability
 COPY packages/prompts packages/prompts
 COPY packages/scenario-tools packages/scenario-tools
-RUN pnpm --filter @ada/architect --filter @ada/ai --filter @ada/prompts --filter @ada/scenario-tools --filter @ada/db build \
-  && pnpm --filter @ada/api build \
+RUN pnpm --filter @ada/api... build \
   && pnpm --filter @ada/api deploy --prod /prod/api
 
 FROM node:24-alpine3.22 AS runtime

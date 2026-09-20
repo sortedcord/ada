@@ -142,11 +142,16 @@ jobs:
     name: Container build and live API smoke test
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      COMPOSE_FILE: compose.yaml:compose.ci.yaml
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-pnpm
 
       - name: Create CI environment
         run: |
@@ -183,8 +188,16 @@ jobs:
       - name: Start the full stack
         run: docker compose up --detach --no-build --wait --wait-timeout 180
 
+      - name: Apply database migrations
+        env:
+          DATABASE_URL: postgres://ada:local-dev-change-this-password@127.0.0.1:5432/ada
+        run: pnpm --filter @ada/db db:migrate
+
       - name: Exercise the live turn pipeline
         run: node scripts/live-scenario-runner.mjs
+
+      - name: Run the live scenario contract test
+        run: pnpm --filter @ada/contracts test:live
 
       - name: Capture container diagnostics
         if: failure()

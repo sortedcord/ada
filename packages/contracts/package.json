@@ -14,7 +14,8 @@
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "generate:schema": "tsx src/generate-artifacts.ts",
-    "test": "vitest run --passWithNoTests --config ../../vitest.config.ts"
+    "test": "vitest run --passWithNoTests --config ../../vitest.config.ts",
+    "test:live": "vitest run --config ../../vitest.live.config.ts"
   },
   "dependencies": {
     "@ada/domain": "workspace:*",
