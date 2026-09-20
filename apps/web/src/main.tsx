@@ -1048,8 +1048,19 @@ function SettingsPage(): React.JSX.Element {
   const queryClient = useQueryClient();
   const models = useQuery({ queryKey: ['settings-models-page'], queryFn: api.getModelSettings });
   const [selectedModel, setSelectedModel] = useState<string>('');
+  const [selectedAuthoringModel, setSelectedAuthoringModel] = useState<string>('');
   const [saveStatus, setSaveStatus] = useState<string>('');
   const modelTest = useMutation({ mutationFn: (m?: string) => api.testModel(m) });
+  const authoringModelMutation = useMutation({
+    mutationFn: (m: string) => api.setAuthoringModel(m),
+    onSuccess: (data) => {
+      setSaveStatus(`Scenario authoring model changed to ${data.authoringModel}`);
+      void queryClient.invalidateQueries({ queryKey: ['settings-models-page'] });
+    },
+    onError: (err: any) => {
+      setSaveStatus(`Failed to update authoring model: ${err?.message || 'Error'}`);
+    },
+  });
   const modelMutation = useMutation({
     mutationFn: (m: string) => api.setActiveModel(m),
     onSuccess: (data) => {
@@ -1068,6 +1079,7 @@ function SettingsPage(): React.JSX.Element {
   });
 
   const currentActiveModel = selectedModel || models.data?.defaultModel || '';
+  const currentAuthoringModel = selectedAuthoringModel || models.data?.authoringModel || currentActiveModel;
 
   return (
     <div className="space-y-6 max-w-4xl py-4">
@@ -1120,6 +1132,34 @@ function SettingsPage(): React.JSX.Element {
               </Select>
               <p className="text-[11px] text-muted-foreground">
                 Discovered automatically from the configured credentials and API endpoint.
+              </p>
+            </div>
+
+            <div className="space-y-2 border-t border-border/40 pt-4">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
+                Scenario Authoring Model
+              </label>
+              <Select
+                value={currentAuthoringModel}
+                onValueChange={(val) => {
+                  setSelectedAuthoringModel(val);
+                  authoringModelMutation.mutate(val);
+                }}
+                disabled={authoringModelMutation.isPending || models.isPending}
+              >
+                <SelectTrigger className="w-full font-mono text-xs h-10 bg-background">
+                  <SelectValue placeholder="Select scenario authoring model..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.data?.models?.map((m: any) => (
+                    <SelectItem key={`authoring-${m.id}`} value={m.id} className="font-mono text-xs">
+                      {m.name || m.id} ({m.id})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Used for scenario chat, authoring proposals, and AI continuity reviews. It falls back to the active model when unset.
               </p>
             </div>
 
