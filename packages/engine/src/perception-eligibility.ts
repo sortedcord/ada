@@ -1,4 +1,3 @@
-import type { Entity } from '@ada/domain';
 
 export interface RuntimeEntityView {
   entityId: string;

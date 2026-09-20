@@ -33,7 +33,8 @@
     "backup": "bash scripts/backup.sh",
     "restore:verify": "bash scripts/restore-verify.sh",
     "security:scan": "pnpm audit --audit-level high",
-    "sbom": "bash scripts/sbom.sh"
+    "sbom": "bash scripts/sbom.sh",
+    "scenario:mcp": "pnpm --filter @ada/scenario-mcp start"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

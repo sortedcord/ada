@@ -195,6 +195,53 @@ export const scenarioRevisions = pgTable(
     ),
   ],
 );
+export const scenarioProposals = pgTable(
+  'scenario_proposals',
+  {
+    id: text('id').primaryKey(),
+    scenarioId: text('scenario_id').notNull(),
+    revisionId: text('revision_id').notNull(),
+    baseVersion: integer('base_version').notNull(),
+    toolName: text('tool_name').notNull(),
+    summary: text('summary').notNull(),
+    operations: jsonb('operations').notNull(),
+    validation: jsonb('validation').notNull().default({}),
+    model: text('model'),
+    promptVersion: integer('prompt_version'),
+    status: text('status').notNull().default('ready'),
+    appliedVersion: integer('applied_version'),
+    ...metadata,
+  },
+  (table) => [
+    index('scenario_proposals_scenario_idx').on(table.scenarioId, table.createdAt),
+    index('scenario_proposals_status_idx').on(table.status),
+  ],
+);
+export const storyCardMutationProposals = pgTable(
+  'story_card_mutation_proposals',
+  {
+    id: text('id').primaryKey(),
+    cardId: text('card_id').notNull(),
+    expectedVersion: integer('expected_version').notNull(),
+    mode: text('mode').notNull(),
+    path: text('path').notNull(),
+    operations: jsonb('operations').notNull().default([]),
+    sourceIds: jsonb('source_ids').notNull().default([]),
+    sourceScopes: jsonb('source_scopes').notNull().default([]),
+    targetScope: text('target_scope').notNull(),
+    reason: text('reason').notNull(),
+    semanticSummary: text('semantic_summary').notNull(),
+    confidence: real('confidence').notNull(),
+    contradictions: jsonb('contradictions').notNull().default([]),
+    validation: jsonb('validation').notNull().default({}),
+    status: text('status').notNull().default('ready'),
+    ...metadata,
+  },
+  (table) => [
+    index('story_card_mutation_proposals_card_idx').on(table.cardId, table.createdAt),
+    index('story_card_mutation_proposals_status_idx').on(table.status),
+  ],
+);
 export const entities = pgTable(
   'entities',
   {

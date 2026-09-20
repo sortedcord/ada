@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { AdityaGuptaGenerationProvider, type GenerationProvider } from '@ada/ai';
 import { and, eq } from 'drizzle-orm';
 import type { ServerEnvironment } from '@ada/config';

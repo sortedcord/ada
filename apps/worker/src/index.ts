@@ -1,10 +1,11 @@
 import { Queue, Worker } from 'bullmq';
 import { loadServerEnvironment } from '@ada/config';
-import { createDatabase, jobRuns, narrativeSegments, turns } from '@ada/db';
+import { createDatabase, claimOutboxBatch, completeOutbox, failOutbox, jobRuns, narrativeSegments, retrievalDocuments, storyCardVersions, storyCards, turns } from '@ada/db';
 import { createLogger, noopTelemetry } from '@ada/observability';
 import { processTurn } from './turn-worker.js';
 import { processDialogueAttribution } from './dialogue-attribution.js';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
+import { indexRetrievalChunk, type VisibilityScope } from '@ada/retrieval';
 
 const environment = loadServerEnvironment();
 const logger = createLogger({
@@ -16,6 +17,31 @@ const database = createDatabase(environment.DATABASE_URL);
 const connection = { url: environment.REDIS_URL };
 const queue = new Queue('turns', { connection });
 const dialogueQueue = new Queue('dialogue-attribution', { connection });
+
+async function processOutboxBatch(): Promise<void> {
+  const rows = await claimOutboxBatch(database.db, 25);
+  for (const row of rows) {
+    try {
+      if (row.topic === 'story-card.reindex') {
+        const payload = row.payload as { cardId?: string; version?: number };
+        if (typeof payload.cardId === 'string' && typeof payload.version === 'number') {
+          const [card] = await database.db.select().from(storyCards).where(eq(storyCards.id, payload.cardId)).limit(1);
+          const [version] = await database.db.select().from(storyCardVersions).where(and(eq(storyCardVersions.cardId, payload.cardId), eq(storyCardVersions.version, payload.version))).limit(1);
+          if (card && version) {
+            const documentId = `scenario-card:${card.revisionId}:${card.id}`;
+            await database.db.insert(retrievalDocuments).values({ id: documentId, sourceType: 'story_card', sourceId: card.id, sourceVersion: payload.version, visibility: version.scope || 'public_scenario', contentHash: `card:${card.id}:${payload.version}`, active: true, attribution: { source: 'mutation', sourceIds: [card.id] } }).onConflictDoUpdate({ target: retrievalDocuments.id, set: { sourceVersion: payload.version, contentHash: `card:${card.id}:${payload.version}`, active: true, updatedAt: new Date() } });
+            await indexRetrievalChunk(database.db, { id: `chunk:${documentId}:v${payload.version}`, documentId, sourceType: 'story_card', sourceId: card.id, text: `${card.title}: ${JSON.stringify(version.body)}`, scope: (version.scope || 'public_scenario') as VisibilityScope, keywords: [card.title, 'story-card'], recency: 1, salience: 0.7, metadata: { cardId: card.id, version: payload.version } });
+          }
+        }
+      }
+      await completeOutbox(database.db, row.id);
+    } catch (error) {
+      logger.error({ err: error, outboxId: row.id }, 'outbox processing failed');
+      await failOutbox(database.db, row.id, new Date(Date.now() + 1_000));
+    }
+  }
+}
+const outboxPoll = setInterval(() => void processOutboxBatch(), 1_000);
 const dialogueWorker = new Worker(
   'dialogue-attribution',
   async (job) => {
@@ -113,6 +139,7 @@ const shutdown = async (signal: string): Promise<void> => {
   shuttingDown = true;
   logger.info({ signal }, 'shutdown requested');
   try {
+    clearInterval(outboxPoll);
     await closeWithDeadline(
       Promise.all([
         worker.close(),

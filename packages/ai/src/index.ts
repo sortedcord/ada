@@ -80,7 +80,7 @@ function requestSignal(signal: AbortSignal | undefined, timeoutMs = 120_000): Ab
   return signal ? AbortSignal.any([signal, timeout]) : timeout;
 }
 
-function parseOutput(response: Record<string, unknown>): {
+export function parseOutput(response: Record<string, unknown>): {
   text: string;
   requestId?: string;
   usage?: { inputTokens?: number; outputTokens?: number };

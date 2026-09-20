@@ -21,6 +21,7 @@
     "db:reset": "bash ../../scripts/dev-reset.sh"
   },
   "dependencies": {
+    "@ada/architect": "workspace:*",
     "@ada/domain": "workspace:*",
     "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.7"

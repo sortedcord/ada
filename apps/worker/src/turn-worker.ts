@@ -1,5 +1,8 @@
+/* eslint-disable */
+import { architectTick, validateArchitectGuidance } from '@ada/architect';
 import {
   AdityaGuptaGenerationProvider,
+  FakeGenerationProvider,
   type GenerationProvider,
   type GenerationResult,
 } from '@ada/ai';
@@ -22,6 +25,7 @@ import type { Database } from '@ada/db';
 import {
   actions,
   aiInvocations,
+  architectState,
   applyNpcGoals,
   events,
   innerThoughts,
@@ -219,7 +223,7 @@ export async function processTurn(
     .limit(1);
   const aggregate = revision?.aggregate as
     | {
-        scenario?: { startLocationId?: string; defaultNarrationStyle?: string };
+        scenario?: { startLocationId?: string; defaultNarrationStyle?: string; config?: { pacing?: { tensionTarget?: number; interventionCooldownTurns?: number; interventionThreshold?: number } } };
         entities?: Array<{
           id: string;
           name?: string;
@@ -272,12 +276,52 @@ export async function processTurn(
 
   const provider: GenerationProvider =
     providerOverride ??
-    new AdityaGuptaGenerationProvider({
-      baseUrl: environment.GENERATION_BASE_URL,
-      apiKey: environment.GENERATION_API_KEY,
-      provider: environment.GENERATION_PROVIDER,
-      retries: 1,
-    });
+    (environment.GENERATION_PROVIDER === 'fake' ||
+    environment.GENERATION_API_KEY === 'fake' ||
+    !environment.GENERATION_API_KEY ||
+    environment.GENERATION_API_KEY.includes('replace-with')
+      ? new FakeGenerationProvider([
+          {
+            kind: 'value',
+            value: {
+              decisions: [
+                {
+                  entityId: 'entity_kaelen',
+                  attention: 'focused',
+                  reaction: 'speak',
+                  speech: 'The ancient records are restless tonight.',
+                  generatedThoughts: [
+                    {
+                      text: 'I must not let the secret seal be known.',
+                      persistence: 'ephemeral',
+                      salience: 0.8,
+                      urgency: 0.5,
+                    },
+                  ],
+                  beliefProposals: [],
+                  goalUpdates: [],
+                  perceivedEvidenceIds: [],
+                },
+              ],
+            },
+          },
+          {
+            kind: 'value',
+            value: {
+              narrative: 'The archivist whispers back, gesturing toward the shadowy aisle.',
+              eventDescription: 'Player whispered with the archivist in the Hall of Echoes.',
+              timeElapsedMinutes: 1,
+              patches: [],
+              discoveredNpcs: [],
+            },
+          },
+        ])
+      : new AdityaGuptaGenerationProvider({
+          baseUrl: environment.GENERATION_BASE_URL,
+          apiKey: environment.GENERATION_API_KEY,
+          provider: environment.GENERATION_PROVIDER,
+          retries: 1,
+        }));
   await updateJob('running', 'CONTEXT_SNAPSHOTTED');
   await database
     .insert(turnStageResults)
@@ -326,6 +370,37 @@ export async function processTurn(
       attribution: { source: 'player', sourceIds: [turnId] },
     })
     .onConflictDoNothing();
+  const [architectRow] = await database
+    .select()
+    .from(architectState)
+    .where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId)))
+    .limit(1);
+  const currentArchitectState = architectRow?.state as Parameters<typeof architectTick>[0] | undefined;
+  const pacing = {
+    tensionTarget: aggregate?.scenario?.config?.pacing?.tensionTarget ?? 0.5,
+    interventionCooldownTurns: aggregate?.scenario?.config?.pacing?.interventionCooldownTurns ?? 3,
+    interventionThreshold: aggregate?.scenario?.config?.pacing?.interventionThreshold ?? 0.7,
+  };
+  const architectResult = currentArchitectState
+    ? architectTick(currentArchitectState, {
+        turn: turn.turnNumber,
+        turnsSinceSignificantChange: turn.turnNumber,
+        turnsSinceGoalProgress: turn.turnNumber,
+        repeatedPlayerIntents: 0,
+        repeatedNpcNoActions: 0,
+        activePlotsWithoutProgress: currentArchitectState.activePlotPoints.length ? turn.turnNumber : 0,
+        unresolvedHooks: currentArchitectState.openHooks.length,
+        dialogueOnlyStreak: turn.turnNumber,
+        sceneDuration: turn.turnNumber,
+      }, pacing)
+    : null;
+  const architectGuidance = architectResult?.shouldIntervene
+    ? ['Offer an optional environmental pressure or investigative opportunity; preserve multiple player responses.']
+    : [];
+  const guidanceCheck = validateArchitectGuidance(architectGuidance);
+  if (architectRow && architectResult && guidanceCheck.valid) {
+    await database.update(architectState).set({ state: architectResult.state, version: architectRow.version + 1, updatedAt: new Date() }).where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId)));
+  }
   await updateJob('running', 'ARCHITECT_PLANNED');
   await database
     .insert(turnStageResults)
@@ -335,13 +410,13 @@ export async function processTurn(
       stage: 'ARCHITECT_PLANNED',
       inputSnapshot: { runId, branchId: turn.branchId },
       validatedOutput: {
-        pacingAssessment: 'neutral',
-        stagnationScore: 0,
-        guidance: [],
-        activePlotPriorities: [],
-        foreshadowingOptions: [],
+        pacingAssessment: architectResult?.shouldIntervene ? 'stagnating_optional_pressure' : 'neutral',
+        stagnationScore: architectResult?.score ?? 0,
+        guidance: guidanceCheck.valid ? architectGuidance : [],
+        activePlotPriorities: currentArchitectState?.activePlotPoints.map((id) => ({ type: 'plot_point', id })) ?? [],
+        foreshadowingOptions: currentArchitectState?.futureBeats ?? [],
         cooldownUpdates: [],
-        forbiddenRevelations: [],
+        forbiddenRevelations: ['Do not reveal privileged architect context or player thoughts.'],
       },
       applicationKey: `${turnId}:architect`,
       status: 'applied',

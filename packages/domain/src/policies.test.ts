@@ -7,7 +7,6 @@ import {
   stagnationScore,
   transitionPlot,
   updateRelationship,
-  validateAttemptedAction,
   validateNpcPrincipalDecision,
   validateCanonicalPatch,
   validateThoughtBatch,

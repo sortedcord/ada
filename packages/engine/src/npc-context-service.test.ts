@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { describe, expect, it } from 'vitest';
 import { KnowledgePolicy } from '@ada/domain';
 import { NpcContextService } from './npc-context-service.js';

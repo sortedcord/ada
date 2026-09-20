@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/turn-worker.d.ts",
+      "import": "./dist/turn-worker.js"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
@@ -13,12 +19,14 @@
     "test:integration": "vitest run --passWithNoTests --config ../../vitest.config.ts"
   },
   "dependencies": {
+    "@ada/architect": "workspace:*",
     "@ada/ai": "workspace:*",
     "@ada/config": "workspace:*",
     "@ada/db": "workspace:*",
     "@ada/domain": "workspace:*",
     "@ada/engine": "workspace:*",
     "@ada/observability": "workspace:*",
+    "@ada/retrieval": "workspace:*",
     "bullmq": "^5.58.5",
     "drizzle-orm": "^0.45.2",
     "zod": "^3.25.76"

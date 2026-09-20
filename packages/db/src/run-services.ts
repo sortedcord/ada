@@ -1,4 +1,5 @@
 import { asc, eq } from 'drizzle-orm';
+import { initialArchitectState } from '@ada/architect';
 import { validateScenarioAggregate } from '@ada/domain';
 import type { Database } from './index.js';
 import {
@@ -200,13 +201,7 @@ export async function createRunFromPublishedRevision(
     await tx.insert(architectState).values({
       runId: input.runId,
       branchId: input.branchId,
-      state: {
-        act: 1,
-        tension: aggregate.scenario.config.pacing.tensionTarget,
-        activePlotPoints: [],
-        cooldowns: {},
-        openHooks: [],
-      },
+      state: initialArchitectState(aggregate.plotPoints, aggregate.scenario.config.pacing),
       version: 1,
       attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
     });

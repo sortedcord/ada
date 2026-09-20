@@ -4,7 +4,10 @@ import { loadServerEnvironment, toBrowserRuntimeConfig } from './index.js';
 const valid = {
   DATABASE_URL: 'postgres://user:password@localhost:5432/db',
   REDIS_URL: 'redis://localhost:6379',
+  GENERATION_PROVIDER: 'test',
+  GENERATION_BASE_URL: 'https://example.com/v1',
   GENERATION_API_KEY: 'fake-generation-key',
+  GENERATION_DEFAULT_MODEL: 'fake-model',
   AUTH_SESSION_SECRET: '01234567890123456789012345678901',
 };
 

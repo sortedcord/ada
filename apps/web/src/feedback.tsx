@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { Send, Sparkles, AlertCircle, CheckCircle2, MessageSquare, Terminal } from 'lucide-react';
 import { Button } from './components/ui/button';

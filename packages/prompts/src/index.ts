@@ -1,4 +1,5 @@
 import { registeredPromptDefinitions } from './builders.js';
+import { authoringPromptDefinitions } from './authoring.js';
 
 export interface PromptDefinition<TInput> {
   readonly name: string;
@@ -18,8 +19,9 @@ export function registerPrompt<TInput>(definition: PromptDefinition<TInput>): vo
 
 export * from './builders.js';
 export * from './naturalistic-dialogue.js';
+export * from './authoring.js';
 
-for (const definition of registeredPromptDefinitions) {
+for (const definition of [...registeredPromptDefinitions, ...authoringPromptDefinitions]) {
   const key = `${definition.name}@${definition.version}`;
   if (!promptRegistry.has(key)) promptRegistry.set(key, definition);
 }

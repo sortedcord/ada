@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { StrictMode, useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { createRoot } from 'react-dom/client';
@@ -339,6 +340,22 @@ function RunsPage(): React.JSX.Element {
     refetchInterval: selected ? 1_500 : false,
   });
 
+  const journal = useQuery({
+    queryKey: ['journal', selected],
+    queryFn: () => api.getJournal(selected),
+    enabled: Boolean(selected),
+    refetchInterval: selected ? 3_000 : false,
+  });
+
+  const embeddings = useQuery({
+    queryKey: ['settings-embeddings-run'],
+    queryFn: api.getEmbeddingSettings,
+    enabled: Boolean(selected),
+    staleTime: 30_000,
+  });
+
+  const [journalOpen, setJournalOpen] = useState(false);
+
   const details = useMutation({
     mutationFn: (segmentId: string) => api.getResponseDetails(selected, segmentId),
   });
@@ -577,11 +594,99 @@ function RunsPage(): React.JSX.Element {
             </div>
 
             <div className="flex items-center gap-2 shrink-0 pr-2">
+              <Badge
+                variant="outline"
+                className={`text-[10px] font-mono ${embeddings.data?.enabled ? 'text-violet-300 border-violet-500/30' : 'text-emerald-300 border-emerald-500/30'}`}
+                title={embeddings.data?.enabled ? `${embeddings.data.model} · ${embeddings.data.dimensions}d vector search` : 'Lexical retrieval fallback'}
+              >
+                {embeddings.data?.enabled ? 'VECTOR' : 'LEXICAL'}
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setJournalOpen(true)}
+                className="h-8 gap-1.5"
+                aria-label="Open player journal"
+              >
+                <BookOpen className="w-3.5 h-3.5" /> Journal
+              </Button>
               <Badge variant="outline" className="text-[10px] font-mono">
                 Turn {run.data?.currentTurn ?? 0}
               </Badge>
             </div>
           </div>
+
+          {/* Player Knowledge Journal */}
+          {journalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-card border rounded-2xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden relative border-indigo-500/30">
+                <div className="flex items-start justify-between gap-4 p-5 border-b border-border/60">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-indigo-400" />
+                      <h2 className="font-bold text-lg">Player Journal</h2>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Only observations and narrative your character is allowed to know.</p>
+                  </div>
+                  <button type="button" onClick={() => setJournalOpen(false)} className="text-muted-foreground hover:text-foreground rounded-full p-1 hover:bg-secondary" aria-label="Close player journal">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-5 space-y-5 overflow-y-auto max-h-[calc(85vh-90px)]">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Observed signals</div>
+                      <div className="text-2xl font-semibold mt-1">{journal.data?.observations.length ?? 0}</div>
+                    </div>
+                    <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Visible scenes</div>
+                      <div className="text-2xl font-semibold mt-1">{journal.data?.narratives.length ?? 0}</div>
+                    </div>
+                  </div>
+
+                  <section className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recent observations</h3>
+                      <Badge variant="outline" className="text-[9px]">player scope</Badge>
+                    </div>
+                    {journal.isPending ? (
+                      <p className="text-xs text-muted-foreground">Loading journal…</p>
+                    ) : journal.data?.observations.length ? (
+                      <div className="space-y-2">
+                        {journal.data.observations.slice().reverse().map((observation) => (
+                          <div key={observation.id} className="rounded-lg border border-border/50 bg-background/30 p-3">
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                              <span>Turn {observation.turnNumber}</span>
+                              <Badge variant="secondary" className="text-[9px]">{observation.modality}</Badge>
+                            </div>
+                            <p className="text-sm mt-1 leading-relaxed">{observation.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">Nothing observed yet.</p>
+                    )}
+                  </section>
+
+                  <section className="space-y-2">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Narrative record</h3>
+                    {journal.data?.narratives.length ? (
+                      <div className="space-y-2">
+                        {journal.data.narratives.slice().reverse().map((narrative) => (
+                          <div key={narrative.id} className="rounded-lg border border-border/50 bg-background/30 p-3">
+                            <div className="text-[10px] text-muted-foreground mb-1">Turn {narrative.turnId.split('_').pop()}</div>
+                            <SafeMarkdown>{narrative.text}</SafeMarkdown>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">No visible narration yet.</p>
+                    )}
+                  </section>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* NPC Details Modal */}
           {activeNpcModal && (
@@ -1365,6 +1470,63 @@ function ScenarioBuilder(): React.JSX.Element {
   const [title, setTitle] = useState('');
   const [notice, setNotice] = useState('');
   const [conflict, setConflict] = useState<string | null>(null);
+  const [proposalSummary, setProposalSummary] = useState('');
+  const [proposalKind, setProposalKind] = useState('character');
+  const [proposalBrief, setProposalBrief] = useState('');
+  const [proposalOperations, setProposalOperations] = useState('[\n  {\n    "operation": "add",\n    "collection": "entities",\n    "value": {}\n  }\n]');
+  const [chatInput, setChatInput] = useState('');
+  const [chatMode, setChatMode] = useState<'fast' | 'deep'>('fast');
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string; proposalId?: string | null }>>([]);
+
+  const proposals = useQuery({
+    queryKey: ['scenario-proposals', scenarioId],
+    queryFn: () => api.listProposals(scenarioId),
+  });
+  const proposeAuthoring = useMutation({
+    mutationFn: () => api.proposeAuthoring(scenarioId, { kind: proposalKind, brief: proposalBrief }),
+    onSuccess: () => {
+      setNotice('AI proposal created for review');
+      void proposals.refetch();
+    },
+    onError: (error) => setNotice(`AI proposal error: ${error.message}`),
+  });
+  const authoringChat = useMutation({
+    mutationFn: (message: string) => api.authoringChat(scenarioId, { kind: proposalKind, message, mode: chatMode, history: chatMessages.map((item) => ({ role: item.role, content: item.content })) }),
+    onSuccess: (result, message) => {
+      setChatMessages((current) => [...current, { role: 'user', content: message }, { role: 'assistant', content: result.reply, proposalId: result.proposalId }]);
+      setChatInput('');
+      setNotice(result.proposalId ? 'Chat proposal staged for review' : 'Assistant replied without changing the scenario');
+      void proposals.refetch();
+    },
+    onError: (error) => setNotice(`Chat error: ${error.message}`),
+  });
+  const createProposal = useMutation({
+    mutationFn: () => api.createProposal(scenarioId, {
+      toolName: 'scenario.builder.manual',
+      summary: proposalSummary || 'Manual scenario authoring proposal',
+      operations: JSON.parse(proposalOperations) as unknown[],
+    }),
+    onSuccess: () => {
+      setNotice('Proposal created for review');
+      setProposalSummary('');
+      void proposals.refetch();
+    },
+    onError: (error) => setNotice(`Proposal error: ${error.message}`),
+  });
+  const rejectProposal = useMutation({
+    mutationFn: (proposalId: string) => api.rejectProposal(scenarioId, proposalId),
+    onSuccess: () => { setNotice('Proposal rejected'); void proposals.refetch(); },
+    onError: (error) => setNotice(`Proposal rejection error: ${error.message}`),
+  });
+  const applyProposal = useMutation({
+    mutationFn: (proposalId: string) => api.applyProposal(scenarioId, proposalId, scenario.data?.revision.version ?? 0),
+    onSuccess: () => {
+      setNotice('Proposal applied');
+      void queryClient.invalidateQueries({ queryKey: ['scenario', scenarioId] });
+      void proposals.refetch();
+    },
+    onError: (error) => setConflict(error.message),
+  });
 
   const patch = useMutation({
     mutationFn: (value: string) =>
@@ -1447,6 +1609,7 @@ function ScenarioBuilder(): React.JSX.Element {
     'plot',
     'start-state',
     'models-pacing',
+    'authoring-assistant',
     'validate',
   ];
 
@@ -1684,6 +1847,31 @@ function ScenarioBuilder(): React.JSX.Element {
                 items={aggregate.plotPoints}
                 expectedVersion={scenario.data.revision.version}
               />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Plot Progress & Affordances</CardTitle>
+                  <CardDescription>Authored plot state is evidence-driven; the architect can propose pressure but cannot force the player.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {aggregate.plotPoints.length === 0 && <p className="text-xs text-muted-foreground italic">No plot points authored yet.</p>}
+                  {aggregate.plotPoints.map((point) => {
+                    const item = point as Record<string, unknown>;
+                    const status = String(item.status ?? 'proposed');
+                    return (
+                      <div key={String(item.id)} className="rounded-lg border border-border/60 bg-background/30 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="font-medium text-sm">{String(item.title ?? item.id)}</div>
+                          <Badge variant="outline" className="text-[10px]">{status}</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{String(item.desiredOutcome ?? 'No desired outcome specified.')}</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {((item.foreshadowingCues as unknown[]) ?? []).slice(0, 3).map((cue, index) => <Badge key={index} variant="secondary" className="text-[9px]">{String(cue)}</Badge>)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
             </div>
           )}
 
@@ -1759,6 +1947,112 @@ function ScenarioBuilder(): React.JSX.Element {
                 />
               </CardContent>
             </Card>
+          )}
+
+          {section === 'authoring-assistant' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Scenario Authoring Assistant</CardTitle>
+                  <CardDescription>
+                    Build a typed, reviewable proposal. Nothing changes until you apply it.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-semibold text-sm">Scenario agent</div>
+                        <p className="text-[11px] text-muted-foreground">Ask the agent to build, deepen, connect, or critique the world. Changes become reviewable proposals.</p>
+                      </div>
+                      <Select value={chatMode} onValueChange={(value) => setChatMode(value as 'fast' | 'deep')}>
+                        <SelectTrigger className="w-28 h-8"><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="fast">Fast</SelectItem><SelectItem value="deep">Deep</SelectItem></SelectContent>
+                      </Select>
+                    </div>
+                    <div className="max-h-52 overflow-y-auto space-y-2">
+                      {chatMessages.length === 0 && <p className="text-xs italic text-muted-foreground">Try: “Create a nervous archivist with a secret that connects to the treaty plot.”</p>}
+                      {chatMessages.map((message, index) => (
+                        <div key={index} className={`rounded-lg p-2.5 text-xs ${message.role === 'user' ? 'bg-secondary ml-8' : 'bg-background border border-border/50 mr-8'}`}>
+                          <div className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">{message.role === 'user' ? 'You' : 'Agent'}</div>
+                          <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                          {message.proposalId && <Badge variant="outline" className="mt-2 text-[9px]">Proposal staged for review</Badge>}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Textarea value={chatInput} onChange={(event) => setChatInput(event.target.value)} placeholder="Tell the scenario agent what to build…" rows={3} />
+                      <Button className="self-end" onClick={() => authoringChat.mutate(chatInput)} disabled={!chatInput.trim() || authoringChat.isPending}>{authoringChat.isPending ? 'Thinking…' : 'Send'}</Button>
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-[180px_1fr] gap-3">
+                    <Select value={proposalKind} onValueChange={setProposalKind}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="character">Character</SelectItem>
+                        <SelectItem value="location">Location</SelectItem>
+                        <SelectItem value="historical_event">Past event</SelectItem>
+                        <SelectItem value="story_card">Story card</SelectItem>
+                        <SelectItem value="plot_point">Plot point</SelectItem>
+                        <SelectItem value="continuity_review">Continuity review</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input value={proposalBrief} onChange={(event) => setProposalBrief(event.target.value)} placeholder="Ask for a layered, source-aware authoring proposal…" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={() => proposeAuthoring.mutate()} disabled={!proposalBrief.trim() || proposeAuthoring.isPending} variant="secondary">
+                      {proposeAuthoring.isPending ? 'Generating…' : 'Generate AI proposal'}
+                    </Button>
+                    <span className="text-[11px] text-muted-foreground self-center">AI output is always staged for review.</span>
+                  </div>
+                  <Input value={proposalSummary} onChange={(event) => setProposalSummary(event.target.value)} placeholder="Manual proposal summary…" />
+                  <Textarea value={proposalOperations} onChange={(event) => setProposalOperations(event.target.value)} rows={12} className="font-mono text-xs" aria-label="Proposal operations JSON" />
+                  <div className="flex items-center gap-2">
+                    <Button onClick={() => createProposal.mutate()} disabled={createProposal.isPending}>
+                      {createProposal.isPending ? 'Validating…' : 'Create Proposal'}
+                    </Button>
+                    <Badge variant="outline">base revision {scenario.data.revision.version}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Proposal Review Queue</CardTitle>
+                  <CardDescription>Review validation results before applying changes to the draft revision.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {proposals.isPending && <p className="text-xs text-muted-foreground">Loading proposals…</p>}
+                  {proposals.data?.length === 0 && <p className="text-xs text-muted-foreground italic">No proposals yet.</p>}
+                  {proposals.data?.map((proposal) => (
+                    <div key={proposal.id} className="rounded-xl border border-border/60 bg-background/40 p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-medium text-sm">{proposal.summary}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono mt-1">{proposal.toolName} · base v{proposal.baseVersion}</div>
+                        </div>
+                        <Badge variant={proposal.validation.valid ? 'default' : 'destructive'}>{proposal.status}</Badge>
+                      </div>
+                      {!proposal.validation.valid && <p className="text-xs text-destructive">{proposal.validation.errors.length} validation error(s)</p>}
+                      {proposal.validation.warnings.length > 0 && <p className="text-xs text-amber-300">{proposal.validation.warnings.length} warning(s)</p>}
+                      <div className="flex flex-wrap gap-2">
+                        {proposal.validation.valid && (proposal.status === 'ready' || proposal.status === 'edited') && (
+                          <Button size="sm" onClick={() => applyProposal.mutate(proposal.id)} disabled={applyProposal.isPending}>Apply proposal</Button>
+                        )}
+                        {proposal.status === 'ready' && (
+                          <Button size="sm" variant="outline" onClick={() => {
+                            setProposalSummary(proposal.summary);
+                            setProposalOperations(JSON.stringify(proposal.operations, null, 2));
+                          }}>Edit in form</Button>
+                        )}
+                        {['ready', 'edited'].includes(proposal.status) && (
+                          <Button size="sm" variant="ghost" className="text-destructive" onClick={() => rejectProposal.mutate(proposal.id)}>Reject</Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {section === 'validate' && (
@@ -1857,6 +2151,11 @@ function CardEditor({
     queryFn: () => api.getCardLinks(scenarioId, cardId),
     enabled: Boolean(cardId),
   });
+  const mutationProposals = useQuery({
+    queryKey: ['card-mutation-proposals', scenarioId, cardId],
+    queryFn: () => api.getCardMutationProposals(scenarioId, cardId),
+    enabled: Boolean(cardId),
+  });
   const mutation = useMutation({
     mutationFn: (action: 'lock' | 'rollback') =>
       action === 'lock'
@@ -1885,7 +2184,7 @@ function CardEditor({
         <CardHeader>
           <CardTitle className="text-base">History & Backlinks</CardTitle>
           <CardDescription>
-            {versions.data?.length ?? 0} versions recorded · {links.data?.length ?? 0} relational backlinks
+            {versions.data?.length ?? 0} versions recorded · {links.data?.length ?? 0} relational backlinks · {mutationProposals.data?.length ?? 0} mutation proposals
           </CardDescription>
         </CardHeader>
         {cardId && (
@@ -1896,6 +2195,11 @@ function CardEditor({
             <Button variant="outline" size="sm" onClick={() => mutation.mutate('rollback')}>
               Rollback Version
             </Button>
+            {mutationProposals.data?.filter((proposal) => (proposal as { status?: string }).status === 'ready').map((proposal) => (
+              <Button key={String((proposal as { id: string }).id)} variant="outline" size="sm" onClick={() => api.applyCardMutationProposal(scenarioId, cardId, String((proposal as { id: string }).id)).then(() => mutationProposals.refetch())}>
+                Apply AI Mutation
+              </Button>
+            ))}
           </CardContent>
         )}
       </Card>

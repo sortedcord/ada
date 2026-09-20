@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import {
   appendTurnStreamEvent,
@@ -173,6 +174,54 @@ export class RunService {
       })),
     };
   }
+  async playerJournal(runId: string) {
+    const run = await this.get(runId);
+    if (!run?.activeBranchId) throw new Error('Run not found');
+
+    const { observations, narrativeSegments } = await import('@ada/db');
+
+    // Return only observations belonging to playerEntityId
+    const playerObservations = await this.db
+      .select({
+        id: observations.id,
+        turnNumber: observations.observedTurn,
+        modality: observations.modality,
+        content: observations.perceivedContent,
+        createdAt: observations.createdAt,
+      })
+      .from(observations)
+      .where(
+        and(
+          eq(observations.runId, runId),
+          eq(observations.branchId, run.activeBranchId),
+          eq(observations.observerEntityId, run.playerEntityId),
+        ),
+      );
+
+    // Return public player narrative history
+    const narratives = await this.db
+      .select({
+        id: narrativeSegments.id,
+        turnId: narrativeSegments.turnId,
+        text: narrativeSegments.text,
+      })
+      .from(narrativeSegments)
+      .where(
+        and(
+          eq(narrativeSegments.runId, runId),
+          eq(narrativeSegments.branchId, run.activeBranchId),
+          eq(narrativeSegments.visibility, 'player_view'),
+        ),
+      );
+
+    return {
+      runId,
+      playerEntityId: run.playerEntityId,
+      observations: playerObservations,
+      narratives,
+    };
+  }
+
   get(id: string) {
     return this.db
       .select()

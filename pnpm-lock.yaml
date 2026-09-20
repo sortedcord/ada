@@ -214,21 +214,33 @@ importers:
 
   apps/api:
     dependencies:
-      '@ai-dungeon/config':
+      '@ada/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
+      '@ada/architect':
+        specifier: workspace:*
+        version: link:../../packages/architect
+      '@ada/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@ai-dungeon/contracts':
+      '@ada/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@ai-dungeon/db':
+      '@ada/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@ai-dungeon/domain':
+      '@ada/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@ai-dungeon/observability':
+      '@ada/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@ada/prompts':
+        specifier: workspace:*
+        version: link:../../packages/prompts
+      '@ada/scenario-tools':
+        specifier: workspace:*
+        version: link:../../packages/scenario-tools
       bullmq:
         specifier: ^5.81.5
         version: 5.81.5(supports-color@7.2.0)
@@ -246,9 +258,19 @@ importers:
         specifier: ^4.20.5
         version: 4.23.13
 
+  apps/scenario-mcp:
+    dependencies:
+      '@ada/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+    devDependencies:
+      tsx:
+        specifier: ^4.20.5
+        version: 4.23.13
+
   apps/web:
     dependencies:
-      '@ai-dungeon/config':
+      '@ada/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@radix-ui/react-select':
@@ -315,24 +337,30 @@ importers:
 
   apps/worker:
     dependencies:
-      '@ai-dungeon/ai':
+      '@ada/ai':
         specifier: workspace:*
         version: link:../../packages/ai
-      '@ai-dungeon/config':
+      '@ada/architect':
+        specifier: workspace:*
+        version: link:../../packages/architect
+      '@ada/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@ai-dungeon/db':
+      '@ada/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@ai-dungeon/domain':
+      '@ada/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@ai-dungeon/engine':
+      '@ada/engine':
         specifier: workspace:*
         version: link:../../packages/engine
-      '@ai-dungeon/observability':
+      '@ada/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@ada/retrieval':
+        specifier: workspace:*
+        version: link:../../packages/retrieval
       bullmq:
         specifier: ^5.58.5
         version: 5.81.5(supports-color@7.2.0)
@@ -349,9 +377,22 @@ importers:
 
   packages/ai: {}
 
+  packages/architect:
+    dependencies:
+      '@ada/domain':
+        specifier: workspace:*
+        version: link:../domain
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+    devDependencies:
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.4)(jiti@2.7.0)(lightningcss@1.32.0)(supports-color@7.2.0)(tsx@4.23.13)(yaml@2.9.1)
+
   packages/config:
     dependencies:
-      '@ai-dungeon/ai':
+      '@ada/ai':
         specifier: workspace:*
         version: link:../ai
       zod:
@@ -360,7 +401,7 @@ importers:
 
   packages/contracts:
     dependencies:
-      '@ai-dungeon/domain':
+      '@ada/domain':
         specifier: workspace:*
         version: link:../domain
       zod:
@@ -376,7 +417,10 @@ importers:
 
   packages/db:
     dependencies:
-      '@ai-dungeon/domain':
+      '@ada/architect':
+        specifier: workspace:*
+        version: link:../architect
+      '@ada/domain':
         specifier: workspace:*
         version: link:../domain
       drizzle-orm:
@@ -401,13 +445,13 @@ importers:
 
   packages/engine:
     dependencies:
-      '@ai-dungeon/ai':
+      '@ada/ai':
         specifier: workspace:*
         version: link:../ai
-      '@ai-dungeon/db':
+      '@ada/db':
         specifier: workspace:*
         version: link:../db
-      '@ai-dungeon/domain':
+      '@ada/domain':
         specifier: workspace:*
         version: link:../domain
 
@@ -424,18 +468,52 @@ importers:
 
   packages/retrieval:
     dependencies:
-      '@ai-dungeon/domain':
+      '@ada/db':
+        specifier: workspace:*
+        version: link:../db
+      '@ada/domain':
         specifier: workspace:*
         version: link:../domain
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(postgres@3.4.9)
+
+  packages/scenario-tools:
+    dependencies:
+      '@ada/domain':
+        specifier: workspace:*
+        version: link:../domain
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+    devDependencies:
+      '@ada/testkit':
+        specifier: workspace:*
+        version: link:../testkit
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.4)(jiti@2.7.0)(lightningcss@1.32.0)(supports-color@7.2.0)(tsx@4.23.13)(yaml@2.9.1)
 
   packages/testkit:
     dependencies:
-      '@ai-dungeon/db':
+      '@ada/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@ada/config':
+        specifier: workspace:*
+        version: link:../config
+      '@ada/db':
         specifier: workspace:*
         version: link:../db
-      '@ai-dungeon/domain':
+      '@ada/domain':
         specifier: workspace:*
         version: link:../domain
+      '@ada/retrieval':
+        specifier: workspace:*
+        version: link:../retrieval
+      '@ada/worker':
+        specifier: workspace:*
+        version: link:../../apps/worker
       '@testcontainers/postgresql':
         specifier: ^11.14.0
         version: 11.14.0(supports-color@7.2.0)

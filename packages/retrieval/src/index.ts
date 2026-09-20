@@ -27,3 +27,8 @@ export interface RetrievalService {
   retrieve(request: RetrievalRequest): Promise<readonly RetrievalChunk[]>;
 }
 export * from './service.js';
+export * from './projectors.js';
+export * from './sql-service.js';
+export * from './indexer.js';
+export * from './embedding-lifecycle.js';
+export * from './memory-curator.js';

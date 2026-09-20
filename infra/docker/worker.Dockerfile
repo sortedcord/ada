@@ -3,22 +3,26 @@ WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/worker/package.json apps/worker/package.json
+COPY packages/architect/package.json packages/architect/package.json
 COPY packages/ai/package.json packages/ai/package.json
 COPY packages/config/package.json packages/config/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/domain/package.json packages/domain/package.json
 COPY packages/engine/package.json packages/engine/package.json
 COPY packages/observability/package.json packages/observability/package.json
+COPY packages/retrieval/package.json packages/retrieval/package.json
 RUN pnpm install --frozen-lockfile
 COPY tsconfig.base.json turbo.json . ./
 COPY apps/worker apps/worker
+COPY packages/architect packages/architect
 COPY packages/ai packages/ai
 COPY packages/config packages/config
 COPY packages/db packages/db
 COPY packages/domain packages/domain
 COPY packages/engine packages/engine
 COPY packages/observability packages/observability
-RUN pnpm --filter @ada/worker build
+COPY packages/retrieval packages/retrieval
+RUN pnpm --filter @ada/architect --filter @ada/retrieval --filter @ada/worker build
 RUN pnpm --filter @ada/worker deploy --prod /prod/worker
 
 FROM node:24-alpine3.22 AS runtime

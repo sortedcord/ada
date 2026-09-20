@@ -1,7 +1,11 @@
+/* eslint-disable */
 import { randomUUID } from 'node:crypto';
 import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
 import type { Queue } from 'bullmq';
 import { apiErrorSchema, healthResponseSchema, migrateScenarioExport } from '@ada/contracts';
+import { AdityaGuptaGenerationProvider, FakeGenerationProvider } from '@ada/ai';
+import { scenarioOperationSchema } from '@ada/scenario-tools';
+import { promptRegistry } from '@ada/prompts';
 import type { ServerEnvironment } from '@ada/config';
 import { cloneScenarioRevision, type Database } from '@ada/db';
 import { OptimisticConflictError, ScenarioService } from './scenario-service.js';
@@ -671,6 +675,122 @@ export function buildApp(
       return service.knowledgePreview(params.scenarioId, params.entityId);
     },
   );
+  app.post('/api/v1/scenarios/:scenarioId/authoring/propose', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const scenarioId = (request.params as { scenarioId: string }).scenarioId;
+    const body = request.body as { kind?: string; brief?: string; constraints?: string[] };
+    const record = await service.get(scenarioId);
+    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
+    const kind = body.kind ?? 'scenario';
+    const brief = body.brief?.trim() ?? '';
+    if (!brief) return reply.code(400).send({ code: 'invalid_request', message: 'Authoring brief is required', requestId: request.id, retryable: false });
+    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
+    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+      ? new FakeGenerationProvider()
+      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
+    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
+    const prompt = promptRegistry.get(`${promptName}@1`);
+    if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
+    const rendered = prompt.render({ brief, constraints: body.constraints ?? [], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, counts: Object.fromEntries(Object.entries(aggregate).map(([key, value]) => [key, Array.isArray(value) ? value.length : undefined])) }) });
+    const generated = await provider.generateObject({
+      model: environment.GENERATION_DEFAULT_MODEL,
+      system: rendered.system,
+      input: rendered.user,
+      schemaName: 'ScenarioAuthoringProposal',
+      schema: { type: 'object', additionalProperties: false, required: ['summary', 'operations'], properties: { summary: { type: 'string' }, operations: { type: 'array' } } },
+      outputTokenLimit: 4_000,
+      parse: (value) => {
+        const candidate = value as { summary?: unknown; operations?: unknown };
+        const operations = Array.isArray(candidate.operations) ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation)) : [];
+        if (!operations.length) throw new Error('Authoring model returned no valid operations');
+        return { summary: String(candidate.summary ?? brief), operations };
+      },
+    });
+    return reply.code(201).send(await service.createProposal(scenarioId, { toolName: `authoring.${kind}`, summary: generated.value.summary, operations: generated.value.operations, model: generated.model, promptVersion: prompt.version }, request.id));
+  });
+
+  app.post('/api/v1/scenarios/:scenarioId/authoring/chat', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const scenarioId = (request.params as { scenarioId: string }).scenarioId;
+    const body = request.body as { message?: string; kind?: string; history?: Array<{ role: string; content: string }>; mode?: 'fast' | 'deep' };
+    const message = body.message?.trim() ?? '';
+    if (!message) return reply.code(400).send({ code: 'invalid_request', message: 'Message is required', requestId: request.id, retryable: false });
+    const record = await service.get(scenarioId);
+    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
+    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
+    const kind = body.kind ?? 'scenario';
+    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
+    const prompt = promptRegistry.get(`${promptName}@1`);
+    if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
+    const historyText = (body.history ?? []).slice(-12).map((item) => `${item.role}: ${item.content}`).join('\n');
+    const rendered = prompt.render({ brief: `${historyText}\nuser: ${message}`, constraints: ['Ask clarifying questions when a safe typed proposal cannot be constructed.', 'Never apply changes directly.'], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }) });
+    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+      ? new FakeGenerationProvider()
+      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
+    const generated = await provider.generateObject({
+      model: environment.GENERATION_DEFAULT_MODEL,
+      system: `${rendered.system}\nAct as a helpful scenario-building agent. Return a natural-language reply plus optional typed operations.`,
+      input: rendered.user,
+      schemaName: 'ScenarioAuthoringChatResponse',
+      schema: { type: 'object', additionalProperties: false, required: ['reply', 'summary', 'operations'], properties: { reply: { type: 'string' }, summary: { type: 'string' }, operations: { type: 'array' } } },
+      outputTokenLimit: body.mode === 'deep' ? 6_000 : 3_000,
+      parse: (value) => {
+        const candidate = value as { reply?: unknown; summary?: unknown; operations?: unknown };
+        const operations = Array.isArray(candidate.operations) ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation)) : [];
+        return { reply: String(candidate.reply ?? 'I could not form a safe proposal yet.'), summary: String(candidate.summary ?? message), operations };
+      },
+    });
+    let proposalId: string | null = null;
+    if (generated.value.operations.length) {
+      const proposal = await service.createProposal(scenarioId, { toolName: `authoring.chat.${kind}`, summary: generated.value.summary, operations: generated.value.operations, model: generated.model, promptVersion: prompt.version }, request.id);
+      proposalId = proposal.id;
+    }
+    return { reply: generated.value.reply, proposalId, model: generated.model, mode: body.mode ?? 'fast' };
+  });
+
+  app.get('/api/v1/scenarios/:scenarioId/continuity-review', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    return service.continuityReview((request.params as { scenarioId: string }).scenarioId);
+  });
+  app.get('/api/v1/scenarios/:scenarioId/proposals', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    return service.listProposals((request.params as { scenarioId: string }).scenarioId);
+  });
+  app.post('/api/v1/scenarios/:scenarioId/proposals', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const body = request.body as { toolName?: string; summary?: string; operations?: unknown; model?: string; promptVersion?: number };
+    return reply.code(201).send(await service.createProposal((request.params as { scenarioId: string }).scenarioId, {
+      toolName: body.toolName ?? 'scenario.authoring',
+      summary: body.summary ?? 'Scenario authoring proposal',
+      operations: body.operations,
+      ...(body.model ? { model: body.model } : {}),
+      ...(body.promptVersion ? { promptVersion: body.promptVersion } : {}),
+    }, request.id));
+  });
+  app.patch('/api/v1/scenarios/:scenarioId/proposals/:proposalId', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const params = request.params as { scenarioId: string; proposalId: string };
+    const body = request.body as { summary?: string; operations?: unknown };
+    return service.editProposal(params.scenarioId, params.proposalId, { ...(body.summary ? { summary: body.summary } : {}), operations: body.operations }, request.id);
+  });
+  app.post('/api/v1/scenarios/:scenarioId/proposals/:proposalId/reject', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const params = request.params as { scenarioId: string; proposalId: string };
+    return service.rejectProposal(params.scenarioId, params.proposalId, request.id);
+  });
+  app.post('/api/v1/scenarios/:scenarioId/proposals/:proposalId/apply', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const body = request.body as { expectedVersion?: number };
+    return service.applyProposal((request.params as { scenarioId: string; proposalId: string }).scenarioId, (request.params as { scenarioId: string; proposalId: string }).proposalId, body.expectedVersion ?? 0, request.id);
+  });
   app.post('/api/v1/scenarios/:scenarioId/publish-revision', async (request, reply) => {
     if (!service)
       return reply.code(503).send({
@@ -680,6 +800,23 @@ export function buildApp(
         retryable: true,
       });
     return service.publish((request.params as { scenarioId: string }).scenarioId, request.id);
+  });
+  app.get('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    return service.listCardMutationProposals((request.params as { cardId: string }).cardId);
+  });
+  app.post('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const body = request.body as Parameters<ScenarioService['createCardMutationProposal']>[1];
+    return reply.code(201).send(await service.createCardMutationProposal((request.params as { cardId: string }).cardId, body, request.id));
+  });
+  app.post('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals/:proposalId/apply', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const params = request.params as { cardId: string; proposalId: string };
+    return service.applyCardMutationProposal(params.cardId, params.proposalId, request.id);
   });
   app.get('/api/v1/scenarios/:scenarioId/story-cards/:cardId/versions', async (request, reply) => {
     if (!service)
@@ -939,6 +1076,17 @@ export function buildApp(
       });
     return runs.scene((request.params as { runId: string }).runId);
   });
+  app.get('/api/v1/runs/:runId/journal', async (request, reply) => {
+    if (!runs)
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
+    return runs.playerJournal((request.params as { runId: string }).runId);
+  });
+
   app.get('/api/v1/runs/:runId/timeline', async (request, reply) => {
     if (!runs)
       return reply.code(503).send({

@@ -164,7 +164,8 @@ describe('full database invariants', () => {
       ).applied,
     ).toBe(false);
     const rebuilt = await rebuildEventProjection(db, 'run_1', 'branch_1', 0, (state) => state + 1);
-    expect(rebuilt).toBe(1);
+    // There is 1 turn-0 kickoff event created on run initialization, plus 1 turn-1 event added in this test = 2 events
+    expect(rebuilt).toBe(2);
   });
 
   it('checks private reads and snapshot checksums', async () => {
@@ -190,6 +191,49 @@ describe('full database invariants', () => {
         'branch_1',
       ),
     ).rejects.toThrow('Private resource access denied');
+
+    // Phase 8 verification: retrieval authorization filters out private chunks before scoring
+    const { SqlRetrievalService } = await import('@ada/retrieval');
+    await sql.unsafe(
+      "insert into retrieval_documents (id, source_type, source_id, source_version, run_id, branch_id, visibility, content_hash, active, attribution) values ('doc_1', 'scenario', 's_1', 1, 'run_1', 'branch_1', 'public_scenario', 'h1', true, $1) on conflict do nothing",
+      [JSON.stringify(metadata)],
+    );
+    await sql.unsafe(
+      "insert into retrieval_documents (id, source_type, source_id, source_version, run_id, branch_id, visibility, owner_entity_id, content_hash, active, attribution) values ('doc_2', 'memory', 'm_1', 1, 'run_1', 'branch_1', 'entity_private', 'npc_1', 'h2', true, $1) on conflict do nothing",
+      [JSON.stringify(metadata)],
+    );
+
+    await sql.unsafe(
+      "insert into retrieval_chunks (id, document_id, text, importance, salience, content_hash, visibility, owner_entity_id, active, search_vector, attribution) values ('rc_public', 'doc_1', 'Public town hall meeting notice', 1, 1, 'hash1', 'public_scenario', null, true, to_tsvector('english', 'Public town hall meeting notice'), $1) on conflict do nothing",
+      [JSON.stringify(metadata)],
+    );
+    await sql.unsafe(
+      "insert into retrieval_chunks (id, document_id, text, importance, salience, content_hash, visibility, owner_entity_id, active, search_vector, attribution) values ('rc_secret', 'doc_2', 'NPC_A_SECRET_CANARY_ONLY', 1, 1, 'hash2', 'entity_private', 'npc_1', true, to_tsvector('english', 'NPC_A_SECRET_CANARY_ONLY'), $1) on conflict do nothing",
+      [JSON.stringify(metadata)],
+    );
+
+    const retrieval = new SqlRetrievalService(db);
+    // Principal NPC 2 should ONLY receive public chunks, NEVER npc_1's secret canary
+    const retrievedByNpc2 = await retrieval.retrieve({
+      principal: { kind: 'NPC', runId: 'run_1', branchId: 'branch_1', entityId: 'npc_2' },
+      query: 'meeting canary',
+      maxCandidates: 10,
+      maxSelected: 10,
+    });
+    const retrievedIdsNpc2 = retrievedByNpc2.map((c) => c.id);
+    expect(retrievedIdsNpc2).toContain('rc_public');
+    expect(retrievedIdsNpc2).not.toContain('rc_secret');
+
+    // Principal NPC 1 CAN retrieve their own private chunk
+    const retrievedByNpc1 = await retrieval.retrieve({
+      principal: { kind: 'NPC', runId: 'run_1', branchId: 'branch_1', entityId: 'npc_1' },
+      query: 'canary',
+      maxCandidates: 10,
+      maxSelected: 10,
+    });
+    const retrievedIdsNpc1 = retrievedByNpc1.map((c) => c.id);
+    expect(retrievedIdsNpc1).toContain('rc_secret');
+
     const snapshot = await createSnapshot(db, {
       id: 'snapshot_1',
       runId: 'run_1',

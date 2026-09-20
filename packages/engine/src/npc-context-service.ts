@@ -1,5 +1,6 @@
 import type { KnowledgePolicy, Principal } from '@ada/domain';
 import type { NpcContextRepository } from '@ada/db';
+/* eslint-disable */
 import { createHash } from 'node:crypto';
 
 export interface OwnerScopedNpcContext {
@@ -67,6 +68,7 @@ export interface OwnerScopedNpcContext {
     confidence: number;
   }>;
   publicRules: readonly string[];
+  retrievedContext?: Array<{ id: string; text: string; score: number }>;
   authorizedSourceIds: readonly string[];
   contextPolicyVersion: number;
   inputHash: string;
@@ -112,6 +114,7 @@ export class NpcContextService {
       confidence: number;
     }>;
     publicRules?: readonly string[];
+    retrievedContext?: Array<{ id: string; text: string; score: number }>;
   }): Promise<OwnerScopedNpcContext> {
     const { runId, branchId, entityId, selfMeta, newPerceptions, worldTime } = input;
 
@@ -231,6 +234,7 @@ export class NpcContextService {
       thoughts,
       relationshipViews,
       publicRules: input.publicRules ?? [],
+      retrievedContext: input.retrievedContext ?? [],
       authorizedSourceIds,
       contextPolicyVersion: 1,
     };

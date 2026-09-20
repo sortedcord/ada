@@ -11,17 +11,21 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests --config ../../vitest.config.ts",
-    "test:integration": "vitest run --config ../../vitest.integration.config.ts"
+    "test:integration": "vitest run --config ../../vitest.integration.config.ts",
+    "lint": "eslint src"
   },
   "dependencies": {
-    "@ada/db": "workspace:*",
+    "@ada/ai": "workspace:*",
+    "@ada/config": "workspace:*",
     "@ada/domain": "workspace:*",
-    "@testcontainers/postgresql": "^11.14.0",
-    "ioredis": "^5.11.1",
+    "@ada/db": "workspace:*",
+    "@ada/retrieval": "workspace:*",
+    "@ada/worker": "workspace:*",
     "postgres": "^3.4.9",
-    "testcontainers": "^11.14.0"
+    "ioredis": "^5.11.1",
+    "testcontainers": "^11.14.0",
+    "@testcontainers/postgresql": "^11.14.0"
   }
 }

@@ -1,14 +1,22 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { and, desc, eq, ilike, sql } from 'drizzle-orm';
 import { validateScenarioAggregate, type ScenarioAggregate } from '@ada/domain';
+import { critiqueStoryCardMutation } from '@ada/architect';
+import {
+  scenarioOperationSchema,
+  validateOperations,
+} from '@ada/scenario-tools';
 import {
   auditLog,
   rollbackStoryCard,
+  mutateStoryCard,
   scenarioRevisions,
   scenarios,
   storyCardLinks,
   storyCardVersions,
   storyCards,
+  scenarioProposals,
+  storyCardMutationProposals,
   type Database,
   withTransactionRetry,
 } from '@ada/db';
@@ -291,6 +299,21 @@ export class ScenarioService {
     return validateScenarioAggregate(record.revision.aggregate as ScenarioAggregate);
   }
 
+  async continuityReview(scenarioId: string) {
+    const record = await this.get(scenarioId);
+    if (!record) throw new Error('Scenario not found');
+    const aggregate = record.revision.aggregate as ScenarioAggregate;
+    const validation = validateScenarioAggregate(aggregate);
+    const entityIds = new Set(aggregate.entities.map((entity) => entity.id));
+    const locationIds = new Set(aggregate.locations.map((location) => location.id));
+    const findings = [...validation.errors, ...validation.warnings];
+    for (const card of aggregate.storyCards) {
+      if (card.scope.ownerEntityId && !entityIds.has(card.scope.ownerEntityId)) findings.push({ path: `storyCards.${card.id}.scope.ownerEntityId`, message: 'Card owner is missing', severity: 'error' as const, section: 'cards', resourceId: card.id });
+      if (card.scope.locationId && !locationIds.has(card.scope.locationId)) findings.push({ path: `storyCards.${card.id}.scope.locationId`, message: 'Card location is missing', severity: 'error' as const, section: 'cards', resourceId: card.id });
+    }
+    return { scenarioId, revisionId: record.revision.id, version: record.revision.version, valid: findings.every((finding) => finding.severity !== 'error'), findings };
+  }
+
   async patch(
     scenarioId: string,
     expectedVersion: number,
@@ -516,6 +539,186 @@ export class ScenarioService {
       attribution: { source: 'player', actorId, sourceIds: [record.revision.id] },
     });
     return aggregate[collection];
+  }
+
+  async createProposal(
+    scenarioId: string,
+    input: {
+      toolName: string;
+      summary: string;
+      operations: unknown;
+      model?: string;
+      promptVersion?: number;
+    },
+    actorId = 'local-system',
+  ) {
+    const record = await this.get(scenarioId);
+    if (!record) throw new Error('Scenario not found');
+    if (record.revision.status === 'published') throw new Error('Published revisions are immutable');
+    const operations = Array.isArray(input.operations)
+      ? input.operations.map((operation) => scenarioOperationSchema.parse(operation))
+      : [];
+    if (operations.length === 0) throw new Error('A proposal must contain at least one operation');
+    const checked = validateOperations(record.revision.aggregate as ScenarioAggregate, operations);
+    const id = `proposal_${randomUUID().replaceAll('-', '')}`;
+    const [proposal] = await this.db.insert(scenarioProposals).values({
+      id,
+      scenarioId,
+      revisionId: record.revision.id,
+      baseVersion: record.revision.version,
+      toolName: input.toolName,
+      summary: input.summary,
+      operations,
+      validation: { valid: checked.valid, errors: checked.errors, warnings: checked.warnings },
+      model: input.model,
+      promptVersion: input.promptVersion,
+      status: checked.valid ? 'ready' : 'failed',
+      attribution: { source: 'player', actorId, sourceIds: [record.revision.id] },
+    }).returning();
+    if (!proposal) throw new Error('Proposal creation failed');
+    return proposal;
+  }
+
+  async listProposals(scenarioId: string) {
+    return this.db.select().from(scenarioProposals).where(eq(scenarioProposals.scenarioId, scenarioId)).orderBy(desc(scenarioProposals.createdAt));
+  }
+
+  async editProposal(scenarioId: string, proposalId: string, input: { summary?: string; operations: unknown }, actorId = 'local-system') {
+    const record = await this.get(scenarioId);
+    if (!record) throw new Error('Scenario not found');
+    const [proposal] = await this.db.select().from(scenarioProposals).where(and(eq(scenarioProposals.id, proposalId), eq(scenarioProposals.scenarioId, scenarioId))).limit(1);
+    if (!proposal) throw new Error('Scenario proposal not found');
+    if (!['ready', 'edited'].includes(proposal.status)) throw new Error(`Proposal is ${proposal.status}`);
+    if (record.revision.version !== proposal.baseVersion) {
+      await this.db.update(scenarioProposals).set({ status: 'stale', updatedAt: new Date() }).where(eq(scenarioProposals.id, proposalId));
+      throw new OptimisticConflictError(record.revision);
+    }
+    const operations = Array.isArray(input.operations) ? input.operations.map((operation) => scenarioOperationSchema.parse(operation)) : [];
+    const checked = validateOperations(record.revision.aggregate as ScenarioAggregate, operations);
+    const [updated] = await this.db.update(scenarioProposals).set({ summary: input.summary ?? proposal.summary, operations, validation: { valid: checked.valid, errors: checked.errors, warnings: checked.warnings }, status: checked.valid ? 'edited' : 'failed', updatedAt: new Date(), version: proposal.version + 1, attribution: { source: 'player', actorId, sourceIds: [proposalId] } }).where(eq(scenarioProposals.id, proposalId)).returning();
+    if (!updated) throw new Error('Proposal update failed');
+    return updated;
+  }
+
+  async rejectProposal(scenarioId: string, proposalId: string, actorId = 'local-system') {
+    const [updated] = await this.db.update(scenarioProposals).set({ status: 'rejected', updatedAt: new Date(), version: sql`${scenarioProposals.version} + 1`, attribution: { source: 'player', actorId, sourceIds: [proposalId] } }).where(and(eq(scenarioProposals.id, proposalId), eq(scenarioProposals.scenarioId, scenarioId))).returning();
+    if (!updated) throw new Error('Scenario proposal not found');
+    return updated;
+  }
+
+  async applyProposal(scenarioId: string, proposalId: string, expectedVersion: number, actorId = 'local-system') {
+    return withTransactionRetry(this.db, async (tx) => {
+      const [proposal] = await tx.select().from(scenarioProposals).where(and(eq(scenarioProposals.id, proposalId), eq(scenarioProposals.scenarioId, scenarioId))).limit(1);
+      if (!proposal) throw new Error('Scenario proposal not found');
+      if (!['ready', 'edited'].includes(proposal.status)) throw new Error(`Proposal is ${proposal.status}`);
+      const [revision] = await tx.select().from(scenarioRevisions).where(eq(scenarioRevisions.id, proposal.revisionId)).limit(1);
+      if (!revision) throw new Error('Scenario revision not found');
+      if (revision.status === 'published') throw new Error('Published revisions are immutable');
+      if (revision.version !== expectedVersion || revision.version !== proposal.baseVersion) {
+        await tx.update(scenarioProposals).set({ status: 'stale', updatedAt: new Date() }).where(eq(scenarioProposals.id, proposalId));
+        throw new OptimisticConflictError(revision);
+      }
+      const operations = (proposal.operations as unknown[]).map((operation) => scenarioOperationSchema.parse(operation));
+      const checked = validateOperations(revision.aggregate as ScenarioAggregate, operations);
+      if (!checked.valid) throw new Error(checked.errors.map((error) => `${error.path}: ${error.message}`).join('; '));
+      const updated = await tx.update(scenarioRevisions).set({ aggregate: checked.aggregate, checksum: this.checksum(checked.aggregate), version: expectedVersion + 1, updatedAt: new Date() }).where(and(eq(scenarioRevisions.id, revision.id), eq(scenarioRevisions.version, expectedVersion))).returning();
+      if (!updated.length) throw new OptimisticConflictError(revision);
+
+      // Keep normalized story-card projections synchronized with the canonical aggregate.
+      for (const card of checked.aggregate.storyCards) {
+        await tx.insert(storyCards).values({
+          id: card.id,
+          revisionId: revision.id,
+          title: card.title,
+          cardType: card.cardType,
+          mutationPolicy: card.mutationPolicy,
+          locked: card.locked,
+          currentVersion: card.currentVersion,
+          attribution: { source: card.source, sourceIds: [revision.id, card.id] },
+        }).onConflictDoUpdate({
+          target: storyCards.id,
+          set: {
+            title: card.title,
+            cardType: card.cardType,
+            mutationPolicy: card.mutationPolicy,
+            locked: card.locked,
+            currentVersion: card.currentVersion,
+            updatedAt: new Date(),
+          },
+        });
+        await tx.insert(storyCardVersions).values({
+          id: `${card.id}_v${card.currentVersion}`,
+          cardId: card.id,
+          version: card.currentVersion,
+          body: card,
+          scope: JSON.stringify(card.scope),
+          source: card.source,
+          diff: [],
+          attribution: { source: card.source, sourceIds: [revision.id, card.id] },
+        }).onConflictDoNothing();
+      }
+      for (const link of checked.aggregate.storyCardLinks) {
+        await tx.insert(storyCardLinks).values({
+          id: link.id,
+          cardId: link.cardId,
+          targetType: link.targetType,
+          targetId: link.targetId,
+          relationType: link.relationType,
+          weight: link.weight,
+          attribution: { source: 'player', sourceIds: [revision.id, link.id] },
+        }).onConflictDoNothing();
+      }
+      await tx.update(scenarioProposals).set({ status: 'applied', appliedVersion: expectedVersion + 1, updatedAt: new Date() }).where(eq(scenarioProposals.id, proposalId));
+      await tx.insert(auditLog).values({ id: randomUUID(), actor: actorId, action: 'scenario.proposal.apply', resourceType: 'scenario_revision', resourceId: revision.id, requestId: actorId, beforeRef: { version: expectedVersion, proposalId }, afterRef: { version: expectedVersion + 1 }, attribution: { source: 'player', actorId, sourceIds: [revision.id, proposalId] } });
+      return updated[0];
+    });
+  }
+
+  async createCardMutationProposal(cardId: string, input: {
+    expectedVersion: number;
+    mode: 'ai_suggest' | 'ai_mutable';
+    path: string;
+    operations?: unknown[];
+    nextBody?: unknown;
+    scope: string;
+    sourceIds: string[];
+    sourceScopes: string[];
+    reason: string;
+    semanticSummary: string;
+    confidence: number;
+    contradictions?: string[];
+  }, actorId = 'local-system') {
+    const [card] = await this.db.select().from(storyCards).where(eq(storyCards.id, cardId)).limit(1);
+    if (!card) throw new Error('Story card not found');
+    const critique = critiqueStoryCardMutation({ ...input, cardId, locked: card.locked, targetScope: input.scope, contradictions: input.contradictions ?? [] }, new Set(input.sourceIds));
+    const id = `card_mutation_${randomUUID().replaceAll('-', '')}`;
+    const [proposal] = await this.db.insert(storyCardMutationProposals).values({
+      id, cardId, expectedVersion: input.expectedVersion, mode: input.mode, path: input.path,
+      operations: input.operations ?? [], sourceIds: input.sourceIds, sourceScopes: input.sourceScopes,
+      targetScope: input.scope, reason: input.reason, semanticSummary: input.semanticSummary,
+      confidence: input.confidence, contradictions: input.contradictions ?? [],
+      validation: critique, status: critique.valid ? 'ready' : 'failed',
+      attribution: { source: 'mutation', actorId, sourceIds: [cardId, ...input.sourceIds] },
+    }).returning();
+    if (!proposal) throw new Error('Card mutation proposal creation failed');
+    return proposal;
+  }
+
+  async listCardMutationProposals(cardId: string) {
+    return this.db.select().from(storyCardMutationProposals).where(eq(storyCardMutationProposals.cardId, cardId)).orderBy(desc(storyCardMutationProposals.createdAt));
+  }
+
+  async applyCardMutationProposal(cardId: string, proposalId: string, actorId = 'local-system') {
+    const [proposal] = await this.db.select().from(storyCardMutationProposals).where(and(eq(storyCardMutationProposals.id, proposalId), eq(storyCardMutationProposals.cardId, cardId))).limit(1);
+    if (!proposal) throw new Error('Card mutation proposal not found');
+    if (proposal.status !== 'ready') throw new Error(`Card mutation proposal is ${proposal.status}`);
+    if (proposal.mode !== 'ai_mutable') throw new Error('ai_suggest proposals require approval before mutation');
+    const operations = proposal.operations as Array<{ nextBody?: unknown }>;
+    const nextBody = operations[0]?.nextBody;
+    if (nextBody === undefined) throw new Error('Card mutation proposal has no next body');
+    const result = await mutateStoryCard(this.db, { cardId, expectedVersion: proposal.expectedVersion, nextBody, scope: proposal.targetScope, source: 'mutation', diff: { proposalId, path: proposal.path }, outboxKey: proposalId });
+    await this.db.update(storyCardMutationProposals).set({ status: 'applied', updatedAt: new Date(), version: sql`${storyCardMutationProposals.version} + 1`, attribution: { source: 'mutation', actorId, sourceIds: [proposalId] } }).where(eq(storyCardMutationProposals.id, proposalId));
+    return result;
   }
 
   async cardVersions(cardId: string) {

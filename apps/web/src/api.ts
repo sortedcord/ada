@@ -145,6 +145,13 @@ export const api = {
         createdAt: string;
       }>;
     }>(`/runs/${encodeURIComponent(runId)}/responses/${encodeURIComponent(segmentId)}/details`),
+  getJournal: (id: string) =>
+    request<{
+      runId: string;
+      playerEntityId: string;
+      observations: Array<{ id: string; turnNumber: number; modality: string; content: string }>;
+      narratives: Array<{ id: string; turnId: string; text: string }>;
+    }>(`/runs/${encodeURIComponent(id)}/journal`),
   getTimeline: (id: string) => request<TurnRecord[]>(`/runs/${encodeURIComponent(id)}/timeline`),
   getScene: (id: string) =>
     request<{ runId: string; branchId: string; worldTime?: string; entities: unknown[]; locations: unknown[] }>(
@@ -221,6 +228,20 @@ export const api = {
     }>(
       `/scenarios/${encodeURIComponent(id)}/entities/${encodeURIComponent(entityId)}/knowledge-preview`,
     ),
+  proposeAuthoring: (id: string, input: { kind: string; brief: string; constraints?: string[] }) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(id)}/authoring/propose`, { method: 'POST', body: JSON.stringify(input) }),
+  authoringChat: (id: string, input: { kind: string; message: string; history: Array<{ role: string; content: string }>; mode: 'fast' | 'deep' }) =>
+    request<{ reply: string; proposalId: string | null; model: string; mode: string }>(`/scenarios/${encodeURIComponent(id)}/authoring/chat`, { method: 'POST', body: JSON.stringify(input) }),
+  listProposals: (id: string) =>
+    request<Array<{ id: string; toolName: string; summary: string; operations: unknown[]; validation: { valid: boolean; errors: unknown[]; warnings: unknown[] }; status: string; baseVersion: number; createdAt: string }>>(`/scenarios/${encodeURIComponent(id)}/proposals`),
+  createProposal: (id: string, input: { toolName: string; summary: string; operations: unknown[]; model?: string; promptVersion?: number }) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(id)}/proposals`, { method: 'POST', body: JSON.stringify(input) }),
+  editProposal: (id: string, proposalId: string, input: { summary?: string; operations: unknown[] }) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(id)}/proposals/${encodeURIComponent(proposalId)}`, { method: 'PATCH', body: JSON.stringify(input) }),
+  rejectProposal: (id: string, proposalId: string) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(id)}/proposals/${encodeURIComponent(proposalId)}/reject`, { method: 'POST', body: JSON.stringify({}) }),
+  applyProposal: (id: string, proposalId: string, expectedVersion: number) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(id)}/proposals/${encodeURIComponent(proposalId)}/apply`, { method: 'POST', body: JSON.stringify({ expectedVersion }) }),
   validateScenario: (id: string) =>
     request<{
       valid: boolean;
@@ -238,6 +259,10 @@ export const api = {
       `/scenarios/${encodeURIComponent(id)}/${collection}/${encodeURIComponent(resourceId)}/duplicate`,
       { method: 'POST', body: JSON.stringify({ expectedVersion, newId }) },
     ),
+  getCardMutationProposals: (scenarioId: string, cardId: string) =>
+    request<unknown[]>(`/scenarios/${encodeURIComponent(scenarioId)}/story-cards/${encodeURIComponent(cardId)}/mutation-proposals`),
+  applyCardMutationProposal: (scenarioId: string, cardId: string, proposalId: string) =>
+    request<unknown>(`/scenarios/${encodeURIComponent(scenarioId)}/story-cards/${encodeURIComponent(cardId)}/mutation-proposals/${encodeURIComponent(proposalId)}/apply`, { method: 'POST', body: JSON.stringify({}) }),
   getCardVersions: (scenarioId: string, cardId: string) =>
     request<unknown[]>(
       `/scenarios/${encodeURIComponent(scenarioId)}/story-cards/${encodeURIComponent(cardId)}/versions`,
