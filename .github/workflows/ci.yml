@@ -1,49 +1,300 @@
 name: CI
+
 on:
-  push:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.event.merge_group.head_sha || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
 
 jobs:
   quality:
+    name: Build and code quality
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm format:check
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm test:integration
-      - run: pnpm test:e2e
-      - run: pnpm build
-      - run: cp .env.example .env
-      - run: docker compose config
-      - run: docker compose build
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-pnpm
+
+      # The repository has historical formatting debt. Check the complete PR
+      # diff so new or modified files cannot add to it without making every
+      # unrelated legacy file a permanent merge blocker.
+      - name: Check formatting of changed files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            BASE_SHA=$(git rev-parse HEAD^)
+          fi
+
+          mapfile -d '' changed_files < <(git diff --name-only --diff-filter=ACMR -z "$BASE_SHA" HEAD)
+          if ((${#changed_files[@]} == 0)); then
+            echo "No changed files to format-check."
+            exit 0
+          fi
+
+          printf 'Checking %s changed files with Prettier.\n' "${#changed_files[@]}"
+          pnpm exec prettier --check --ignore-unknown -- "${changed_files[@]}"
+
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check
+        run: pnpm typecheck
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Run unit tests
+        run: pnpm test
+
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-pnpm
+
+      # Integration tests import built workspace packages and use Testcontainers
+      # for isolated pgvector/PostgreSQL and Redis instances.
+      - name: Build workspace
+        run: pnpm build
+
+      - name: Run integration tests
+        run: pnpm turbo run test:integration --concurrency=2
+
+  browser-tests:
+    name: Browser and accessibility tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Build web app and dependencies
+        run: pnpm turbo run build --filter=@ada/web
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # The E2E suite includes e2e/a11y.spec.ts, so this covers both browser
+      # behavior and axe accessibility assertions without running it twice.
+      - name: Run Playwright suite
+        run: pnpm test:e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            test-results
+            playwright-report
+            apps/web/test-results
+            apps/web/playwright-report
+          if-no-files-found: warn
+          retention-days: 7
+
+  container-smoke:
+    name: Container build and live API smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Create CI environment
+        run: |
+          cp .env.example .env
+          cat >> .env <<'EOF'
+          GENERATION_ENABLED=true
+          GENERATION_PROVIDER=fake
+          GENERATION_API_KEY=fake
+          EOF
+
+      - name: Validate Compose configuration
+        run: docker compose config --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build application images
+        uses: docker/bake-action@v6
+        with:
+          files: compose.yaml
+          targets: api,worker,web
+          load: true
+          set: |
+            api.tags=ada-api:latest
+            api.cache-from=type=gha,scope=ada-api
+            api.cache-to=type=gha,scope=ada-api,mode=max
+            worker.tags=ada-worker:latest
+            worker.cache-from=type=gha,scope=ada-worker
+            worker.cache-to=type=gha,scope=ada-worker,mode=max
+            web.tags=ada-web:latest
+            web.cache-from=type=gha,scope=ada-web
+            web.cache-to=type=gha,scope=ada-web,mode=max
+
+      - name: Start the full stack
+        run: docker compose up --detach --no-build --wait --wait-timeout 180
+
+      - name: Exercise the live turn pipeline
+        run: node scripts/live-scenario-runner.mjs
+
+      - name: Capture container diagnostics
+        if: failure()
+        run: |
+          docker compose ps --all > docker-compose-ps.txt 2>&1 || true
+          docker compose logs --no-color > docker-compose.log 2>&1 || true
+
+      - name: Upload container diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-diagnostics
+          path: |
+            docker-compose-ps.txt
+            docker-compose.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose down --volumes --remove-orphans
 
   security:
+    name: Dependency, Dockerfile, and secret scanning
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version-file: .nvmrc, cache: pnpm }
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm audit --audit-level high
-      - uses: hadolint/hadolint-action@v3.1.0
+      - name: Check out complete history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Audit dependencies
+        run: pnpm audit --audit-level high
+
+      - name: Review dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+      - name: Lint API Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: infra/docker/api.Dockerfile
-      - uses: hadolint/hadolint-action@v3.1.0
+          failure-threshold: error
+
+      - name: Lint worker Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: infra/docker/worker.Dockerfile
-      - uses: hadolint/hadolint-action@v3.1.0
+          failure-threshold: error
+
+      - name: Lint web Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: infra/docker/web.Dockerfile
-      - uses: gitleaks/gitleaks-action@v2
+          failure-threshold: error
+
+      - name: Scan repository for committed secrets
+        uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  merge-gate:
+    name: Merge gate
+    if: always()
+    needs:
+      - quality
+      - unit-tests
+      - integration-tests
+      - browser-tests
+      - container-smoke
+      - security
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify all required checks passed
+        env:
+          QUALITY: ${{ needs.quality.result }}
+          UNIT_TESTS: ${{ needs.unit-tests.result }}
+          INTEGRATION_TESTS: ${{ needs.integration-tests.result }}
+          BROWSER_TESTS: ${{ needs.browser-tests.result }}
+          CONTAINER_SMOKE: ${{ needs.container-smoke.result }}
+          SECURITY: ${{ needs.security.result }}
+        run: |
+          failed=0
+          for check in \
+            "quality=$QUALITY" \
+            "unit-tests=$UNIT_TESTS" \
+            "integration-tests=$INTEGRATION_TESTS" \
+            "browser-tests=$BROWSER_TESTS" \
+            "container-smoke=$CONTAINER_SMOKE" \
+            "security=$SECURITY"; do
+            name=${check%%=*}
+            result=${check#*=}
+            if [[ "$result" != "success" ]]; then
+              echo "::error::$name finished with result: $result"
+              failed=1
+            fi
+          done
+          exit "$failed"

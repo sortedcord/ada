@@ -83,11 +83,10 @@ test('authors and validates a scenario through the builder UI', async ({ page })
   );
   await page.goto('/scenarios');
   await page.getByRole('link', { name: 'Create draft' }).click();
-  await page.getByLabel('Title').fill('My scenario');
-  await page.getByLabel('Slug').fill('my-scenario');
-  await page.getByRole('button', { name: 'Create draft' }).click();
-  await expect(page.getByRole('heading', { name: 'premise' })).toBeVisible();
-  await page.getByRole('button', { name: 'validate' }).click();
-  await page.getByRole('button', { name: 'Validate scenario' }).click();
+  await page.getByPlaceholder('e.g. Whispers of Eldoria').fill('My scenario');
+  await page.getByPlaceholder('e.g. whispers-of-eldoria').fill('my-scenario');
+  await page.getByRole('button', { name: 'Create Draft' }).click();
+  await expect(page.getByRole('heading', { name: 'World Identity & Premise' })).toBeVisible();
+  await page.getByRole('button', { name: 'Validate', exact: true }).first().click();
   await expect(page.getByText('Scenario is valid.')).toBeVisible();
 });

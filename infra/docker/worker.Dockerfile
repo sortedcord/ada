@@ -22,8 +22,8 @@ COPY packages/domain packages/domain
 COPY packages/engine packages/engine
 COPY packages/observability packages/observability
 COPY packages/retrieval packages/retrieval
-RUN pnpm --filter @ada/architect --filter @ada/retrieval --filter @ada/worker build
-RUN pnpm --filter @ada/worker deploy --prod /prod/worker
+RUN pnpm --filter @ada/architect --filter @ada/retrieval --filter @ada/worker build \
+  && pnpm --filter @ada/worker deploy --prod /prod/worker
 
 FROM node:24-alpine3.22 AS runtime
 WORKDIR /app

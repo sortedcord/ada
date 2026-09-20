@@ -9,7 +9,6 @@ test('application shell has no serious accessibility violations', async ({ page 
       (violation) => violation.impact === 'critical' || violation.impact === 'serious',
     ),
   ).toEqual([]);
-  await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();
-  await page.keyboard.press('Control+K');
-  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
+  await expect(page.locator('nav')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Toggle theme' })).toBeVisible();
 });

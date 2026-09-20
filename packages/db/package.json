@@ -14,7 +14,7 @@
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests --config ../../vitest.config.ts",
-    "test:integration": "vitest run --passWithNoTests --config ../../vitest.config.ts",
+    "test:integration": "vitest run --passWithNoTests --config ../../vitest.integration.config.ts",
     "db:migrate": "bash ../../scripts/db-migrate.sh",
     "db:check": "drizzle-kit check --config drizzle.config.ts && node dist/index.js check",
     "db:seed": "bash ../../scripts/db-seed.sh",
