@@ -13,7 +13,7 @@ const tools = [
   },
   {
     name: 'scenario_validate',
-    description: 'Validate the complete scenario aggregate and return errors and warnings, including structural problems and content that is generic, duplicated, clichéd, or too vague to support play.',
+    description: 'Validate the complete scenario aggregate and return structural/reference errors and warnings. Use scenario_continuity_review separately for a broader authoring critique; validation itself does not judge prose quality.',
     inputSchema: { type: 'object', required: ['scenarioId'], properties: { scenarioId: { type: 'string' } } },
   },
   {
@@ -47,7 +47,7 @@ const tools = [
   },
   {
     name: 'scenario_continuity_review',
-    description: 'Run a deterministic continuity and reference review over a scenario. Use it to catch orphaned references and visibility problems, and treat generic, cliché, duplicate, or same-voice content as a warning worth revising.',
+    description: 'Run a deterministic continuity and reference review over a scenario. It catches orphaned references and visibility problems; use the returned findings as the structural baseline before revising generic or same-voice content.',
     inputSchema: { type: 'object', required: ['scenarioId'], properties: { scenarioId: { type: 'string' } } },
   },
   {
