@@ -17,6 +17,8 @@ describe('prompt builders', () => {
     expect(characterAuthoringPrompt.version).toBe(2);
     expect(locationAuthoringPrompt.version).toBe(2);
     expect(rendered.system).toContain('specific speech style');
+    expect(rendered.system).toContain('# NATURALISTIC CHARACTER DIALOGUE');
+    expect(rendered.system).toContain('LOCAL PERSPECTIVE');
     expect(rendered.system).toContain('delve');
     expect(rendered.system).toContain('CRAFT EXAMPLE');
     expect(rendered.hash).toHaveLength(64);

@@ -685,11 +685,13 @@ export function buildApp(
     const kind = body.kind ?? 'scenario';
     const brief = body.brief?.trim() ?? '';
     if (!brief) return reply.code(400).send({ code: 'invalid_request', message: 'Authoring brief is required', requestId: request.id, retryable: false });
+    if (kind === 'continuity_review') return reply.code(400).send({ code: 'invalid_request', message: 'Use the authoring continuity-review endpoint for findings-only reviews', requestId: request.id, retryable: false });
     const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
     const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
       ? new FakeGenerationProvider()
       : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
-    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
+    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : undefined;
+    if (!promptName) return reply.code(400).send({ code: 'invalid_request', message: `Unsupported authoring kind: ${kind}`, requestId: request.id, retryable: false });
     const prompt = promptRegistry.get(`${promptName}@2`);
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
     const rendered = prompt.render({ brief, constraints: body.constraints ?? [], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, counts: Object.fromEntries(Object.entries(aggregate).map(([key, value]) => [key, Array.isArray(value) ? value.length : undefined])) }) });
@@ -748,6 +750,79 @@ export function buildApp(
       proposalId = proposal.id;
     }
     return { reply: generated.value.reply, proposalId, model: generated.model, mode: body.mode ?? 'fast' };
+  });
+
+  app.post('/api/v1/scenarios/:scenarioId/authoring/continuity-review', async (request, reply) => {
+    if (!service)
+      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+    const scenarioId = (request.params as { scenarioId: string }).scenarioId;
+    const record = await service.get(scenarioId);
+    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
+    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
+    const prompt = promptRegistry.get('scenario-continuity-review@2');
+    if (!prompt) throw new Error('Authoring prompt is not registered: scenario-continuity-review');
+    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+      ? new FakeGenerationProvider()
+      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
+    const rendered = prompt.render({
+      brief: 'Review the complete scenario and return findings only. Do not propose or apply operations.',
+      constraints: ['Return findings only.', 'Do not apply changes.', 'Distinguish deterministic structural issues from craft recommendations.'],
+      context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }),
+    });
+    const generated = await provider.generateObject({
+      model: environment.GENERATION_DEFAULT_MODEL,
+      system: rendered.system,
+      input: rendered.user,
+      schemaName: 'ScenarioContinuityReview',
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['findings'],
+        properties: {
+          findings: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['path', 'message', 'severity', 'section'],
+              properties: {
+                path: { type: 'string' },
+                message: { type: 'string' },
+                severity: { type: 'string', enum: ['error', 'warning'] },
+                section: { type: 'string' },
+                resourceId: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+      outputTokenLimit: 4_000,
+      parse: (value) => {
+        const candidate = value as { findings?: unknown };
+        const findings = Array.isArray(candidate.findings) ? candidate.findings.flatMap((item) => {
+          if (!item || typeof item !== 'object') return [];
+          const finding = item as Record<string, unknown>;
+          const severity = finding.severity === 'error' ? 'error' : finding.severity === 'warning' ? 'warning' : null;
+          if (!severity || typeof finding.path !== 'string' || typeof finding.message !== 'string' || typeof finding.section !== 'string') return [];
+          return [{
+            path: finding.path,
+            message: finding.message,
+            severity,
+            section: finding.section,
+            ...(typeof finding.resourceId === 'string' ? { resourceId: finding.resourceId } : {}),
+          }];
+        }) : [];
+        return { findings };
+      },
+    });
+    return {
+      scenarioId,
+      revisionId: record.revision.id,
+      version: record.revision.version,
+      findings: generated.value.findings,
+      model: generated.model,
+      promptVersion: prompt.version,
+    };
   });
 
   app.get('/api/v1/scenarios/:scenarioId/continuity-review', async (request, reply) => {

@@ -13,7 +13,7 @@ const tools = [
   },
   {
     name: 'scenario_validate',
-    description: 'Validate the complete scenario aggregate and return structural/reference errors and warnings. Use scenario_continuity_review separately for a broader authoring critique; validation itself does not judge prose quality.',
+    description: 'Validate the complete scenario aggregate and return structural/reference errors and warnings. This deterministic check does not judge prose quality.',
     inputSchema: { type: 'object', required: ['scenarioId'], properties: { scenarioId: { type: 'string' } } },
   },
   {
@@ -32,7 +32,6 @@ const tools = [
             { const: 'historical_event', description: 'A causal past event with conflicting accounts, scoped knowledge, evidence, and present-day residue.' },
             { const: 'story_card', description: 'A discoverable, player-facing fact or hook activated by behavior, objects, or consequences.' },
             { const: 'plot_point', description: 'A pressure point with multiple approaches, meaningful failure, escalation, and no forced player choice.' },
-            { const: 'continuity_review', description: 'A critique that also flags generic, cliché, interchangeable, or unearned content.' },
           ],
         },
         brief: { type: 'string', description: 'Ground the request in named entities, specific objects or sensory traces, tensions, and what must remain unknown. Avoid “mysterious,” “epic,” or “make it interesting” without particulars.' },
@@ -47,8 +46,13 @@ const tools = [
   },
   {
     name: 'scenario_continuity_review',
-    description: 'Run a deterministic continuity and reference review over a scenario. It catches orphaned references and visibility problems; use the returned findings as the structural baseline before revising generic or same-voice content.',
+    description: 'Run a deterministic structural and reference review over a scenario. It reports orphaned references and visibility problems; it does not assess prose quality or character voice.',
     inputSchema: { type: 'object', required: ['scenarioId'], properties: { scenarioId: { type: 'string' } } },
+  },
+  {
+    name: 'scenario_authoring_review',
+    description: 'Ask the authoring model for a findings-only continuity and craft review. It can flag contradictions, inaccessible secrets, duplicate concepts, generic hooks, cliché content, and same-voice writing. It never applies changes or creates a proposal.',
+    inputSchema: { type: 'object', required: ['scenarioId'], properties: { scenarioId: { type: 'string', description: 'Scenario to review; inspect it with scenario_get first.' } } },
   },
   {
     name: 'scenario_list_proposals',
@@ -76,6 +80,7 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
   if (name === 'scenario_propose') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/authoring/propose`, { method: 'POST', body: JSON.stringify({ kind: args.kind, brief: args.brief, constraints: args.constraints ?? [] }) });
   if (name === 'scenario_chat') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/authoring/chat`, { method: 'POST', body: JSON.stringify({ message: args.message, kind: args.kind ?? 'scenario', mode: args.mode ?? 'fast', history: args.history ?? [] }) });
   if (name === 'scenario_continuity_review') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/continuity-review`);
+  if (name === 'scenario_authoring_review') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/authoring/continuity-review`, { method: 'POST', body: JSON.stringify({}) });
   if (name === 'scenario_list_proposals') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/proposals`);
   if (name === 'scenario_apply_proposal') return callApi(`/scenarios/${encodeURIComponent(scenarioId)}/proposals/${encodeURIComponent(String(args.proposalId))}/apply`, { method: 'POST', body: JSON.stringify({ expectedVersion: args.expectedVersion }) });
   throw new Error(`Unknown tool: ${name}`);

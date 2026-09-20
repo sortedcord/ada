@@ -259,6 +259,21 @@ export const api = {
         resourceId?: string;
       }>;
     }>(`/scenarios/${encodeURIComponent(id)}/continuity-review`),
+  authoringContinuityReview: (id: string) =>
+    request<{
+      scenarioId: string;
+      revisionId: string;
+      version: number;
+      findings: Array<{
+        path: string;
+        message: string;
+        severity: 'error' | 'warning';
+        section: string;
+        resourceId?: string;
+      }>;
+      model: string;
+      promptVersion: number;
+    }>(`/scenarios/${encodeURIComponent(id)}/authoring/continuity-review`, { method: 'POST', body: JSON.stringify({}) }),
   duplicateResource: (
     id: string,
     collection: string,

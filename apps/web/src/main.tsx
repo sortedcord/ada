@@ -1563,8 +1563,14 @@ function ScenarioBuilder(): React.JSX.Element {
   const continuityReview = useMutation({
     mutationFn: () => api.continuityReview(scenarioId),
     onSuccess: (result) =>
-      setNotice(result.findings.length ? `${result.findings.length} continuity finding(s)` : 'Continuity review passed'),
+      setNotice(result.findings.length ? `${result.findings.length} structural finding(s)` : 'Structural continuity review passed'),
     onError: (error) => setNotice(`Continuity review error: ${error.message}`),
+  });
+  const authoringContinuityReview = useMutation({
+    mutationFn: () => api.authoringContinuityReview(scenarioId),
+    onSuccess: (result) =>
+      setNotice(result.findings.length ? `${result.findings.length} authoring finding(s)` : 'AI authoring review passed'),
+    onError: (error) => setNotice(`AI authoring review error: ${error.message}`),
   });
 
   const knowledge = useMutation({
@@ -2000,7 +2006,6 @@ function ScenarioBuilder(): React.JSX.Element {
                         <SelectItem value="historical_event">Past event</SelectItem>
                         <SelectItem value="story_card">Story card</SelectItem>
                         <SelectItem value="plot_point">Plot point</SelectItem>
-                        <SelectItem value="continuity_review">Continuity review</SelectItem>
                       </SelectContent>
                     </Select>
                     <Input value={proposalBrief} onChange={(event) => setProposalBrief(event.target.value)} placeholder="Ask for a layered, source-aware authoring proposal…" />
@@ -2022,18 +2027,36 @@ function ScenarioBuilder(): React.JSX.Element {
                   <div className="rounded-xl border border-border/60 bg-background/40 p-4 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <div className="font-semibold text-sm">Continuity check</div>
-                        <p className="text-[11px] text-muted-foreground">Ask the same authoring workflow to find orphaned references, contradictions, and visibility problems before you apply a proposal.</p>
+                        <div className="font-semibold text-sm">Continuity checks</div>
+                        <p className="text-[11px] text-muted-foreground">Run a deterministic structural check, or ask the authoring model for a craft review before applying a proposal.</p>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => continuityReview.mutate()} disabled={continuityReview.isPending}>
-                        {continuityReview.isPending ? 'Reviewing…' : 'Run continuity review'}
-                      </Button>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => continuityReview.mutate()} disabled={continuityReview.isPending || authoringContinuityReview.isPending}>
+                          {continuityReview.isPending ? 'Checking…' : 'Structural check'}
+                        </Button>
+                        <Button variant="secondary" size="sm" onClick={() => authoringContinuityReview.mutate()} disabled={continuityReview.isPending || authoringContinuityReview.isPending}>
+                          {authoringContinuityReview.isPending ? 'Asking AI…' : 'Ask AI reviewer'}
+                        </Button>
+                      </div>
                     </div>
                     {continuityReview.data && (
                       <div className="space-y-2">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Structural findings</div>
                         {continuityReview.data.findings.length === 0 && <p className="text-xs text-emerald-400">No structural continuity findings.</p>}
                         {continuityReview.data.findings.map((finding, index) => (
-                          <div key={`${finding.path}-${index}`} className={`rounded-lg border p-2.5 text-xs ${finding.severity === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-amber-500/30 bg-amber-500/10 text-amber-200'}`}>
+                          <div key={`structural-${finding.path}-${index}`} className={`rounded-lg border p-2.5 text-xs ${finding.severity === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-amber-500/30 bg-amber-500/10 text-amber-200'}`}>
+                            <div className="font-mono text-[10px] opacity-80">{finding.path}</div>
+                            <p className="mt-1">{finding.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {authoringContinuityReview.data && (
+                      <div className="space-y-2">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">AI authoring findings</div>
+                        {authoringContinuityReview.data.findings.length === 0 && <p className="text-xs text-emerald-400">No craft findings from the authoring reviewer.</p>}
+                        {authoringContinuityReview.data.findings.map((finding, index) => (
+                          <div key={`authoring-${finding.path}-${index}`} className={`rounded-lg border p-2.5 text-xs ${finding.severity === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-amber-500/30 bg-amber-500/10 text-amber-200'}`}>
                             <div className="font-mono text-[10px] opacity-80">{finding.path}</div>
                             <p className="mt-1">{finding.message}</p>
                           </div>
