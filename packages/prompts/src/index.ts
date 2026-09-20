@@ -19,6 +19,7 @@ export function registerPrompt<TInput>(definition: PromptDefinition<TInput>): vo
 
 export * from './builders.js';
 export * from './naturalistic-dialogue.js';
+export * from './anti-slop.js';
 export * from './authoring.js';
 
 for (const definition of [...registeredPromptDefinitions, ...authoringPromptDefinitions]) {
