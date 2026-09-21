@@ -84,6 +84,7 @@ export const api = {
       configured: boolean;
       provider: string;
       defaultModel: string;
+      authoringModel: string;
       maxResponseLength?: number;
       models?: Array<{ id: string; name?: string; provider: string }>;
     }>('/settings/models'),
@@ -103,6 +104,11 @@ export const api = {
     ),
   setActiveModel: (model: string) =>
     request<{ ok: boolean; activeModel: string }>('/settings/models/active', {
+      method: 'PUT',
+      body: JSON.stringify({ model }),
+    }),
+  setAuthoringModel: (model: string) =>
+    request<{ ok: boolean; authoringModel: string }>('/settings/models/authoring', {
       method: 'PUT',
       body: JSON.stringify({ model }),
     }),

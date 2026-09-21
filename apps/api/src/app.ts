@@ -97,6 +97,41 @@ export function buildApp(
         environment.DEBUG_INSPECTORS_ENABLED,
       )
     : undefined;
+  const readConfiguredModel = async (key: string, fallback: string): Promise<string> => {
+    if (!dependencies.db) return fallback;
+    try {
+      const { appSettings } = await import('@ada/db');
+      const { eq } = await import('drizzle-orm');
+      const [row] = await dependencies.db.select().from(appSettings).where(eq(appSettings.key, key)).limit(1);
+      return row?.value && typeof (row.value as { model?: unknown }).model === 'string'
+        ? (row.value as { model: string }).model
+        : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+  const readAuthoringModel = async (): Promise<string> =>
+    readConfiguredModel(
+      'authoring_model',
+      await readConfiguredModel('active_model', environment.GENERATION_DEFAULT_MODEL),
+    );
+  const writeConfiguredModel = async (key: string, model: string): Promise<void> => {
+    if (!dependencies.db) throw new Error('Database unavailable');
+    const { appSettings } = await import('@ada/db');
+    await dependencies.db
+      .insert(appSettings)
+      .values({
+        key,
+        value: { model },
+        attribution: { source: 'admin', sourceIds: [] },
+        version: 1,
+        schemaVersion: 1,
+      })
+      .onConflictDoUpdate({
+        target: appSettings.key,
+        set: { value: { model }, updatedAt: new Date() },
+      });
+  };
   app.addSchema({
     $id: 'ApiError',
     type: 'object',
@@ -202,22 +237,10 @@ export function buildApp(
   }));
 
   app.get('/api/v1/settings/models', async () => {
-    // 1. Check if model override exists in app_settings table
-    let activeModel = environment.GENERATION_DEFAULT_MODEL;
-    if (dependencies.db) {
-      try {
-        const { appSettings } = await import('@ada/db');
-        const { eq } = await import('drizzle-orm');
-        const [row] = await dependencies.db.select().from(appSettings).where(eq(appSettings.key, 'active_model')).limit(1);
-        if (row?.value && typeof (row.value as any).model === 'string') {
-          activeModel = (row.value as any).model;
-        }
-      } catch {
-        // fallback to env
-      }
-    }
+    const activeModel = await readConfiguredModel('active_model', environment.GENERATION_DEFAULT_MODEL);
+    const authoringModel = await readConfiguredModel('authoring_model', activeModel);
 
-    // 2. Discover available models from the provider using current API credentials
+    // Discover available models from the provider using current API credentials
     let discoveredModels: Array<{ id: string; name?: string }> = [];
     if (environment.GENERATION_ENABLED && environment.GENERATION_API_KEY) {
       try {
@@ -259,6 +282,7 @@ export function buildApp(
       configured: environment.GENERATION_ENABLED,
       provider: environment.GENERATION_PROVIDER,
       defaultModel: activeModel,
+      authoringModel,
       maxResponseLength: environment.GENERATION_MAX_RESPONSE_LENGTH,
       models: discoveredModels.map((m) => ({
         provider: environment.GENERATION_PROVIDER,
@@ -303,6 +327,18 @@ export function buildApp(
       return { ok: true, activeModel: model };
     } catch (err: any) {
       return reply.code(500).send({ error: err?.message || 'Failed to update active model' });
+    }
+  });
+
+  app.put('/api/v1/settings/models/authoring', async (request, reply) => {
+    const body = (request.body ?? {}) as { model?: string };
+    const model = typeof body.model === 'string' ? body.model.trim() : '';
+    if (!model) return reply.code(400).send({ error: 'Model identifier required' });
+    try {
+      await writeConfiguredModel('authoring_model', model);
+      return { ok: true, authoringModel: model };
+    } catch (err: any) {
+      return reply.code(500).send({ error: err?.message || 'Failed to update scenario authoring model' });
     }
   });
 
@@ -696,7 +732,7 @@ export function buildApp(
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
     const rendered = prompt.render({ brief, constraints: body.constraints ?? [], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, counts: Object.fromEntries(Object.entries(aggregate).map(([key, value]) => [key, Array.isArray(value) ? value.length : undefined])) }) });
     const generated = await provider.generateObject({
-      model: environment.GENERATION_DEFAULT_MODEL,
+      model: await readAuthoringModel(),
       system: rendered.system,
       input: rendered.user,
       schemaName: 'ScenarioAuthoringProposal',
@@ -732,7 +768,7 @@ export function buildApp(
       ? new FakeGenerationProvider()
       : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
     const generated = await provider.generateObject({
-      model: environment.GENERATION_DEFAULT_MODEL,
+      model: await readAuthoringModel(),
       system: `${rendered.system}\nAct as a helpful scenario-building agent. Return a natural-language reply plus optional typed operations.`,
       input: rendered.user,
       schemaName: 'ScenarioAuthoringChatResponse',
@@ -770,7 +806,7 @@ export function buildApp(
       context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }),
     });
     const generated = await provider.generateObject({
-      model: environment.GENERATION_DEFAULT_MODEL,
+      model: await readAuthoringModel(),
       system: rendered.system,
       input: rendered.user,
       schemaName: 'ScenarioContinuityReview',
