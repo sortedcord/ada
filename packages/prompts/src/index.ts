@@ -17,6 +17,7 @@ export function registerPrompt<TInput>(definition: PromptDefinition<TInput>): vo
   promptRegistry.set(key, definition);
 }
 
+export * from './anti-slop.js';
 export * from './builders.js';
 export * from './naturalistic-dialogue.js';
 export * from './anti-slop.js';
