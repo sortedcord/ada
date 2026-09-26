@@ -2,11 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import postgres from 'postgres';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import {
-  createDatabase,
-  createRunFromPublishedRevision,
-  snapshotChecksum,
-} from '@ada/db';
+import { createDatabase, createRunFromPublishedRevision, snapshotChecksum } from '@ada/db';
 import { processTurn } from '@ada/worker';
 import type { ServerEnvironment } from '@ada/config';
 import { FakeGenerationProvider } from '@ada/ai';
@@ -36,6 +32,10 @@ async function applyMigrations(client: ReturnType<typeof postgres>): Promise<voi
     '0008_narrow_the_fallen.sql',
     '0009_jittery_radioactive_man.sql',
     '0010_per_principal_cognition.sql',
+    '0011_scenario_authoring_proposals.sql',
+    '0012_story_card_mutation_proposals.sql',
+    '0013_repair_unjournaled_schema.sql',
+    '0014_portal_spatial_state.sql',
   ]) {
     const file = await readFile(resolve(process.cwd(), '../db/drizzle', filename), 'utf8');
     for (const statement of file
@@ -240,7 +240,9 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
       const playerText = turnInputs[i]!;
 
       // Fetch fresh run state for expected version
-      const [currentRun] = await sql<{ expected_version: number; current_turn: number }[]>`select expected_version, current_turn from runs where id = 'run_game_1'`;
+      const [currentRun] = await sql<
+        { expected_version: number; current_turn: number }[]
+      >`select expected_version, current_turn from runs where id = 'run_game_1'`;
       const expectedVersion = currentRun?.expected_version || 1;
 
       // Insert turn record
@@ -293,7 +295,9 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
       await processTurn(db, testEnv, turnId, 'run_game_1', undefined, fakeProvider);
 
       // Verify turn completed
-      const [completedTurn] = await sql<{ status: string; stage: string; failure: unknown }[]>`select status, stage, failure from turns where id = ${turnId}`;
+      const [completedTurn] = await sql<
+        { status: string; stage: string; failure: unknown }[]
+      >`select status, stage, failure from turns where id = ${turnId}`;
       expect(completedTurn?.status).toBe('completed');
       expect(completedTurn?.stage).toBe('COMPLETED');
 
@@ -306,7 +310,12 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
 
     // Alice queries for secrets -> SHOULD receive her own heirloom ring
     const aliceResults = await retrieval.retrieve({
-      principal: { kind: 'NPC', runId: 'run_game_1', branchId: 'branch_game_1', entityId: 'npc_alice' },
+      principal: {
+        kind: 'NPC',
+        runId: 'run_game_1',
+        branchId: 'branch_game_1',
+        entityId: 'npc_alice',
+      },
       query: 'SECRET_ALICE_HEIRLOOM_RING',
       maxCandidates: 10,
       maxSelected: 10,
@@ -318,7 +327,12 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
 
     // Player View -> MUST NOT receive Alice's secret or Bob's secret
     const playerResults = await retrieval.retrieve({
-      principal: { kind: 'PLAYER_VIEW', runId: 'run_game_1', branchId: 'branch_game_1', entityId: 'player_1' },
+      principal: {
+        kind: 'PLAYER_VIEW',
+        runId: 'run_game_1',
+        branchId: 'branch_game_1',
+        entityId: 'player_1',
+      },
       query: 'SECRET',
       maxCandidates: 10,
       maxSelected: 10,
@@ -328,7 +342,9 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
     expect(playerTexts.some((t) => t.includes('SECRET_BOB_TREASON_CANARY'))).toBe(false);
 
     // Absent Bob was not in location_1 -> verify Bob received no observations
-    const bobObservations = await sql<{ id: string }[]>`select id from observations where observer_entity_id = 'npc_bob'`;
+    const bobObservations = await sql<
+      { id: string }[]
+    >`select id from observations where observer_entity_id = 'npc_bob'`;
     expect(bobObservations).toHaveLength(0);
   }, 180_000);
 });

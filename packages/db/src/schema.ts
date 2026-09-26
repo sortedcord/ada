@@ -94,7 +94,11 @@ export const aiInvocations = pgTable(
   },
   (table) => [
     index('ai_invocations_correlation_idx').on(table.correlationId),
-    index('ai_invocations_principal_idx').on(table.correlationId, table.principalEntityId, table.stage),
+    index('ai_invocations_principal_idx').on(
+      table.correlationId,
+      table.principalEntityId,
+      table.stage,
+    ),
   ],
 );
 export const jobRuns = pgTable(
@@ -681,6 +685,23 @@ export const runLocationState = pgTable(
   },
   (table) => [primaryKey({ columns: [table.runId, table.branchId, table.locationId] })],
 );
+
+/** Mutable state for authored portal edges; an edge ID is its stable portal ID. */
+export const runPortalState = pgTable(
+  'run_portal_state',
+  {
+    runId: text('run_id').notNull(),
+    branchId: text('branch_id').notNull(),
+    portalId: text('portal_id').notNull(),
+    state: text('state').notNull(),
+    transmission: jsonb('transmission').notNull(),
+    ...metadata,
+  },
+  (table) => [
+    primaryKey({ columns: [table.runId, table.branchId, table.portalId] }),
+    index('run_portal_state_branch_idx').on(table.runId, table.branchId),
+  ],
+);
 export const runStoryCardState = pgTable(
   'run_story_card_state',
   {
@@ -838,7 +859,9 @@ export const relationshipViews = pgTable(
     ...metadata,
   },
   (table) => [
-    primaryKey({ columns: [table.runId, table.branchId, table.ownerEntityId, table.subjectEntityId] }),
+    primaryKey({
+      columns: [table.runId, table.branchId, table.ownerEntityId, table.subjectEntityId],
+    }),
     index('relationship_views_owner_idx').on(table.runId, table.branchId, table.ownerEntityId),
   ],
 );
@@ -859,7 +882,9 @@ export const entityAliases = pgTable(
     ...metadata,
   },
   (table) => [
-    primaryKey({ columns: [table.runId, table.branchId, table.ownerEntityId, table.subjectEntityId] }),
+    primaryKey({
+      columns: [table.runId, table.branchId, table.ownerEntityId, table.subjectEntityId],
+    }),
     index('entity_aliases_owner_idx').on(table.runId, table.branchId, table.ownerEntityId),
   ],
 );
@@ -880,9 +905,7 @@ export const communications = pgTable(
     worldTime: timestamp('world_time', { withTimezone: true }).notNull(),
     ...metadata,
   },
-  (table) => [
-    index('communications_run_turn_idx').on(table.runId, table.branchId, table.turnId),
-  ],
+  (table) => [index('communications_run_turn_idx').on(table.runId, table.branchId, table.turnId)],
 );
 
 export const allTables = {
@@ -926,6 +949,7 @@ export const allTables = {
   runEntityState,
   runRelationshipState,
   runLocationState,
+  runPortalState,
   runStoryCardState,
   architectState,
   runSnapshots,

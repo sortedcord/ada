@@ -15,6 +15,7 @@ import {
   outbox,
   runEntityState,
   runLocationState,
+  runPortalState,
   runRelationshipState,
   runSnapshots,
   runStoryCardState,
@@ -358,6 +359,7 @@ export async function mutateStoryCard(
 export interface SnapshotState {
   entities?: (typeof runEntityState)['$inferInsert'][];
   locations?: (typeof runLocationState)['$inferInsert'][];
+  portals?: (typeof runPortalState)['$inferInsert'][];
   relationships?: (typeof runRelationshipState)['$inferInsert'][];
   storyCards?: (typeof runStoryCardState)['$inferInsert'][];
 }
@@ -432,6 +434,19 @@ export async function restoreSnapshot(
         .onConflictDoUpdate({
           target: [runLocationState.runId, runLocationState.branchId, runLocationState.locationId],
           set: { state: row.state, version: row.version, updatedAt: new Date() },
+        });
+    for (const row of state.portals ?? [])
+      await tx
+        .insert(runPortalState)
+        .values(row)
+        .onConflictDoUpdate({
+          target: [runPortalState.runId, runPortalState.branchId, runPortalState.portalId],
+          set: {
+            state: row.state,
+            transmission: row.transmission,
+            version: row.version,
+            updatedAt: new Date(),
+          },
         });
     for (const row of state.storyCards ?? [])
       await tx

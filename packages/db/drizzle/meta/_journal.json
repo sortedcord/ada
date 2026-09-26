@@ -78,6 +78,13 @@
       "when": 1789889373209,
       "tag": "0013_repair_unjournaled_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790429086479,
+      "tag": "0014_portal_spatial_state",
+      "breakpoints": true
     }
   ]
 }

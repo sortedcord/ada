@@ -1,6 +1,6 @@
 import { asc, eq } from 'drizzle-orm';
 import { initialArchitectState } from '@ada/architect';
-import { validateScenarioAggregate } from '@ada/domain';
+import { defaultPortalTransmissionProfile, validateScenarioAggregate } from '@ada/domain';
 import type { Database } from './index.js';
 import {
   architectState,
@@ -11,6 +11,7 @@ import {
   runBranches,
   runEntityState,
   runLocationState,
+  runPortalState,
   runRelationshipState,
   runSnapshots,
   runStoryCardState,
@@ -85,7 +86,9 @@ export async function createRunFromPublishedRevision(
           branchId: input.branchId,
           entityId: entity.id,
           state: {
-            locationId: entity.playable ? (aggregate.scenario.startLocationId || entity.startingLocationId) : entity.startingLocationId,
+            locationId: entity.playable
+              ? aggregate.scenario.startLocationId || entity.startingLocationId
+              : entity.startingLocationId,
             active: entity.active,
             alive: entity.alive,
             attributes: entity.structuredAttributes,
@@ -170,10 +173,7 @@ export async function createRunFromPublishedRevision(
       }
 
       if (initialAliases.length) {
-        await tx
-          .insert(entityAliases)
-          .values(initialAliases)
-          .onConflictDoNothing();
+        await tx.insert(entityAliases).values(initialAliases).onConflictDoNothing();
       }
     }
     if (aggregate.locations.length)
@@ -182,10 +182,36 @@ export async function createRunFromPublishedRevision(
           runId: input.runId,
           branchId: input.branchId,
           locationId: location.id,
-          state: { environment: location.environment, hazards: location.hazards, blocked: false },
+          state: {
+            environment: location.environment,
+            hazards: location.hazards,
+            blocked: false,
+            parentLocationId: location.parentLocationId,
+            spatialKind: 'authored',
+          },
           version: 1,
           attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
         })),
+      );
+    const portalEdges = aggregate.locationEdges.filter(
+      (edge) => edge.connectionKind === 'portal' && edge.portal,
+    );
+    if (portalEdges.length)
+      await tx.insert(runPortalState).values(
+        portalEdges.map((edge) => {
+          const portal = edge.portal!;
+          const state = portal.defaultState ?? 'open';
+          const transmission = (portal.transmission ?? defaultPortalTransmissionProfile)[state];
+          return {
+            runId: input.runId,
+            branchId: input.branchId,
+            portalId: edge.id,
+            state,
+            transmission,
+            version: 1,
+            attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
+          };
+        }),
       );
     if (aggregate.storyCards.length)
       await tx.insert(runStoryCardState).values(
@@ -226,10 +252,27 @@ export async function createRunFromPublishedRevision(
         runId: input.runId,
         branchId: input.branchId,
         locationId: location.id,
-        state: { environment: location.environment },
+        state: {
+          environment: location.environment,
+          parentLocationId: location.parentLocationId,
+          spatialKind: 'authored',
+        },
         version: 1,
         attribution: { source: 'system', sourceIds: [revision.id] },
       })),
+      portals: portalEdges.map((edge) => {
+        const portal = edge.portal!;
+        const state = portal.defaultState ?? 'open';
+        return {
+          runId: input.runId,
+          branchId: input.branchId,
+          portalId: edge.id,
+          state,
+          transmission: (portal.transmission ?? defaultPortalTransmissionProfile)[state],
+          version: 1,
+          attribution: { source: 'system', sourceIds: [revision.id] },
+        };
+      }),
       storyCards: aggregate.storyCards.map((card) => ({
         runId: input.runId,
         branchId: input.branchId,
@@ -267,58 +310,70 @@ export async function createRunFromPublishedRevision(
       const turn0Id = `turn_${input.runId}_0`;
       const event0Id = `event_${input.runId}_0`;
       const seg0Id = `segment_${input.runId}_0`;
-      await tx.insert(turns).values({
-        id: turn0Id,
-        runId: input.runId,
-        branchId: input.branchId,
-        turnNumber: 0,
-        parentTurnId: null,
-        rawPlayerInput: '[Prologue / Introduction]',
-        status: 'completed',
-        stage: 'COMPLETED',
-        finalNarrative: kickoff,
-        idempotencyKey: `${input.runId}:turn:0`,
-        expectedVersion: 1,
-        startedAt: new Date(),
-        endedAt: new Date(),
-        attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
-      }).onConflictDoNothing();
+      await tx
+        .insert(turns)
+        .values({
+          id: turn0Id,
+          runId: input.runId,
+          branchId: input.branchId,
+          turnNumber: 0,
+          parentTurnId: null,
+          rawPlayerInput: '[Prologue / Introduction]',
+          status: 'completed',
+          stage: 'COMPLETED',
+          finalNarrative: kickoff,
+          idempotencyKey: `${input.runId}:turn:0`,
+          expectedVersion: 1,
+          startedAt: new Date(),
+          endedAt: new Date(),
+          attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
+        })
+        .onConflictDoNothing();
 
-      await tx.insert(events).values({
-        id: event0Id,
-        runId: input.runId,
-        branchId: input.branchId,
-        turnId: turn0Id,
-        eventType: 'kickoff',
-        locationId: aggregate.scenario.startLocationId,
-        worldTime: input.worldTime,
-        canonicalDescription: kickoff,
-        visibilityHints: ['scene_observable'],
-        salience: 1,
-        emotionalWeight: 0,
-        attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
-      }).onConflictDoNothing();
+      await tx
+        .insert(events)
+        .values({
+          id: event0Id,
+          runId: input.runId,
+          branchId: input.branchId,
+          turnId: turn0Id,
+          eventType: 'kickoff',
+          locationId: aggregate.scenario.startLocationId,
+          worldTime: input.worldTime,
+          canonicalDescription: kickoff,
+          visibilityHints: ['scene_observable'],
+          salience: 1,
+          emotionalWeight: 0,
+          attribution: { source: 'system', actorId: input.actorId, sourceIds: [revision.id] },
+        })
+        .onConflictDoNothing();
 
-      await tx.insert(narrativeSegments).values({
-        id: seg0Id,
-        runId: input.runId,
-        branchId: input.branchId,
-        turnId: turn0Id,
-        version: 1,
-        segmentType: 'narration',
-        eventIds: [event0Id],
-        segmentOrder: 0,
-        visibility: 'player_view',
-        text: kickoff,
-        attribution: { source: 'narrator', actorId: input.actorId, sourceIds: [event0Id] },
-      }).onConflictDoNothing();
+      await tx
+        .insert(narrativeSegments)
+        .values({
+          id: seg0Id,
+          runId: input.runId,
+          branchId: input.branchId,
+          turnId: turn0Id,
+          version: 1,
+          segmentType: 'narration',
+          eventIds: [event0Id],
+          segmentOrder: 0,
+          visibility: 'player_view',
+          text: kickoff,
+          attribution: { source: 'narrator', actorId: input.actorId, sourceIds: [event0Id] },
+        })
+        .onConflictDoNothing();
 
-      await tx.insert(turnStreamEvents).values({
-        turnId: turn0Id,
-        eventKey: `${turn0Id}:completed`,
-        eventType: 'turn.completed',
-        payload: { turnId: turn0Id, narrative: kickoff },
-      }).onConflictDoNothing();
+      await tx
+        .insert(turnStreamEvents)
+        .values({
+          turnId: turn0Id,
+          eventKey: `${turn0Id}:completed`,
+          eventType: 'turn.completed',
+          payload: { turnId: turn0Id, narrative: kickoff },
+        })
+        .onConflictDoNothing();
     }
 
     return { runId: input.runId, branchId: input.branchId };

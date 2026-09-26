@@ -9,6 +9,7 @@ import {
   outbox,
   runEntityState,
   runLocationState,
+  runPortalState,
   scenarioRevisions,
   type Database,
   runs,
@@ -56,7 +57,11 @@ export class RunService {
       .where(eq(turns.runId, runId))
       .orderBy(desc(turns.turnNumber));
     const segmentRows = await this.db
-      .select({ id: narrativeSegments.id, turnId: narrativeSegments.turnId, attribution: narrativeSegments.attribution })
+      .select({
+        id: narrativeSegments.id,
+        turnId: narrativeSegments.turnId,
+        attribution: narrativeSegments.attribution,
+      })
       .from(narrativeSegments)
       .where(eq(narrativeSegments.runId, runId));
     const segmentsByTurn = new Map(segmentRows.map((segment) => [segment.turnId, segment]));
@@ -94,24 +99,35 @@ export class RunService {
       .where(
         and(eq(runLocationState.runId, runId), eq(runLocationState.branchId, run.activeBranchId)),
       );
+    const portals = await this.db
+      .select()
+      .from(runPortalState)
+      .where(and(eq(runPortalState.runId, runId), eq(runPortalState.branchId, run.activeBranchId)));
 
     const [rev] = await this.db
       .select()
       .from(scenarioRevisions)
       .where(eq(scenarioRevisions.id, run.scenarioRevisionId))
       .limit(1);
-    const aggEntities = (rev?.aggregate as any)?.entities as Array<{
-      id: string;
-      name?: string;
-      kind?: string;
-      publicDescription?: string;
-      personality?: string[];
-      playable?: boolean;
-    }> | undefined;
+    const aggEntities = (rev?.aggregate as any)?.entities as
+      | Array<{
+          id: string;
+          name?: string;
+          kind?: string;
+          publicDescription?: string;
+          personality?: string[];
+          playable?: boolean;
+        }>
+      | undefined;
 
     const nameMap = new Map<
       string,
-      { name: string; description?: string | undefined; personality?: string[] | undefined; playable?: boolean | undefined }
+      {
+        name: string;
+        description?: string | undefined;
+        personality?: string[] | undefined;
+        playable?: boolean | undefined;
+      }
     >();
     if (Array.isArray(aggEntities)) {
       for (const e of aggEntities) {
@@ -170,6 +186,12 @@ export class RunService {
       locations: locations.map((row) => ({
         locationId: row.locationId,
         state: row.state,
+        version: row.version,
+      })),
+      portals: portals.map((row) => ({
+        portalId: row.portalId,
+        state: row.state,
+        transmission: row.transmission,
         version: row.version,
       })),
     };

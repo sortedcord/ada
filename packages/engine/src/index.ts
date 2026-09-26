@@ -16,4 +16,5 @@ export * from './intent.js';
 export * from './npc.js';
 export * from './perception.js';
 export * from './perception-eligibility.js';
+export * from './spatial.js';
 export * from './npc-context-service.js';

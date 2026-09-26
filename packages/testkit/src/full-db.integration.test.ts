@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import postgres from 'postgres';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { locationEdgeSchema, locationSchema } from '@ada/domain';
 import {
   appendEventsWithProjection,
   applyStageIdempotently,
@@ -38,6 +39,12 @@ async function applyMigrations(client: ReturnType<typeof postgres>): Promise<voi
     '0006_concerned_magik.sql',
     '0007_tranquil_tyger_tiger.sql',
     '0008_narrow_the_fallen.sql',
+    '0009_jittery_radioactive_man.sql',
+    '0010_per_principal_cognition.sql',
+    '0011_scenario_authoring_proposals.sql',
+    '0012_story_card_mutation_proposals.sql',
+    '0013_repair_unjournaled_schema.sql',
+    '0014_portal_spatial_state.sql',
   ]) {
     const file = await readFile(resolve(process.cwd(), '../db/drizzle', filename), 'utf8');
     for (const statement of file
@@ -60,8 +67,69 @@ describe('full database invariants', () => {
     await stopTestServices(services);
   }, 30_000);
 
-  it('creates scenario/run aggregates and preserves optimistic conflicts', async () => {
+  it('creates scenario/run aggregates, initializes portal state, and preserves optimistic conflicts', async () => {
     const aggregate = makeScenarioAggregate();
+    aggregate.locations.push(
+      locationSchema.parse({
+        id: 'location_hall',
+        revisionId: 'revision_1',
+        name: 'Hall',
+        aliases: [],
+        type: 'hall',
+        tags: [],
+        publicDescription: 'A hall beyond the door.',
+        privateDetails: '',
+        parentLocationId: null,
+        environment: {},
+        capacity: 10,
+        accessRules: [],
+        sensoryProperties: { sight: true, sound: true, hearingRange: 10 },
+        hazards: [],
+        aiMutationPolicy: 'manual_only',
+        metadata: {
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+          version: 1,
+          schemaVersion: 1,
+          attribution: { source: 'system', sourceIds: [] },
+        },
+      }),
+    );
+    aggregate.locationEdges.push(
+      locationEdgeSchema.parse({
+        id: 'portal_fixture_door',
+        revisionId: 'revision_1',
+        sourceLocationId: 'location_1',
+        destinationLocationId: 'location_hall',
+        directed: false,
+        directionLabel: 'through the door',
+        travelText: 'A door joins the two rooms.',
+        travelTime: 1,
+        travelCost: 0,
+        accessRequirements: [],
+        discoverability: 1,
+        blocked: false,
+        connectionKind: 'portal',
+        portal: {
+          name: 'fixture door',
+          defaultState: 'closed',
+          transmission: {
+            open: { sight: 1, sound: 1 },
+            ajar: { sight: 0.3, sound: 0.6 },
+            closed: { sight: 0, sound: 0.15 },
+            locked: { sight: 0, sound: 0.08 },
+            barred: { sight: 0, sound: 0.2 },
+          },
+        },
+        metadata: {
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+          version: 1,
+          schemaVersion: 1,
+          attribution: { source: 'system', sourceIds: [] },
+        },
+      }),
+    );
     const repo = scenarioRepository(createDatabase(databaseUrl).db);
     await sql.unsafe(
       "insert into scenarios (id, slug, title, status, attribution) values ('scenario_1', 'fixture', 'Fixture', 'valid', $1)",
@@ -95,6 +163,10 @@ describe('full database invariants', () => {
     });
     const runs = await sql`select id, active_branch_id from runs where id = 'run_1'`;
     expect(runs[0]?.active_branch_id).toBe('branch_1');
+    const portals =
+      await sql`select state, transmission from run_portal_state where run_id = 'run_1' and portal_id = 'portal_fixture_door'`;
+    expect(portals[0]?.state).toBe('closed');
+    expect(portals[0]?.transmission).toEqual({ sight: 0, sound: 0.15 });
   });
 
   it('applies stages/events idempotently and rebuilds projections', async () => {

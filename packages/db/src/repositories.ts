@@ -5,6 +5,7 @@ import {
   events,
   runEntityState,
   runLocationState,
+  runPortalState,
   runStoryCardState,
   runs,
   scenarioRevisions,
@@ -195,6 +196,7 @@ export async function appendEventsWithProjection(
     eventRows: (typeof events)['$inferInsert'][];
     entityState?: (typeof runEntityState)['$inferInsert'][];
     locationState?: (typeof runLocationState)['$inferInsert'][];
+    portalState?: (typeof runPortalState)['$inferInsert'][];
     storyCardState?: (typeof runStoryCardState)['$inferInsert'][];
   },
 ): Promise<{ applied: boolean; eventIds: string[] }> {
@@ -234,6 +236,19 @@ export async function appendEventsWithProjection(
           target: [runLocationState.runId, runLocationState.branchId, runLocationState.locationId],
           set: {
             state: sql`excluded.state`,
+            version: sql`excluded.version`,
+            updatedAt: new Date(),
+          },
+        });
+    if (input.portalState?.length)
+      await tx
+        .insert(runPortalState)
+        .values(input.portalState)
+        .onConflictDoUpdate({
+          target: [runPortalState.runId, runPortalState.branchId, runPortalState.portalId],
+          set: {
+            state: sql`excluded.state`,
+            transmission: sql`excluded.transmission`,
             version: sql`excluded.version`,
             updatedAt: new Date(),
           },

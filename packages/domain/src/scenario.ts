@@ -77,17 +77,20 @@ export const entitySchema = z
     publicDescription: z.string().max(10_000),
     privateDescription: z.string().max(10_000),
     history: z.string().max(30_000).default(''),
-    historicalEvents: z.array(
-      z.object({
-        id: idSchema,
-        title: boundedText(200),
-        summary: z.string().max(5_000),
-        participants: z.array(idSchema).max(50),
-        chronology: z.string().max(200),
-        consequences: z.array(z.string().max(2_000)).max(20).default([]),
-        visibility: z.enum(['public', 'entity_private']).default('public'),
-      }),
-    ).max(100).default([]),
+    historicalEvents: z
+      .array(
+        z.object({
+          id: idSchema,
+          title: boundedText(200),
+          summary: z.string().max(5_000),
+          participants: z.array(idSchema).max(50),
+          chronology: z.string().max(200),
+          consequences: z.array(z.string().max(2_000)).max(20).default([]),
+          visibility: z.enum(['public', 'entity_private']).default('public'),
+        }),
+      )
+      .max(100)
+      .default([]),
     appearance: z.string().max(10_000),
     personality: z.array(z.string().max(500)).max(50),
     speechStyle: z.string().max(5_000),
@@ -170,6 +173,42 @@ export const locationSchema = z.object({
 });
 export type Location = z.infer<typeof locationSchema>;
 
+/** A portal is a traversable boundary whose state controls cross-location perception. */
+export const portalStateSchema = z.enum(['open', 'ajar', 'closed', 'locked', 'barred']);
+export type PortalState = z.infer<typeof portalStateSchema>;
+
+export const portalTransmissionSchema = z.object({
+  sight: confidenceSchema,
+  sound: confidenceSchema,
+});
+export type PortalTransmission = z.infer<typeof portalTransmissionSchema>;
+
+export const defaultPortalTransmissionProfile = {
+  open: { sight: 1, sound: 1 },
+  ajar: { sight: 0.35, sound: 0.65 },
+  closed: { sight: 0, sound: 0.15 },
+  locked: { sight: 0, sound: 0.08 },
+  barred: { sight: 0.1, sound: 0.25 },
+} as const satisfies Record<PortalState, PortalTransmission>;
+
+export const portalTransmissionProfileSchema = z.object({
+  open: portalTransmissionSchema,
+  ajar: portalTransmissionSchema,
+  closed: portalTransmissionSchema,
+  locked: portalTransmissionSchema,
+  barred: portalTransmissionSchema,
+});
+
+export const portalDefinitionSchema = z.object({
+  name: boundedText(100),
+  defaultState: portalStateSchema.default('open'),
+  transmission: portalTransmissionProfileSchema.default(defaultPortalTransmissionProfile),
+});
+export type PortalDefinition = z.infer<typeof portalDefinitionSchema>;
+
+export const locationConnectionKindSchema = z.enum(['route', 'portal']);
+export type LocationConnectionKind = z.infer<typeof locationConnectionKindSchema>;
+
 export const locationEdgeSchema = z
   .object({
     id: idSchema,
@@ -184,6 +223,9 @@ export const locationEdgeSchema = z
     accessRequirements: z.array(z.string().max(2_000)).max(100),
     discoverability: confidenceSchema,
     blocked: z.boolean(),
+    connectionKind: locationConnectionKindSchema.default('route'),
+    /** Required for portal edges; the edge ID is the stable portal ID at runtime. */
+    portal: portalDefinitionSchema.optional(),
     metadata: metadataSchema,
   })
   .superRefine((edge, ctx) => {
@@ -193,8 +235,24 @@ export const locationEdgeSchema = z
         path: ['destinationLocationId'],
         message: 'location edge must connect distinct locations',
       });
+    if (edge.connectionKind === 'portal' && !edge.portal)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['portal'],
+        message: 'portal edges require a portal definition',
+      });
+    if (edge.connectionKind === 'route' && edge.portal)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['portal'],
+        message: 'route edges cannot define portal transmission',
+      });
   });
 export type LocationEdge = z.infer<typeof locationEdgeSchema>;
+export type PortalEdge = LocationEdge & {
+  connectionKind: 'portal';
+  portal: PortalDefinition;
+};
 
 export const cardScopeSchema = z.object({
   kind: z.enum(['global', 'location', 'entity', 'run', 'entity_private']),
