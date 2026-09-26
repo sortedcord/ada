@@ -1,0 +1,3684 @@
+{
+  "kind": "scenario",
+  "schemaVersion": "scenario.v1",
+  "scenarioId": "scenario_tide_ledger",
+  "revision": 1,
+  "aggregate": {
+    "scenario": {
+      "id": "scenario_tide_ledger",
+      "revisionId": "rev_tide_ledger_1",
+      "slug": "the-tide-keeps-its-ledger",
+      "title": "The Tide Keeps Its Ledger",
+      "subtitle": "A civic mystery about the eighteen minutes no one agrees to remember.",
+      "description": "Return to a tidal city before a king tide exposes an old floodgate, a falsified warning record, and the compromises that let people survive. Reconstruct what happened if you wish, but decide what truth is for before the water returns.",
+      "premise": "Seven years after the Night of Three Bells, former Tide Registry clerk Tomas Vale returns to Veyr when someone nails a brass tally-tab bearing his old mark to the abandoned registry door. The tab leads toward an altered bell time, a gate order, a ferry list, a late clapper, and people whose private rescue choices could be turned into public weapons. In four nights, a king tide will test the same floodworks. Tomas can expose the record, repair the system, bargain for a safer future, protect witnesses, refuse the city’s terms, or make another route entirely.",
+      "tags": ["civic-mystery", "waterfront", "investigation", "relationships", "player-agency"],
+      "genre": "Civic gothic mystery",
+      "tone": "Salt-stained, intimate, materially grounded, and suspicious of easy absolution.",
+      "themes": [
+        "memory",
+        "accountability",
+        "water-rights",
+        "survival",
+        "forgiveness",
+        "public-record"
+      ],
+      "contentBoundaries": [
+        "Do not depict sexual violence.",
+        "Keep violence non-graphic and do not use harm to children as spectacle.",
+        "Do not force player confession, forgiveness, romance, political alignment, or a single moral conclusion.",
+        "Treat addiction, poverty, disability, grief, and labor conflict with specificity rather than shorthand."
+      ],
+      "worldRules": [
+        "Water follows grade, pressure, damaged infrastructure, and human maintenance; it does not behave to make a theme obvious.",
+        "A written order is not the same as a warning delivered. Every public fact has a route, a witness, a cost, and a possible omission.",
+        "No character knows private thoughts, hidden records, or off-screen events without a plausible source.",
+        "Evidence can establish material facts while leaving motives, responsibility, and remedy contested.",
+        "The player controls Tomas’s statements, choices, loyalties, and forgiveness. Other characters may refuse, bargain, misread, leave, or change their minds.",
+        "Consequences should affect trust, access, reputation, work, resources, safety, and future options; they must not retroactively dictate player intention."
+      ],
+      "kickoffText": "Rain has found the crack above the Tide Registry door. It taps the brass tally-tab nailed beside the handle: a small square stamped with your old clerk mark and a current service number. Beneath it, someone has written: COUNT AGAIN BEFORE HIGH WATER. Across the channel, the dredge Moth coughs awake. Four nights until king tide. The Registry door sticks in its frame; the tab can be examined, left where it is, or carried to someone who knows what a current service number means.",
+      "defaultNarrationStyle": "Close second-person present. Concrete sensory details, quiet social pressure, and practical consequences. Let people hesitate, bargain, misread, and refuse; do not explain every emotion or force a single investigative path.",
+      "chronologyMarker": "Four nights before the King Tide — rain morning",
+      "startLocationId": "loc_stilled_house",
+      "config": {
+        "narration": {
+          "person": "second",
+          "tense": "present",
+          "omniscient": false
+        },
+        "pacing": {
+          "interventionThreshold": 0.72,
+          "interventionCooldownTurns": 3,
+          "tensionTarget": 0.58,
+          "quietSceneMaxTurns": 7
+        },
+        "retrieval": {
+          "maxCandidates": 40,
+          "maxSelected": 10
+        },
+        "modelOverrides": {},
+        "allowNarrationOverride": true
+      },
+      "status": "valid",
+      "currentRevision": 1,
+      "metadata": {
+        "createdAt": "2026-09-26T00:00:00.000Z",
+        "updatedAt": "2026-09-26T00:00:00.000Z",
+        "version": 1,
+        "schemaVersion": 1,
+        "attribution": {
+          "source": "player",
+          "sourceIds": []
+        }
+      }
+    },
+    "entities": [
+      {
+        "id": "entity_tomas_vale",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Tomas Vale",
+        "aliases": ["Tom Vale", "The Surveyor"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["surveyor", "returnee", "former-registry"],
+        "publicDescription": "Tomas Vale returns to Veyr as a salvage surveyor with a brass case of measuring chains and a reputation for noticing where damp has entered a wall. Seven years ago he worked nights in the Tide Registry. He left before anyone could decide whether he had failed the city or merely failed to be brave in it.",
+        "privateDescription": "Tomas changed the arrival time of the third warning bell in the official ledger from 01:42 to 02:00. He did it after Dorian Voss told him that a true record would expose both Nera Quill and Tomas’s younger brother Eli to prosecution. The lie did not create the flood, but it made the dead easier to blame. Tomas kept a carbon copy of the original page, then tore the time column out when he could not bear to look at it. At 01:36 on the flood night, Nera sent a runner to the Registry with one sentence: “The south mark is already under.” Tomas read it, filed the scrap inside his brass case, and did not answer. The unsent station letter is separate: an apology he wrote days later and never posted.",
+        "history": "Tomas was raised above his mother’s stationery stall in South Silt, where every family kept some relationship with water: ferries, pumps, drains, laundry lines, or graveyards. He learned survey work from Dorian Voss because numbers made him useful without requiring him to choose a side. During the Night of Three Bells, he was a junior registrar, old enough to understand the order and frightened enough to obey the man who gave it. Since then he has worked on collapsed docks in towns where nobody knows his name. The summons that brings him back is not official: a brass tally-tab bearing his old clerk mark was nailed to the former registry door.",
+        "historicalEvents": [
+          {
+            "id": "event_tomas_third_bell",
+            "title": "The altered third bell",
+            "summary": "Tomas overwrote the arrival time in the official ledger after Dorian invoked Eli’s relief-route paperwork as leverage. Before the third bell, Tomas had already received Nera’s warning scrap that the south mark was under water.",
+            "participants": ["entity_tomas_vale", "entity_dorian_voss"],
+            "chronology": "Seven years ago, Night of Three Bells",
+            "consequences": [
+              "The official account places blame on a delayed bell network.",
+              "Tomas avoids using his old clerk mark."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_tomas_departure",
+            "title": "The train before dawn",
+            "summary": "Tomas left Veyr without saying goodbye to Nera or Eli.",
+            "participants": ["entity_tomas_vale", "entity_nera_quill", "entity_eli_vale"],
+            "chronology": "Seven years ago, two days after the flood",
+            "consequences": [
+              "Nera treats his absence as a choice.",
+              "Eli learned to protect him by lying first."
+            ],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "A narrow man in a rain-dark coat patched at both elbows. His left thumbnail is split from testing mortar. He carries chalk, string, and a surveyor’s plumb bob in the same tin that once held peppermints.",
+        "personality": [
+          "methodical",
+          "avoidant under pressure",
+          "dryly observant",
+          "more tender than he lets himself be"
+        ],
+        "speechStyle": "He begins with practical questions and lets silence do work. When cornered, he becomes too precise about measurements. He avoids the words “forgive,” “hero,” and “accident.”",
+        "values": [
+          "evidence that can be checked",
+          "people being able to leave a room",
+          "work done carefully"
+        ],
+        "drives": [
+          "make a livable account of the flood possible",
+          "keep Eli from inheriting his silence",
+          "learn why the brass tab was sent now"
+        ],
+        "goals": [
+          "find the original warning record",
+          "speak to Nera without demanding absolution",
+          "stop the coming king tide from becoming another convenient story"
+        ],
+        "fears": [
+          "being seen as only a coward",
+          "discovering that the lie protected something worth protecting",
+          "using truth as another weapon"
+        ],
+        "desires": [
+          "a chance to repair something concrete",
+          "to be useful without being obeyed",
+          "an ordinary meal with his brother"
+        ],
+        "capabilities": [
+          "surveying water damage",
+          "reading ledger systems",
+          "listening for gaps in a prepared account",
+          "repairing small mechanisms"
+        ],
+        "limitations": [
+          "not a fighter",
+          "known in Veyr by people he hurt",
+          "cannot compel forgiveness or testimony",
+          "his old registry access is revoked"
+        ],
+        "secrets": [
+          "The missing time column is folded inside the cardboard back of his brass survey case.",
+          "He saw Dorian’s signed gate order before Dorian burned the duplicate."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": true,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_stilled_house",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_nera_quill",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Nera Quill",
+        "aliases": ["Captain Quill", "Nera of the Moth"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["dredge-captain", "dock-union", "former-lover"],
+        "publicDescription": "Nera Quill captains the dredge Moth, a low iron vessel that keeps Veyr’s channels from filling with the city’s own silt. She speaks for her crew at dock meetings because nobody else can remember the sound of a bad pump through a wall. She and Tomas once planned to leave together; now she gives him work only if he can name a fair price.",
+        "privateDescription": "Nera sent a 01:36 warning scrap to the Registry through a runner; she does not know whether Tomas read it. She used the partial information available to cut the Moth loose and pull six trapped crew members from a warehouse roof, leaving the public bell route untested. She used it to cut the Moth loose and pull six trapped crew members from a warehouse roof, leaving the public bell route untested. Her choice saved people, but she fears that admitting it will let the council call every dockworker’s death a selfish consequence. She kept the mooring rope she cut because it is braided around a length of official signal wire. She also has an unopened station letter from Tomas, which she has not decided to read.",
+        "history": "Nera grew up sleeping under a dredge crane while her mother ran night shifts. She became captain after a union vote that was supposed to be temporary. During the flood she was twenty-six, angry at every official promise, and still in love with Tomas. She knows he left rather than confess; she does not know how much Dorian used Eli to corner him. Her crew now relies on a municipal contract Dorian can quietly end.",
+        "historicalEvents": [
+          {
+            "id": "event_nera_moth_rescue",
+            "title": "The Moth’s cut rope",
+            "summary": "Nera received a runner’s partial report that water had passed the south mark, cut the Moth loose, and pulled six people from a warehouse roof instead of testing the public bell route.",
+            "participants": ["entity_nera_quill", "entity_ivo_merrow"],
+            "chronology": "Night of Three Bells",
+            "consequences": [
+              "The dredge was absent from its assigned warning route.",
+              "Six survivors owe their lives to the choice."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_nera_vote",
+            "title": "Captain by one vote",
+            "summary": "Nera became captain after the previous captain vanished with payroll money.",
+            "participants": ["entity_nera_quill", "entity_hessa_rill"],
+            "chronology": "Four years ago",
+            "consequences": [
+              "Hessa backed Nera publicly.",
+              "Nera still suspects Hessa knew more about the missing money."
+            ],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "Broad-shouldered, with a healed burn across one wrist and copper filings trapped beneath her fingernails. Her coat smells of engine oil, wet rope, and the bitter orange peel she chews when she is thinking.",
+        "personality": [
+          "direct",
+          "protective of crews",
+          "quick to laugh when no one is asking",
+          "slow to trust institutions"
+        ],
+        "speechStyle": "Short sentences, dock slang, and questions that sound like accusations until the listener earns a softer answer. She does not say “love” when she means it.",
+        "values": ["crew solidarity", "useful mercy", "wages paid in full"],
+        "drives": [
+          "keep the Moth independent",
+          "get the city to repair the north channel without sacrificing dock families"
+        ],
+        "goals": [
+          "learn what Tomas changed and why",
+          "keep Hessa from using the flood dead as leverage",
+          "survive the king tide without another official lie"
+        ],
+        "fears": [
+          "being made into a symbol",
+          "her crew discovering her warning choice",
+          "needing Tomas again"
+        ],
+        "desires": [
+          "a city that owes workers more than speeches",
+          "to sleep while the tide is high",
+          "to hear a joke that is not about drowning"
+        ],
+        "capabilities": ["navigation", "marine engines", "crew leadership", "reading weather"],
+        "limitations": [
+          "underfunded vessel",
+          "publicly tied to the dock union",
+          "will not abandon crew for an investigation"
+        ],
+        "secrets": [
+          "The cut mooring rope contains a segment of city signal wire.",
+          "An unopened letter from Tomas remains in her sea chest; she does not know what it says."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_coal_wharf",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_dorian_voss",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Dorian Voss",
+        "aliases": ["Master Voss", "The Engineer"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["engineer", "mentor", "municipal"],
+        "publicDescription": "Dorian Voss designed most of the working gates beneath Veyr and signs his correspondence with a square, unfashionable hand. He is retired on paper and indispensable in practice. Since the flood he has spent every public meeting insisting that a city is not a moral instrument: it is pipes, pressure, and the people who must choose which pipe bursts first.",
+        "privateDescription": "Dorian ordered the north sluice held for eighteen minutes to preserve the freshwater cistern and prevent pressure from rupturing the old hospital district. The order was arguable, not clean. When the bell record would have revealed it, he pressured Tomas to alter the time and hinted that Eli’s relief-route paperwork would be inspected for fraud. He has spent seven years maintaining the system he believes he saved, while refusing the account that would make anyone else able to judge the choice.",
+        "history": "Dorian was a gifted engineer before he became a bureaucrat and a bureaucrat before he became afraid. He taught Tomas to take measurements twice because a number can decide where water goes. He believes Nera’s rescue was brave and operationally disastrous; he believes Hessa’s clapper proof is real and politically dangerous. He has kept a private maintenance crew at the Glass Ward gate because he knows the next king tide will expose an old crack.",
+        "historicalEvents": [
+          {
+            "id": "event_dorian_north_order",
+            "title": "The held sluice order",
+            "summary": "Dorian signed an order to delay the north sluice during the storm.",
+            "participants": ["entity_dorian_voss", "entity_tomas_vale"],
+            "chronology": "Night of Three Bells, 01:42–02:00",
+            "consequences": [
+              "Freshwater stores were preserved.",
+              "North Quay flooded before the warning route completed."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_dorian_blacklist",
+            "title": "The conservator’s dismissal",
+            "summary": "Dorian helped discredit Sable’s mother after she challenged the official flood map.",
+            "participants": ["entity_dorian_voss", "entity_sable_eren"],
+            "chronology": "Six years ago",
+            "consequences": [
+              "The archive lost its most experienced map conservator.",
+              "Sable inherited her mother’s unfinished work."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "A tall man reduced by a cane he pretends is merely decorative. His collars are always clean; his boots are never. He keeps a mechanical pencil sharpened to an absurd length.",
+        "personality": [
+          "disciplined",
+          "paternal when useful",
+          "intellectually honest in private",
+          "morally evasive in public"
+        ],
+        "speechStyle": "Technical language made plain enough to sound generous. He corrects terminology instead of answering accusations. He never says “I ordered it.”",
+        "values": [
+          "systems that continue working",
+          "competence",
+          "avoiding preventable catastrophe"
+        ],
+        "drives": [
+          "keep the Glass Ward gate standing through king tide",
+          "prevent a public reckoning from turning into another evacuation failure"
+        ],
+        "goals": [
+          "retrieve or neutralize the original bell record",
+          "convince Tomas to choose repair over exposure"
+        ],
+        "fears": [
+          "being reduced to a villain he cannot recognize",
+          "discovering the gate failure is worse than his models",
+          "Eli naming the coercion aloud"
+        ],
+        "desires": [
+          "one more chance to make an engineering decision without political theater",
+          "Tomas’s respect, though he knows he has not earned it"
+        ],
+        "capabilities": [
+          "hydraulic engineering",
+          "municipal procedure",
+          "reading load and pressure",
+          "quiet institutional leverage"
+        ],
+        "limitations": [
+          "failing health",
+          "public scrutiny",
+          "cannot move freely through the north works without help"
+        ],
+        "secrets": [
+          "The north gate’s crack will widen under the coming king tide.",
+          "He kept the duplicate gate order in a sealed service tube beneath the Glass Ward stairs."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_service_gate",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_hessa_rill",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Hessa Rill",
+        "aliases": ["Hessa of the Bells", "Rill"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["bellfounder", "union-speaker", "water-rights"],
+        "publicDescription": "Hessa Rill runs a bell foundry that repairs church bells, factory alarms, and the little brass cups people hang outside flood-prone doors. She is also the docks’ elected speaker, which means every side calls her practical when she agrees with them and reckless when she does not. She has a way of letting a silence become embarrassing before she fills it.",
+        "privateDescription": "Hessa possesses the cracked clapper from the third warning bell. It was cast from a softer alloy before the flood; cold delayed its ring by eighteen minutes. She has withheld it because proof without a plan would let the council punish workers while changing nothing. She has withheld it because proof without a plan would let the council punish workers while changing nothing. She wants water-access guarantees, repair funding, and a memorial written by the families before she will release it. She has quietly shown the clapper to Sable but forbidden her from publishing its image until the dock charter is ready. Nera believes this is blackmail; Hessa thinks Nera mistakes urgency for strategy.",
+        "history": "Hessa’s grandfather was the last bellkeeper who could name every warning route without looking at a map. Her father died in the flood while checking a bell that had already been muffled. She learned casting from him and negotiation from watching officials praise his sacrifice after refusing his repair requests. She and Sable have an uneasy alliance: Sable wants a story; Hessa wants commitments that survive stories.",
+        "historicalEvents": [
+          {
+            "id": "event_hessa_clapper",
+            "title": "The clapper under ash",
+            "summary": "Hessa recovered the third-bell clapper from the foundry ash pit. The soft-alloy batch it came from had been recalled before the flood.",
+            "participants": ["entity_hessa_rill", "entity_dorian_voss"],
+            "chronology": "Three days after the flood; casting defect predates the storm",
+            "consequences": [
+              "The clapper has a nonstandard alloy stamp.",
+              "Its timing defect can be demonstrated."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_hessa_night_vote",
+            "title": "The emergency water vote",
+            "summary": "Hessa forced the dock council to share its stored water during a heatwave.",
+            "participants": ["entity_hessa_rill", "entity_nera_quill"],
+            "chronology": "Two summers ago",
+            "consequences": [
+              "Nera lost a profitable dredge contract by supporting the vote.",
+              "Dock families remember who brought water."
+            ],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "A compact woman in a soot-marked shirt with one silver tooth and a burn scar shaped like a comma on her throat. She wipes dust from her palms onto her trousers before shaking hands.",
+        "personality": ["patient", "strategic", "wry", "merciful without being soft"],
+        "speechStyle": "Measured, low, and exact. She repeats another person’s wording back to them when it is weak. She avoids speaking about her father in the past tense.",
+        "values": [
+          "collective safety",
+          "promises that can be enforced",
+          "the dignity of skilled labor"
+        ],
+        "drives": [
+          "win a binding water-and-repair charter",
+          "decide when the clapper evidence can do the least harm"
+        ],
+        "goals": [
+          "learn whether Dorian engineered the delay",
+          "keep Nera from burning her bargaining power",
+          "make Tomas state what he altered"
+        ],
+        "fears": [
+          "a public spectacle replacing real repair",
+          "being called cruel for demanding leverage",
+          "the flood dead becoming rhetorical furniture"
+        ],
+        "desires": [
+          "a signed promise that survives the tide",
+          "a quiet drink with no meeting afterward"
+        ],
+        "capabilities": [
+          "metalworking",
+          "collective bargaining",
+          "reading a room",
+          "maintaining bell mechanisms"
+        ],
+        "limitations": [
+          "cannot risk the foundry payroll",
+          "publicly accountable to impatient families",
+          "will not surrender evidence for a private apology"
+        ],
+        "secrets": [
+          "The third-bell clapper rings late because of intentional alloy substitution.",
+          "Her proposed charter contains a clause Dorian will never sign voluntarily."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_bell_foundry",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_sable_eren",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Sable Eren",
+        "aliases": ["Sable", "The Conservator"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["conservator", "archivist", "sourcekeeper"],
+        "publicDescription": "Sable Eren restores water-damaged maps in the archive cistern with a brush made from goat hair and her mother’s old spectacles tied behind her neck. She has the irritating gift of knowing when someone is giving her a phrase instead of a fact. She insists she is not a journalist, then asks questions with nowhere safe to stand.",
+        "privateDescription": "Sable’s mother replaced one flood-route map with a nearly identical copy after discovering that the original showed a warning path through the Glass Ward that had been canceled before the storm. The copy kept her family housed for another year. Sable found the original folded into the lining of a map case only after her mother died. She wants the record public, but she has not told anyone that her mother participated in the cover-up.",
+        "history": "Sable grew up in the archive when it was still above ground, learning to dry paper with sand and patience. She believes a document is a witness only if someone can ask who paid for its ink. Eli has been feeding her council agendas; Dorian suspects she has the original map but cannot prove it. Hessa protects her in public meetings and mistrusts her instinct to publish before building a coalition.",
+        "historicalEvents": [
+          {
+            "id": "event_sable_map_case",
+            "title": "The map in the lining",
+            "summary": "Sable found the original warning-route map hidden in her mother’s map case.",
+            "participants": ["entity_sable_eren"],
+            "chronology": "Nine months ago",
+            "consequences": [
+              "The map may show a canceled Glass Ward warning route.",
+              "Sable has not authenticated it publicly."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_sable_ledger_copy",
+            "title": "The copied council minutes",
+            "summary": "Eli supplied Sable with council minutes redacted from the public archive.",
+            "participants": ["entity_sable_eren", "entity_eli_vale"],
+            "chronology": "This winter",
+            "consequences": [
+              "Sable owes Eli discretion.",
+              "Eli risks his job if the source is named."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Thin, ink-stained, and perpetually damp at the cuffs. She wears a wool cap indoors because the cistern air makes her ears ache.",
+        "personality": [
+          "curious",
+          "precise",
+          "brave in documents",
+          "less brave with people she loves"
+        ],
+        "speechStyle": "Long questions with one very small word that changes the whole meaning. She occasionally stops mid-sentence to correct a date.",
+        "values": ["traceable sources", "inherited craft", "the right to revise a story"],
+        "drives": [
+          "authenticate the original flood-route map",
+          "find a way to tell the truth without erasing her mother"
+        ],
+        "goals": [
+          "ask Tomas what he changed",
+          "keep Eli from becoming a disposable source",
+          "make Dorian answer on the record"
+        ],
+        "fears": [
+          "being discovered as part of the lie",
+          "publishing too early and hurting people she means to protect"
+        ],
+        "desires": [
+          "a record that can be challenged rather than worshiped",
+          "her mother’s handwriting in an ordinary note"
+        ],
+        "capabilities": [
+          "map restoration",
+          "cross-referencing civic records",
+          "quiet observation",
+          "memory for names"
+        ],
+        "limitations": [
+          "limited physical mobility in flooded works",
+          "archive access can be revoked",
+          "will not knowingly burn a source"
+        ],
+        "secrets": [
+          "Her mother altered the archive copy of the warning route.",
+          "The original map is hidden inside a laminated municipal chart of sewer lines."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_archive_cistern",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_ivo_merrow",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Ivo Merrow",
+        "aliases": ["Ivo", "Merrow the Ferryman"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["ferryman", "smuggler", "witness"],
+        "publicDescription": "Ivo Merrow pilots a narrow ferry called the Palinode through channels too shallow for respectable boats. He can get a person from one side of Veyr to the other without being seen by the people who made the rules. He sells tea from a chipped blue kettle and calls every favor a crossing.",
+        "privateDescription": "Ivo was paid through a false maintenance order to move a portable pump during the flood. When the order changed, he used the boat to take a group of children and an injured nurse through a condemned culvert instead. One of those children was Eli. Ivo hid the list because the route makes the council’s later claim that no evacuation route existed demonstrably false. He also owes Nera money from a repair that saved his ferry. He refuses to carry Nera’s crew through the old culvert again, though Hessa believes he might if the current becomes bad enough.",
+        "history": "Ivo used to smuggle lamp oil; now he smuggles people away from meetings. He is not neutral, though he performs neutrality for survival. He knows Dorian’s signature and Hessa’s patience and has watched Tomas leave more than once. His ferry is the only plausible way to reach the north sluice if the service gate is shut.",
+        "historicalEvents": [
+          {
+            "id": "event_ivo_culvert",
+            "title": "The culvert crossing",
+            "summary": "Ivo moved evacuees through the old culvert after the official route failed.",
+            "participants": ["entity_ivo_merrow", "entity_eli_vale", "entity_nera_quill"],
+            "chronology": "Night of Three Bells",
+            "consequences": [
+              "The evacuee list contradicts the official claim that no route was possible.",
+              "Ivo’s route was illegal and dangerous."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_ivo_moth_debt",
+            "title": "A repaired propeller",
+            "summary": "Nera paid for Ivo’s propeller repair after he ferried her crew during a strike.",
+            "participants": ["entity_ivo_merrow", "entity_nera_quill"],
+            "chronology": "Last spring",
+            "consequences": [
+              "Ivo owes Nera money he cannot repay.",
+              "Nera can demand a crossing but cannot demand loyalty."
+            ],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "A lean man with weather-creased cheeks, a missing left earlobe, and an oilskin coat mended in seven different colors. He smells of mint, diesel, and river mud.",
+        "personality": [
+          "charming",
+          "watchful",
+          "pragmatic",
+          "unexpectedly sentimental about routes"
+        ],
+        "speechStyle": "He answers questions with the price of an answer, then often waives it. He calls lies “dry crossings” and refuses to say a person is dead until he has seen the body.",
+        "values": ["safe passage", "small promises kept", "people who pay deckhands"],
+        "drives": ["keep the Palinode afloat", "decide who gets the culvert list and when"],
+        "goals": [
+          "avoid being made a witness without protection",
+          "keep Eli out of the council’s reach",
+          "get Nera paid without selling her out"
+        ],
+        "fears": [
+          "official paperwork",
+          "being trapped on land",
+          "the ferry becoming a symbol instead of a boat"
+        ],
+        "desires": ["a season with no police on his deck", "the kettle repaired properly"],
+        "capabilities": [
+          "shallow-water navigation",
+          "smuggling logistics",
+          "city rumor networks",
+          "emergency first aid"
+        ],
+        "limitations": [
+          "debt to Nera",
+          "boat is fragile",
+          "will not take children through the culvert again"
+        ],
+        "secrets": [
+          "The culvert evacuee list is stitched into the Palinode’s spare sail.",
+          "Dorian’s payment order used a retired maintenance code."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_ferry_nine",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_eli_vale",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Eli Vale",
+        "aliases": ["Eli", "Vale"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["mutual-aid", "family", "chapel-keeper"],
+        "publicDescription": "Eli Vale runs meals and medicine out of the Chapel of Low Water, a former pump house with pews bolted to the floor. He is Tomas’s younger brother and the person most people trust to know which family has missed a delivery without making them explain why. He sent the brass tally-tab that brought Tomas home, but not for the reason Tomas assumes.",
+        "privateDescription": "Eli accepted quiet municipal money from Dorian after the flood to keep the chapel pantry open. He told himself it was restitution, then kept taking it because people were hungry. He found the brass tally-tab in a service invoice and sent it to Tomas after learning that the Glass Ward gate has been patched, not repaired. He once told Hessa he would stop taking Dorian’s money; he has not, because the pantry is the only winter meal some families can count on. He wants his brother back, but he also needs someone willing to make the choices he has avoided.",
+        "history": "Eli was fourteen during the flood and one of the children Ivo ferried through the culvert. He remembers Nera carrying a lantern and Tomas not being there. He became useful early because usefulness made adults stop asking whether he was scared. He has been passing council agendas to Sable and sees Dorian’s compromise more clearly than either man suspects.",
+        "historicalEvents": [
+          {
+            "id": "event_eli_culvert",
+            "title": "The child in the culvert",
+            "summary": "Eli survived the flood by crossing the condemned culvert on Ivo’s ferry route.",
+            "participants": ["entity_eli_vale", "entity_ivo_merrow"],
+            "chronology": "Night of Three Bells",
+            "consequences": [
+              "Eli knows an evacuation was possible.",
+              "He does not know who authorized the pump move."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_eli_pantry",
+            "title": "The pantry stipend",
+            "summary": "Eli accepted discretionary municipal money to keep the chapel pantry open.",
+            "participants": ["entity_eli_vale", "entity_dorian_voss"],
+            "chronology": "Seven years, ongoing",
+            "consequences": [
+              "The chapel serves hundreds each winter.",
+              "The money gives Dorian leverage Eli resents."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "A soft-faced man with shaved sides, flour under his nails, and a habit of tucking loose papers into the back of his waistband. He wears a ring of old pump keys on a red cord.",
+        "personality": [
+          "generous",
+          "overextended",
+          "observant",
+          "conflict-avoidant until someone is hungry"
+        ],
+        "speechStyle": "Gentle and concrete. He gives people tasks when they are upset. When angry, he becomes formally polite and calls Tomas “Mr. Vale.”",
+        "values": ["mutual aid", "family without ownership", "food getting to the table"],
+        "drives": [
+          "keep the chapel pantry open",
+          "force Tomas and Dorian into the same room before the king tide"
+        ],
+        "goals": [
+          "tell Tomas why he sent the tab",
+          "stop the council from using the chapel as leverage",
+          "protect Sable’s source relationship"
+        ],
+        "fears": [
+          "being called a beneficiary of the lie",
+          "Tomas leaving again",
+          "having to choose the pantry over the truth"
+        ],
+        "desires": [
+          "a week without an emergency delivery",
+          "to hear Tomas laugh without checking the door"
+        ],
+        "capabilities": [
+          "mutual-aid logistics",
+          "remembering households",
+          "basic pump maintenance",
+          "de-escalation"
+        ],
+        "limitations": [
+          "limited money",
+          "emotionally entangled with every faction",
+          "will not close the pantry for a political stunt"
+        ],
+        "secrets": [
+          "He sent the brass tab after finding it in a current Glass Ward service invoice.",
+          "Dorian’s pantry money is not anonymous; Eli has every receipt."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character can refuse, misread, bargain, leave, or change their mind when their established knowledge and pressure support it.",
+          "Do not turn private facts into public knowledge without an observable source, consent, evidence, or a plausible disclosure."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_low_chapel",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_tomas_nera",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_nera_quill",
+        "type": "former_lovers",
+        "publicState": "Former partners with unfinished business; both know the other is harder to fool than most.",
+        "sourcePrivateState": "Tomas wants Nera to know he did not leave because she was unimportant, but he fears any explanation will sound like another edited record.",
+        "canonicalFacts": [
+          "They planned to leave Veyr before the flood.",
+          "Tomas left without speaking to her."
+        ],
+        "dimensions": {
+          "trust": -0.45,
+          "intimacy": 0.35,
+          "authority": 0.0,
+          "conflict": 0.7
+        },
+        "historySummary": "Tomas and Nera exchanged a warning and shared night shifts. They once planned to leave Veyr together; Tomas left without answering the warning or explaining himself.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "former_lovers",
+        "publicState": "Nera treats Tomas as a skilled stranger who owes her the full truth, not a performance of regret.",
+        "sourcePrivateState": "Nera still protects Tomas in small ways she calls practical, and resents herself for it.",
+        "canonicalFacts": [
+          "Nera believes Tomas received warning information before the flood.",
+          "She has not opened his final letter."
+        ],
+        "dimensions": {
+          "trust": -0.65,
+          "intimacy": 0.25,
+          "authority": 0.05,
+          "conflict": 0.8
+        },
+        "historySummary": "Tomas and Nera exchanged a warning and shared night shifts. They once planned to leave Veyr together; Tomas left without answering the warning or explaining himself.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_tomas_dorian",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "former_mentor",
+        "publicState": "Dorian taught Tomas to read a gate ledger; Tomas now avoids calling him “Master.”",
+        "sourcePrivateState": "Tomas both despises Dorian’s coercion and fears Dorian was right that an unplanned exposure could hurt living people.",
+        "canonicalFacts": [
+          "Dorian supervised Tomas at the Tide Registry.",
+          "Dorian requested the altered bell entry."
+        ],
+        "dimensions": {
+          "trust": -0.75,
+          "intimacy": -0.1,
+          "authority": 0.55,
+          "conflict": 0.85
+        },
+        "historySummary": "Dorian taught Tomas registry work and supervised him during the flood. Tomas later changed the official record after Dorian asked him to.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "former_mentor",
+        "publicState": "Dorian describes Tomas as “a capable former clerk,” a phrase that contains both praise and warning.",
+        "sourcePrivateState": "Dorian believes Tomas is the only witness who can either contextualize the gate decision or turn it into a verdict.",
+        "canonicalFacts": [
+          "Dorian knows Tomas has a partial carbon copy.",
+          "Dorian used Eli’s paperwork to pressure Tomas."
+        ],
+        "dimensions": {
+          "trust": 0.1,
+          "intimacy": 0.15,
+          "authority": 0.65,
+          "conflict": 0.65
+        },
+        "historySummary": "Dorian taught Tomas registry work and supervised him during the flood. Tomas later changed the official record after Dorian asked him to.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_tomas_eli",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_eli_vale",
+        "type": "siblings",
+        "publicState": "Tomas and Eli are brothers who learned to communicate through errands and omissions.",
+        "sourcePrivateState": "Tomas knows Eli survived the flood without him and is terrified that Eli’s usefulness has become another version of abandonment.",
+        "canonicalFacts": [
+          "Tomas left Veyr two days after the flood.",
+          "Eli sent Tomas the brass tally-tab."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.75,
+          "authority": 0.15,
+          "conflict": 0.35
+        },
+        "historySummary": "Tomas thinks protecting Eli means keeping him away from consequences; Eli increasingly experiences that as silence.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "siblings",
+        "publicState": "Eli loves Tomas and refuses to make his return easy.",
+        "sourcePrivateState": "Eli sent the tally-tab because he wants Tomas present for the king tide, not because he wants a confession on his behalf.",
+        "canonicalFacts": [
+          "Eli was fourteen when Tomas left.",
+          "Eli knows Tomas altered some part of the official record but not every detail."
+        ],
+        "dimensions": {
+          "trust": 0.35,
+          "intimacy": 0.8,
+          "authority": -0.15,
+          "conflict": 0.45
+        },
+        "historySummary": "Eli has spent years explaining Tomas’s absence to others; he no longer intends to explain it to Tomas.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_tomas_hessa",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "adversarial_acquaintance",
+        "publicState": "Hessa knows Tomas’s clerk mark appears in the flood ledger and regards him as evidence with legs.",
+        "sourcePrivateState": "Tomas respects Hessa’s patience but fears she will use his guilt to obtain a bargain that leaves Nera exposed.",
+        "canonicalFacts": [
+          "Hessa has petitioned for the bell record.",
+          "Tomas’s altered entry delayed her access to the truth."
+        ],
+        "dimensions": {
+          "trust": -0.1,
+          "intimacy": -0.1,
+          "authority": -0.2,
+          "conflict": 0.5
+        },
+        "historySummary": "They have spoken only in meetings where neither could ask the useful question.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "adversarial_acquaintance",
+        "publicState": "Hessa considers Tomas neither enemy nor ally until he chooses what he will risk.",
+        "sourcePrivateState": "Hessa suspects Tomas’s shame makes him easier to manipulate, which is precisely why she does not want to rely on it.",
+        "canonicalFacts": [
+          "Hessa possesses material evidence about the third bell.",
+          "Tomas can identify registry notation Hessa cannot."
+        ],
+        "dimensions": {
+          "trust": 0.0,
+          "intimacy": -0.2,
+          "authority": 0.25,
+          "conflict": 0.45
+        },
+        "historySummary": "Hessa will offer Tomas a task before she offers him sympathy.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_tomas_sable",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_sable_eren",
+        "type": "uneasy_allies",
+        "publicState": "Sable needs Tomas to read old registry notation; Tomas needs Sable’s source discipline.",
+        "sourcePrivateState": "Tomas recognizes in Sable the same habit of treating a document as safer than a person and dislikes how familiar it feels.",
+        "canonicalFacts": [
+          "Sable has access to a disputed flood-route map.",
+          "Tomas can authenticate portions of the old ledger."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0.0,
+          "authority": 0.0,
+          "conflict": 0.2
+        },
+        "historySummary": "Their alliance has rules neither has stated: no source is offered without a cost, and no cost is assumed harmless.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "uneasy_allies",
+        "publicState": "Sable sees Tomas as a reluctant primary source who may still be editing himself.",
+        "sourcePrivateState": "Sable wants Tomas’s account but fears becoming another person who asks him to perform guilt for public use.",
+        "canonicalFacts": [
+          "Tomas was a Tide Registry clerk during the flood.",
+          "Tomas’s old clerk mark is on a corrected ledger page."
+        ],
+        "dimensions": {
+          "trust": 0.2,
+          "intimacy": 0.05,
+          "authority": 0.1,
+          "conflict": 0.3
+        },
+        "historySummary": "Sable has prepared questions for Tomas and keeps revising them because every version sounds like an accusation.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_tomas_ivo",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_tomas_vale",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "old_friend",
+        "publicState": "Ivo and Tomas have crossed the city together often enough to know when not to ask why.",
+        "sourcePrivateState": "Tomas knows Ivo has the kind of evidence that gets people arrested before it gets them heard.",
+        "canonicalFacts": [
+          "Ivo ferried Eli during the flood.",
+          "Tomas once helped Ivo read a municipal permit."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.25,
+          "authority": 0.0,
+          "conflict": 0.1
+        },
+        "historySummary": "Their friendship survives because neither calls it loyalty when it is inconvenient.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_tomas",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_tomas_vale",
+        "type": "old_friend",
+        "publicState": "Ivo calls Tomas “Surveyor” when he wants him to remember who is listening.",
+        "sourcePrivateState": "Ivo knows Tomas can become honest only after he has made a map of the cost of honesty.",
+        "canonicalFacts": [
+          "Ivo saw Tomas leave after the flood.",
+          "Tomas knows a portion of Ivo’s illicit route network."
+        ],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.3,
+          "authority": 0.0,
+          "conflict": 0.15
+        },
+        "historySummary": "Ivo has not asked Tomas why he left because he knows a question can be a debt too.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_hessa",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "union_allies",
+        "publicState": "Nera and Hessa lead different parts of the docks and agree more often in public than in private.",
+        "sourcePrivateState": "Nera thinks Hessa hoards leverage while people need action; Hessa thinks Nera spends leverage before checking who pays.",
+        "canonicalFacts": [
+          "Hessa supported Nera’s captaincy.",
+          "Both lost family or crew in the flood."
+        ],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.15,
+          "authority": 0.0,
+          "conflict": 0.45
+        },
+        "historySummary": "They protect each other in meetings and argue afterward over whether urgency is courage or impatience.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_nera",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_nera_quill",
+        "type": "union_allies",
+        "publicState": "Hessa trusts Nera with a crew, not with a secret that needs time.",
+        "sourcePrivateState": "Hessa worries Nera’s rescue story will be used against every dockworker if released without context.",
+        "canonicalFacts": [
+          "Nera saved six people with the Moth.",
+          "Hessa’s charter requires Nera’s crews to support it."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.1,
+          "authority": 0.05,
+          "conflict": 0.35
+        },
+        "historySummary": "Hessa values Nera’s refusal to become polite for power, even while trying to make that refusal survivable.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_sable",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_sable_eren",
+        "type": "institutional_adversaries",
+        "publicState": "Dorian calls Sable’s work “valuable preservation” while keeping her access conditional.",
+        "sourcePrivateState": "Dorian suspects Sable has an original map and fears what she will make it mean rather than what it proves.",
+        "canonicalFacts": [
+          "Dorian helped discredit Sable’s mother.",
+          "Sable’s archive contract is renewed by a municipal office linked to Dorian."
+        ],
+        "dimensions": {
+          "trust": -0.5,
+          "intimacy": -0.15,
+          "authority": 0.65,
+          "conflict": 0.7
+        },
+        "historySummary": "Dorian regards Sable as a problem of procedure; she regards him as a procedure that learned to speak.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_dorian",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "institutional_adversaries",
+        "publicState": "Sable knows Dorian is more complicated than the public story and resents that complication for making the story harder.",
+        "sourcePrivateState": "Sable fears that if Dorian’s engineering case is persuasive, she will have to admit her mother’s lie helped save something.",
+        "canonicalFacts": [
+          "Dorian was involved in her mother’s dismissal.",
+          "Dorian understands the flood infrastructure better than any available witness."
+        ],
+        "dimensions": {
+          "trust": -0.6,
+          "intimacy": -0.2,
+          "authority": -0.35,
+          "conflict": 0.85
+        },
+        "historySummary": "Sable will not accept a technical explanation that has no names attached to its consequences.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_eli",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_eli_vale",
+        "type": "patronage",
+        "publicState": "Dorian supports the chapel pantry through discretionary municipal funds.",
+        "sourcePrivateState": "Dorian tells himself Eli’s pantry is restitution and avoids asking whether the money has made Eli less free.",
+        "canonicalFacts": [
+          "Dorian authorized regular pantry payments.",
+          "Eli has receipts for every payment."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0.1,
+          "authority": 0.7,
+          "conflict": 0.25
+        },
+        "historySummary": "Dorian sees Eli as a practical remedy; Eli sees the remedy’s strings.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_dorian",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "patronage",
+        "publicState": "Eli accepts Dorian’s money because people need food, not because he believes Dorian deserves gratitude.",
+        "sourcePrivateState": "Eli knows the pantry could become a threat if the council asks the wrong questions about its funding.",
+        "canonicalFacts": [
+          "The pantry relies on municipal money.",
+          "Eli knows Dorian knew more about the flood than he admitted."
+        ],
+        "dimensions": {
+          "trust": -0.2,
+          "intimacy": -0.1,
+          "authority": -0.5,
+          "conflict": 0.55
+        },
+        "historySummary": "Eli has practiced polite answers to Dorian for years and is tired of practicing.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_ivo",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "strained_allies",
+        "publicState": "Hessa treats Ivo as a useful route with a human name attached.",
+        "sourcePrivateState": "Hessa knows Ivo’s culvert story could prove the city had alternatives but worries his safety will be treated as expendable evidence.",
+        "canonicalFacts": [
+          "Ivo moved evacuees during the flood.",
+          "Hessa’s foundry has repaired the Palinode without paperwork."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0.05,
+          "authority": 0.1,
+          "conflict": 0.3
+        },
+        "historySummary": "They trade favors in forms neither wants recorded.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_hessa",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "strained_allies",
+        "publicState": "Ivo admires Hessa’s ability to make a room wait and fears her ability to make a room decide.",
+        "sourcePrivateState": "Ivo thinks Hessa will protect a witness only until protecting the witness conflicts with the charter.",
+        "canonicalFacts": [
+          "Hessa has evidence of the bell defect.",
+          "Ivo can access the north sluice by water."
+        ],
+        "dimensions": {
+          "trust": 0.35,
+          "intimacy": 0.0,
+          "authority": 0.0,
+          "conflict": 0.25
+        },
+        "historySummary": "Ivo knows Hessa’s promises are carefully priced, and that is why he takes them seriously.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_ivo",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "debt_and_respect",
+        "publicState": "Nera is owed money by Ivo and dislikes that she also owes him gratitude.",
+        "sourcePrivateState": "Nera suspects Ivo knows more about the flood route than he has said, but she will not force him through the council’s machinery.",
+        "canonicalFacts": [
+          "Nera paid for the Palinode’s propeller repair.",
+          "Ivo assisted the Moth during the flood."
+        ],
+        "dimensions": {
+          "trust": 0.4,
+          "intimacy": 0.05,
+          "authority": 0.2,
+          "conflict": 0.2
+        },
+        "historySummary": "Their debt is real but neither allows it to define the whole relationship.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_nera",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_nera_quill",
+        "type": "debt_and_respect",
+        "publicState": "Ivo calls Nera “Captain” even when she tells him not to.",
+        "sourcePrivateState": "Ivo owes Nera money and has kept her rescue choice private because he knows how evidence can punish the person who acted.",
+        "canonicalFacts": [
+          "Nera saved Ivo’s ferry business once.",
+          "Ivo saw Nera choose the Moth rescue route."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.1,
+          "authority": -0.15,
+          "conflict": 0.15
+        },
+        "historySummary": "Ivo will take Nera’s passengers anywhere except through a route that risks children.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_eli",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_eli_vale",
+        "type": "sources_and_friends",
+        "publicState": "Sable and Eli exchange council papers for pantry lists and call it mutual help.",
+        "sourcePrivateState": "Sable worries Eli is becoming the kind of source a city can destroy because he believes he is too ordinary to matter.",
+        "canonicalFacts": [
+          "Eli supplied redacted council agendas.",
+          "Sable helps the chapel preserve old delivery records."
+        ],
+        "dimensions": {
+          "trust": 0.6,
+          "intimacy": 0.35,
+          "authority": 0.0,
+          "conflict": 0.1
+        },
+        "historySummary": "Their friendship is built around tasks neither would call friendship until one of them fails to show up.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_sable",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_sable_eren",
+        "type": "sources_and_friends",
+        "publicState": "Eli trusts Sable’s care with paper more than he trusts her instinct to publish it.",
+        "sourcePrivateState": "Eli has not told Sable about the pantry payments because he fears she will turn them into a story before he can keep people fed.",
+        "canonicalFacts": [
+          "Sable can authenticate council documents.",
+          "Eli knows where the chapel accounts are hidden."
+        ],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.4,
+          "authority": 0.0,
+          "conflict": 0.2
+        },
+        "historySummary": "Eli knows Sable listens seriously, which makes withholding things from her feel worse than lying.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_quill_sable_eren",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_sable_eren",
+        "type": "union-and-source-allies",
+        "publicState": "Nera respects Sable’s work and dislikes the way a published page can outlive its subject.",
+        "sourcePrivateState": "Nera wants the original route map authenticated, but fears Sable will publish before the charter protects the people named in it.",
+        "canonicalFacts": [
+          "Nera supplied Sable a dock log to compare with the flood map.",
+          "Sable has seen the private map but not the Moth’s rope."
+        ],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.1,
+          "authority": 0.0,
+          "conflict": 0.35
+        },
+        "historySummary": "They trade access to records for access to people; neither considers that exchange neutral.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_eren_nera_quill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_nera_quill",
+        "type": "union-and-source-allies",
+        "publicState": "Sable regards Nera as a witness whose practical memory may challenge the archive.",
+        "sourcePrivateState": "Sable worries Nera’s crew will be harmed if their rescue route becomes a public test case.",
+        "canonicalFacts": [
+          "Nera was on Coal Wharf during the flood.",
+          "Hessa and Nera disagree on when to release evidence."
+        ],
+        "dimensions": {
+          "trust": 0.4,
+          "intimacy": 0.05,
+          "authority": 0.0,
+          "conflict": 0.25
+        },
+        "historySummary": "Nera answers Sable’s questions, but will not answer on behalf of her crew.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_quill_eli_vale",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_eli_vale",
+        "type": "survivor-and-captain",
+        "publicState": "Nera remembers Eli as a child who kept a list of everyone who made it across the culvert.",
+        "sourcePrivateState": "Nera suspects Eli accepts Dorian’s money and does not want that suspicion to become a weapon against the chapel.",
+        "canonicalFacts": [
+          "Nera did not personally carry Eli through the flood.",
+          "The Moth crew and Ivo’s ferry both participated in evacuations."
+        ],
+        "dimensions": {
+          "trust": 0.35,
+          "intimacy": 0.1,
+          "authority": 0.15,
+          "conflict": 0.2
+        },
+        "historySummary": "Nera brings the chapel pantry fuel when the Moth has spare; Eli asks no questions about where it came from.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_vale_nera_quill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_nera_quill",
+        "type": "survivor-and-captain",
+        "publicState": "Eli trusts Nera’s practical judgment and fears her anger more than her criticism.",
+        "sourcePrivateState": "Eli believes Nera can turn the Moth into the safest evacuation route if the gate fails.",
+        "canonicalFacts": [
+          "Nera knows the docks better than any council planner.",
+          "Eli’s pantry is partly funded by Dorian."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.2,
+          "authority": -0.1,
+          "conflict": 0.15
+        },
+        "historySummary": "They share a habit of checking who has eaten before discussing what is owed.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nera_quill_dorian_voss",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_nera_quill",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "captain-and-engineer",
+        "publicState": "Nera knows Dorian as the engineer who approves dredge contracts and describes delays as calculations.",
+        "sourcePrivateState": "Nera suspects Dorian’s gate decision helped flood the north; she does not know about the hospital pressure-main emergency or the signed order.",
+        "canonicalFacts": [
+          "Dorian controlled municipal repair priorities.",
+          "Nera’s crew received an incomplete warning."
+        ],
+        "dimensions": {
+          "trust": -0.55,
+          "intimacy": -0.2,
+          "authority": -0.35,
+          "conflict": 0.75
+        },
+        "historySummary": "Dorian once renewed the Moth contract after Nera challenged him in public; both remember the exchange as a warning.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_voss_nera_quill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_nera_quill",
+        "type": "captain-and-engineer",
+        "publicState": "Dorian recognizes Nera’s flood rescue as a rapid, rational response under bad information.",
+        "sourcePrivateState": "He fears Nera will publicly interpret the hold order as a decision to sacrifice North Quay, and knows that fear is not baseless.",
+        "canonicalFacts": [
+          "Dorian knows the sluice hold saved the cistern and harmed North Quay.",
+          "Nera has not seen his order."
+        ],
+        "dimensions": {
+          "trust": -0.25,
+          "intimacy": -0.15,
+          "authority": 0.45,
+          "conflict": 0.65
+        },
+        "historySummary": "He respects her enough not to call her reckless to her face, which she reads as condescension.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_rill_sable_eren",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_sable_eren",
+        "type": "evidence-and-charter-allies",
+        "publicState": "Hessa trusts Sable’s restoration skills and asks her to check provenance before anyone makes a speech.",
+        "sourcePrivateState": "Hessa has shown Sable the clapper and original map but asked her to hold both until workers have protections.",
+        "canonicalFacts": [
+          "Sable has seen the clapper and the map.",
+          "Hessa wants a binding charter before a public reveal."
+        ],
+        "dimensions": {
+          "trust": 0.65,
+          "intimacy": 0.2,
+          "authority": 0.15,
+          "conflict": 0.2
+        },
+        "historySummary": "They have worked side by side through two council hearings and disagree about when proof becomes useful.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_eren_hessa_rill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "evidence-and-charter-allies",
+        "publicState": "Sable relies on Hessa to know which public promise can actually be enforced.",
+        "sourcePrivateState": "Sable fears that waiting for a perfect charter will let Dorian retire the evidence with him.",
+        "canonicalFacts": [
+          "Hessa holds the late clapper.",
+          "Sable’s mother altered an archive copy."
+        ],
+        "dimensions": {
+          "trust": 0.6,
+          "intimacy": 0.1,
+          "authority": -0.1,
+          "conflict": 0.3
+        },
+        "historySummary": "Hessa is one of the few people Sable will let read her restoration notes before they are finished.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_rill_eli_vale",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_eli_vale",
+        "type": "mutual-aid-and-accountability",
+        "publicState": "Hessa respects Eli’s pantry work and once organized a foundry shift to deliver food during a pump outage.",
+        "sourcePrivateState": "Hessa knows Eli takes municipal money and wants him protected, not exposed as proof of Dorian’s generosity.",
+        "canonicalFacts": [
+          "The chapel pantry serves dock families.",
+          "Eli keeps receipts for Dorian’s stipend."
+        ],
+        "dimensions": {
+          "trust": 0.6,
+          "intimacy": 0.25,
+          "authority": 0.1,
+          "conflict": 0.2
+        },
+        "historySummary": "Hessa has asked Eli to attend the charter meeting as a witness to water access, not as a symbol of charity.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_vale_hessa_rill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "mutual-aid-and-accountability",
+        "publicState": "Eli considers Hessa dependable but worries she will make the pantry a bargaining point.",
+        "sourcePrivateState": "Eli has withheld the full stipend ledger from Hessa because it could threaten winter supplies.",
+        "canonicalFacts": [
+          "Hessa favors enforceable funding commitments.",
+          "Eli has accepted discretionary municipal support."
+        ],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.2,
+          "authority": -0.1,
+          "conflict": 0.3
+        },
+        "historySummary": "They agree on who needs help and disagree on whether public leverage helps them.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_voss_hessa_rill",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_hessa_rill",
+        "type": "engineer-and-foundry-speaker",
+        "publicState": "Dorian has relied on Hessa’s foundry to cast replacement parts that municipal shops cannot make.",
+        "sourcePrivateState": "Dorian knows Hessa has the third-bell clapper and expects she will use it to force a charter.",
+        "canonicalFacts": [
+          "Hessa has evidence of the bell defect.",
+          "Dorian controls the gate maintenance order."
+        ],
+        "dimensions": {
+          "trust": 0.15,
+          "intimacy": 0.0,
+          "authority": 0.25,
+          "conflict": 0.6
+        },
+        "historySummary": "Their arguments are technical until one of them mentions who waited for water.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_hessa_rill_dorian_voss",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_hessa_rill",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "engineer-and-foundry-speaker",
+        "publicState": "Hessa considers Dorian competent and dangerous precisely because he can explain the costs of every option.",
+        "sourcePrivateState": "Hessa believes Dorian knew about the defective alloy before the flood but cannot yet prove who approved it.",
+        "canonicalFacts": [
+          "Dorian signed the gate hold order.",
+          "Hessa recovered the clapper after the flood."
+        ],
+        "dimensions": {
+          "trust": -0.2,
+          "intimacy": -0.1,
+          "authority": -0.3,
+          "conflict": 0.7
+        },
+        "historySummary": "Hessa refuses to simplify Dorian into a villain; she also refuses to let complexity cancel responsibility.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_dorian_voss_ivo_merrow",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_dorian_voss",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "municipal-engineer-and-ferryman",
+        "publicState": "Dorian has issued maintenance permits that kept Ivo’s ferry legal enough to operate.",
+        "sourcePrivateState": "Dorian knows a decommissioned service route exists but not that Ivo used it to evacuate people.",
+        "canonicalFacts": [
+          "Ivo has moved people through restricted channels.",
+          "Dorian’s office issued a retired-code order during the flood."
+        ],
+        "dimensions": {
+          "trust": 0.0,
+          "intimacy": -0.1,
+          "authority": 0.55,
+          "conflict": 0.35
+        },
+        "historySummary": "Their paperwork stays carefully vague; both understand that exact words can close a route.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_merrow_dorian_voss",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_dorian_voss",
+        "type": "municipal-engineer-and-ferryman",
+        "publicState": "Ivo thinks Dorian sees him as a controllable exception.",
+        "sourcePrivateState": "Ivo knows Dorian’s signature appeared on a false maintenance order but does not know the gate’s full pressure rationale.",
+        "canonicalFacts": [
+          "Dorian can close Ivo’s lawful routes.",
+          "Ivo knows how to reach the north sluice by water."
+        ],
+        "dimensions": {
+          "trust": -0.25,
+          "intimacy": -0.15,
+          "authority": -0.65,
+          "conflict": 0.4
+        },
+        "historySummary": "Ivo charges Dorian double for an honest crossing and refuses to say why.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_sable_eren_ivo_merrow",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_sable_eren",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "archivist-and-witness",
+        "publicState": "Sable wants to document Ivo’s culvert account without publishing passenger names.",
+        "sourcePrivateState": "Sable does not know Ivo has the complete evacuee list stitched into his sail.",
+        "canonicalFacts": [
+          "Ivo can corroborate an alternative route.",
+          "Sable protects sources when given a clear boundary."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0.0,
+          "authority": 0.0,
+          "conflict": 0.2
+        },
+        "historySummary": "They have agreed on one rule: no names in a draft until the named person sees it.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_merrow_sable_eren",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_sable_eren",
+        "type": "archivist-and-witness",
+        "publicState": "Ivo trusts Sable’s hands with paper more than he trusts her conclusions.",
+        "sourcePrivateState": "Ivo fears the archive will treat his illegal route as proof that everyone could have been saved.",
+        "canonicalFacts": [
+          "Sable is searching for a missing route map.",
+          "Ivo has evidence that does not prove universal access."
+        ],
+        "dimensions": {
+          "trust": 0.35,
+          "intimacy": 0.0,
+          "authority": 0.0,
+          "conflict": 0.15
+        },
+        "historySummary": "Sable accepts that a witness can have a condition; Ivo notices she means it.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_vale_ivo_merrow",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_eli_vale",
+        "targetEntityId": "entity_ivo_merrow",
+        "type": "survivor-and-ferryman",
+        "publicState": "Eli remembers Ivo as the ferryman who made him count heads instead of asking whether he was afraid.",
+        "sourcePrivateState": "Eli has never told Ivo that Dorian later used the pantry stipend to ask where Tomas had gone.",
+        "canonicalFacts": [
+          "Ivo carried Eli through the culvert.",
+          "Eli took municipal pantry funds from Dorian."
+        ],
+        "dimensions": {
+          "trust": 0.7,
+          "intimacy": 0.2,
+          "authority": 0.0,
+          "conflict": 0.1
+        },
+        "historySummary": "Ivo brings the chapel mint tea when he cannot bring money.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_ivo_merrow_eli_vale",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceEntityId": "entity_ivo_merrow",
+        "targetEntityId": "entity_eli_vale",
+        "type": "survivor-and-ferryman",
+        "publicState": "Ivo feels responsible for Eli because he was a frightened child on the ferry once.",
+        "sourcePrivateState": "Ivo suspects Eli knows more about current municipal orders than he admits.",
+        "canonicalFacts": ["Eli runs the pantry.", "Ivo has a copy of the evacuation list."],
+        "dimensions": {
+          "trust": 0.6,
+          "intimacy": 0.15,
+          "authority": 0.1,
+          "conflict": 0.1
+        },
+        "historySummary": "Ivo keeps Eli’s name on the list even though he knows Eli is now old enough to object.",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "locations": [
+      {
+        "id": "loc_stilled_house",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "The Stilled House",
+        "aliases": ["Old Tide Registry", "Registry"],
+        "type": "civic-building",
+        "tags": ["registry", "records", "return"],
+        "publicDescription": "The former Tide Registry leans over a drained side channel, its lower bricks furred with salt. A brass tally-tab has been nailed beside the door at eye level, as if the building is asking to be counted. Inside, tide marks climb the wall in pencil and a rain bucket catches water from a roof that was repaired three times and never properly.",
+        "privateDetails": "A removable panel behind the counter opens onto a receiving pipe wide enough for a person to crawl through. The pipe joins the archive cistern and was used for unofficial document transfers during the flood.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "rain-muted morning",
+          "sound": "roof drip, distant chain winch",
+          "smell": "wet paper and salt mortar"
+        },
+        "capacity": 25,
+        "accessRules": ["The public counter is open.", "The basement is officially condemned."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 30
+        },
+        "hazards": ["Loose plaster above the north desk", "Flooded basement after heavy rain"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_coal_wharf",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Coal Wharf",
+        "aliases": ["Moth Berth", "The Wharf"],
+        "type": "working-waterfront",
+        "tags": ["docks", "labor", "dredge"],
+        "publicDescription": "Coal Wharf is all black timber, low warehouses, and a work bell that has not rung in years. The dredge Moth sits against a rotting ladder with its engine cover open. Tea steams from a paint-spattered mug while gulls argue over something nobody wants to identify.",
+        "privateDetails": "A rusted cargo winch still contains a sealed signal conduit leading toward the old warning network. The conduit is visible only when the tide falls below the painted third line.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "grey daylight",
+          "sound": "engine knocks, gulls, rope against iron",
+          "smell": "diesel, kelp, hot tea"
+        },
+        "capacity": 80,
+        "accessRules": ["Public dock access during day.", "Crew areas require captain permission."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 90
+        },
+        "hazards": ["Unstable ladder to the Moth", "Sudden wake from ferry traffic"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_bell_foundry",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Rill Bell Foundry",
+        "aliases": ["The Bellworks", "Rill Foundry"],
+        "type": "workshop",
+        "tags": ["bells", "union", "metalwork"],
+        "publicDescription": "The foundry is warmer than the street and quieter than a forge should be. Bells of every size hang from overhead hooks, each tagged with a neighborhood and a repair date. The smallest bell on the wall has no clapper and a child’s name scratched into its rim.",
+        "privateDetails": "The ash pit beneath the cooling rack contains a false bottom. Hessa keeps the third-bell clapper wrapped in oiled cloth below it, along with drafts of the water charter and old alloy invoices.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "amber furnace light",
+          "sound": "cooling metal ticks, distant hammer blows",
+          "smell": "charcoal, hot iron, orange peel"
+        },
+        "capacity": 35,
+        "accessRules": [
+          "Shop is public during work hours.",
+          "Casting floor requires Hessa or a worker to approve entry."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 45
+        },
+        "hazards": ["Hot metal", "Overhead suspended bells"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_archive_cistern",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Archive Cistern",
+        "aliases": ["The Cistern", "Map Vault"],
+        "type": "underground-archive",
+        "tags": ["maps", "archives", "water"],
+        "publicDescription": "Below the public archive, map drawers stand on brick plinths above a finger of black water. Pages dry beneath weighted screens. A small fan turns by hand because the electric one burned out last winter. Pencil lines on the walls show high water in three different inks.",
+        "privateDetails": "A laminated sewer chart hides a thin pocket containing Sable’s original warning-route map. A collapsed maintenance tunnel once connected to the Stilled House receiving pipe.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "lamp pools and reflected water",
+          "sound": "fan crank, dripping, paper rustle",
+          "smell": "mildew, glue, cold stone"
+        },
+        "capacity": 20,
+        "accessRules": [
+          "Archive card required for work tables.",
+          "Flooded drawers require conservator supervision."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 25
+        },
+        "hazards": ["Slippery brick", "Water-damaged shelves"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_service_gate",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Glass Ward Service Gate",
+        "aliases": ["Service Gate", "Glass Gate"],
+        "type": "infrastructure",
+        "tags": ["gate", "cistern", "municipal"],
+        "publicDescription": "The service gate is hidden behind a clean row of town houses where rain runs neatly into brass drains. Its wheel is larger than a dining table and painted municipal blue. Someone has recently swept the stairs, though the paint around the lower hinge has a fresh pale scar.",
+        "privateDetails": "The gate has been patched, not repaired. A sealed service tube beneath the stair holds Dorian’s duplicate order. The pressure crack is inside the housing, invisible until the wheel is opened.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "hard reflected daylight",
+          "sound": "distant pipes, water pressure hum",
+          "smell": "limewash and iron"
+        },
+        "capacity": 20,
+        "accessRules": [
+          "Municipal service seal or worker escort required.",
+          "Gate housing is restricted during high-water alert."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 20
+        },
+        "hazards": ["Pressurized machinery", "Security patrols"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_low_chapel",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Chapel of Low Water",
+        "aliases": ["Low Chapel", "The Pantry"],
+        "type": "mutual-aid-hub",
+        "tags": ["chapel", "pantry", "community"],
+        "publicDescription": "The old pump house has pews bolted between pressure pipes and soup simmering beneath a cracked saint’s mosaic. Delivery lists cover one wall in neat chalk. The floor is always warm near the central pump, and someone has placed a bowl of mint leaves beside the door for visitors who are about to say something difficult.",
+        "privateDetails": "Eli keeps receipts for the pantry’s municipal stipend in a flour tin under the third pew. A forgotten pump key can open a maintenance hatch leading toward the old flood channels.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "warm lamps",
+          "sound": "ladles, low conversation, pump thrum",
+          "smell": "lentils, mint, damp wool"
+        },
+        "capacity": 120,
+        "accessRules": ["Meals are public.", "Supply room is staff-only."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 70
+        },
+        "hazards": ["Crowding during distribution", "Old pump vibration"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_ferry_nine",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "Ferry Nine Landing",
+        "aliases": ["Palinode Landing", "Ferry Nine"],
+        "type": "ferry-landing",
+        "tags": ["ferry", "routes", "smuggling"],
+        "publicDescription": "Ferry Nine is a narrow stair cut into the embankment, painted with tide numbers and old election slogans. The Palinode waits below, patched in mismatched colors, its blue kettle tied to the rail with wire. The river here moves sideways before it chooses a direction.",
+        "privateDetails": "The Palinode’s spare sail contains the stitched evacuee list from the culvert crossing. At low water, an unmarked maintenance channel leads toward the north sluice.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "open river light",
+          "sound": "water under hull, kettle rattle, distant bells",
+          "smell": "mint tea, diesel, river mud"
+        },
+        "capacity": 40,
+        "accessRules": [
+          "Ferry crossing requires Ivo or another pilot.",
+          "North channel is unsafe above middle tide."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 100
+        },
+        "hazards": ["Fast current", "Unmarked submerged pylons"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_north_sluice",
+        "revisionId": "rev_tide_ledger_1",
+        "name": "North Sluice",
+        "aliases": ["The Sluice", "North Gate"],
+        "type": "floodworks",
+        "tags": ["flood", "sluice", "finale"],
+        "publicDescription": "The north sluice sits below a warehouse district that still carries water lines seven years old. Its gate teeth are packed with reeds, plastic toys, and a strip of red cloth. When the tide pulls away, the stone apron reveals an eighteen-minute sequence of chalk marks made by different hands.",
+        "privateDetails": "The internal gate mechanism has a widening pressure crack. The original warning route, the culvert exit, and the Glass Ward service line all converge here. What happens at king tide can be witnessed, repaired, sabotaged, delayed, or made public; it cannot be made consequence-free.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "open sky and reflected water",
+          "sound": "metal groan, water pull, warehouse wind",
+          "smell": "brine, rust, old algae"
+        },
+        "capacity": 60,
+        "accessRules": [
+          "Dangerous during high tide.",
+          "Service gate access or ferry approach required."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 150
+        },
+        "hazards": ["Surge water", "Unstable catwalk", "Pressurized gate failure"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "locationEdges": [
+      {
+        "id": "edge_stilled_coal",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_stilled_house",
+        "destinationLocationId": "loc_coal_wharf",
+        "directed": false,
+        "directionLabel": "south along the side channel",
+        "travelText": "A damp service lane descends past shuttered laundries to the wharf.",
+        "travelTime": 8,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_coal_stilled",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_coal_wharf",
+        "destinationLocationId": "loc_stilled_house",
+        "directed": false,
+        "directionLabel": "north along the side channel",
+        "travelText": "The lane rises from the wharf toward the crooked roofline of the registry.",
+        "travelTime": 8,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_stilled_chapel",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_stilled_house",
+        "destinationLocationId": "loc_low_chapel",
+        "directed": false,
+        "directionLabel": "east through Pump Court",
+        "travelText": "Pump Court smells of wet limestone and lunch queues.",
+        "travelTime": 6,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_chapel_stilled",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_low_chapel",
+        "destinationLocationId": "loc_stilled_house",
+        "directed": false,
+        "directionLabel": "west through Pump Court",
+        "travelText": "The registry’s leaning upper floor is visible beyond the pump house chimneys.",
+        "travelTime": 6,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_stilled_archive",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_stilled_house",
+        "destinationLocationId": "loc_archive_cistern",
+        "directed": false,
+        "directionLabel": "through the archive lane",
+        "travelText": "A covered lane joins the old registry to the public archive entrance.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_archive_stilled",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_archive_cistern",
+        "destinationLocationId": "loc_stilled_house",
+        "directed": false,
+        "directionLabel": "through the archive lane",
+        "travelText": "The lane is dry except where water has found the old receiving pipe.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_coal_foundry",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_coal_wharf",
+        "destinationLocationId": "loc_bell_foundry",
+        "directed": false,
+        "directionLabel": "up Bellmakers Street",
+        "travelText": "Bellmakers Street climbs away from the water between metal shops and union notices.",
+        "travelTime": 7,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_foundry_coal",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_bell_foundry",
+        "destinationLocationId": "loc_coal_wharf",
+        "directed": false,
+        "directionLabel": "down Bellmakers Street",
+        "travelText": "The air cools and smells more of rope as the street drops toward Coal Wharf.",
+        "travelTime": 7,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_coal_ferry",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_coal_wharf",
+        "destinationLocationId": "loc_ferry_nine",
+        "directed": false,
+        "directionLabel": "east along the quay",
+        "travelText": "A low quay path follows the channel to the ferry steps.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_ferry_coal",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_ferry_nine",
+        "destinationLocationId": "loc_coal_wharf",
+        "directed": false,
+        "directionLabel": "west along the quay",
+        "travelText": "The dredge cranes stand above the quay like black punctuation.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_archive_service",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_archive_cistern",
+        "destinationLocationId": "loc_service_gate",
+        "directed": false,
+        "directionLabel": "north through Glass Ward",
+        "travelText": "The route climbs past clean drains and locked service doors.",
+        "travelTime": 10,
+        "travelCost": 0,
+        "accessRequirements": ["municipal access or a plausible escort"],
+        "discoverability": 0.8,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_service_archive",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_service_gate",
+        "destinationLocationId": "loc_archive_cistern",
+        "directed": false,
+        "directionLabel": "south through Glass Ward",
+        "travelText": "The descent makes the archive lamps seem dimmer than before.",
+        "travelTime": 10,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1.0,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_service_sluice",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_service_gate",
+        "destinationLocationId": "loc_north_sluice",
+        "directed": true,
+        "directionLabel": "down the maintenance stairs",
+        "travelText": "A restricted stair runs beside the service pipe toward the north floodworks.",
+        "travelTime": 9,
+        "travelCost": 0,
+        "accessRequirements": ["service seal, worker escort, or an alternative route"],
+        "discoverability": 0.5,
+        "blocked": true,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_ferry_sluice",
+        "revisionId": "rev_tide_ledger_1",
+        "sourceLocationId": "loc_ferry_nine",
+        "destinationLocationId": "loc_north_sluice",
+        "directed": true,
+        "directionLabel": "north by water",
+        "travelText": "At low water, the Palinode can slip between the old channel markers to the sluice apron.",
+        "travelTime": 12,
+        "travelCost": 0,
+        "accessRequirements": ["a pilot and safe tide"],
+        "discoverability": 0.7,
+        "blocked": false,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "storyCards": [
+      {
+        "id": "card_public_three_bells",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Night of Three Bells",
+        "cardType": "historical_event",
+        "tags": ["flood", "public-record"],
+        "canonicalBody": "Seven years ago, a storm tide entered North Quay after three warning bells arrived late or not at all. The official account attributes the disaster to weather, aging equipment, and a dock bell network that failed under load. Every year the city observes a minute of silence at 02:00.",
+        "playerVisibleBody": "Veyr marks the Night of Three Bells at 02:00. Families disagree about whether the bells failed, arrived late, or were never meant to reach every street.",
+        "activationHints": ["third bell", "02:00", "flood anniversary", "official account"],
+        "priority": 9,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_king_tide",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Coming King Tide",
+        "cardType": "lore",
+        "tags": ["tide", "deadline"],
+        "canonicalBody": "A king tide is expected in four nights. It will raise the river high enough to test the north sluice and the Glass Ward service gate. The city has announced routine inspections and no evacuation plan.",
+        "playerVisibleBody": "In four nights, the highest tide of the season will test the city’s old floodworks.",
+        "activationHints": ["king tide", "four nights", "high water", "inspection"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_bell_network",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "How Veyr Warns Itself",
+        "cardType": "rule",
+        "tags": ["bells", "warnings"],
+        "canonicalBody": "Veyr’s warning system is physical: bell relays, runners, signal wire, and people willing to pull a rope. A written order does nothing until a particular person carries it, rings it, or chooses not to.",
+        "playerVisibleBody": "Flood warnings in Veyr depend on bells, people, and routes—not on a single magical alarm.",
+        "activationHints": ["warning bell", "signal wire", "route", "clapper"],
+        "priority": 8,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_water_charter",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "Water Is Not Neutral",
+        "cardType": "rule",
+        "tags": ["water-rights", "civic"],
+        "canonicalBody": "Glass Ward receives reliable water because its service gate is maintained first. North Quay receives promises, tanker deliveries, and repair schedules that slip whenever budgets shrink. The proposed Dock Water Charter would tie repair funding and emergency access to enforceable public conditions.",
+        "playerVisibleBody": "Different parts of Veyr receive water differently. A proposed charter could change who gets repairs and emergency access.",
+        "activationHints": ["water charter", "Glass Ward", "North Quay", "repair funding"],
+        "priority": 8,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_moth",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Moth",
+        "cardType": "location",
+        "tags": ["dredge", "crew"],
+        "canonicalBody": "The dredge Moth clears silt from the commercial channel and doubles as an unofficial rescue boat whenever weather turns. Its contract is municipal, its crew is union, and neither arrangement is as secure as it sounds.",
+        "playerVisibleBody": "The Moth is a working dredge and a potential rescue vessel at Coal Wharf.",
+        "activationHints": ["Moth", "dredge", "Nera", "crew"],
+        "priority": 6,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "location",
+          "locationId": "loc_coal_wharf"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_low_chapel",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Chapel Pantry",
+        "cardType": "location",
+        "tags": ["mutual-aid", "food"],
+        "canonicalBody": "The Chapel of Low Water distributes meals, medicine, and unwanted advice. Its books are cleaner than most city offices because Eli Vale keeps them that way.",
+        "playerVisibleBody": "The Chapel Pantry is a place to find Eli, food, and people who know what the city has failed to deliver.",
+        "activationHints": ["chapel", "pantry", "Eli", "medicine"],
+        "priority": 6,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "location",
+          "locationId": "loc_low_chapel"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_routes",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "Routes Are Not Destinies",
+        "cardType": "style",
+        "tags": ["agency", "play"],
+        "canonicalBody": "Evidence may reveal choices, but it does not dictate the one the player must make. Expose, repair, negotiate, withhold, leave, or invent another route when the story supports it. No person owes a confession simply because another person wants closure.",
+        "playerVisibleBody": "The city has pressures and consequences, not a required moral answer.",
+        "activationHints": ["choice", "consequence", "no forced confession"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_tomas_black_copy",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Black Copy",
+        "cardType": "item",
+        "tags": ["ledger", "tomas", "private"],
+        "canonicalBody": "Inside Tomas’s brass survey case is a carbon copy of the third-bell ledger page. The time column is torn out, but the graphite impression of “01:42” remains beneath the crease. Tomas recognizes the pressure pattern of Dorian’s pencil note: HOLD UNTIL GLASS IS STABLE.",
+        "activationHints": ["brass case", "carbon copy", "01:42", "Dorian pencil"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_tomas_vale"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_tomas_unsent_letter",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Unsent Letter",
+        "cardType": "item",
+        "tags": ["tomas", "nera", "private"],
+        "canonicalBody": "Tomas wrote Nera a letter at the station and never posted it. It says he was afraid she would ask him to explain himself before he understood what he had done. Nera has the unopened letter in her sea chest. It does not say that Tomas had already received her 01:36 warning scrap.",
+        "activationHints": ["unsent letter", "Nera", "station"],
+        "priority": 7,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_tomas_vale"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_nera_rope",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Rope in the Locker",
+        "cardType": "item",
+        "tags": ["nera", "signal", "private"],
+        "canonicalBody": "Nera keeps the cut Moth mooring rope coiled behind an engine panel. A strand of municipal signal wire is braided through it. The wire is stamped with a replacement order dated two weeks before the flood, but the official maintenance log says the wire was not replaced until after.",
+        "activationHints": ["cut rope", "signal wire", "maintenance order"],
+        "priority": 9,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_nera_quill"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_dorian_order",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Duplicate Order",
+        "cardType": "item",
+        "tags": ["dorian", "sluice", "private"],
+        "canonicalBody": "Dorian sealed a duplicate gate order in a service tube beneath the Glass Ward stairs. It orders the north sluice held to preserve the freshwater cistern. The order includes a handwritten contingency: if the third bell has not cleared the dock route, proceed anyway. That contingency is crossed out.",
+        "activationHints": ["duplicate order", "service tube", "north sluice", "Glass Ward"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_dorian_voss"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_hessa_clapper",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Late Clapper",
+        "cardType": "item",
+        "tags": ["hessa", "bell", "private"],
+        "canonicalBody": "The third-bell clapper contains soft alloy from a batch recalled before the flood. It rings late when cold. Hessa can demonstrate the delay, but only by exposing that she took evidence from the ash pit while the city was still searching for bodies.",
+        "activationHints": ["late clapper", "alloy stamp", "ash pit"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_hessa_rill"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_sable_original_map",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Map in the Lining",
+        "cardType": "item",
+        "tags": ["sable", "map", "private"],
+        "canonicalBody": "The original route map shows a temporary warning runner path through Glass Ward. The path was removed in red pencil before the flood. Sable’s mother created the archive copy that omitted both the path and the red pencil. The original has a coffee ring that matches Dorian’s old office mug.",
+        "activationHints": ["original map", "red pencil", "Glass Ward route"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_sable_eren"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_ivo_evacuee_list",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Sail List",
+        "cardType": "item",
+        "tags": ["ivo", "culvert", "private"],
+        "canonicalBody": "Names and ages of forty-one evacuees are stitched into the Palinode’s spare sail. The list includes Eli Vale, an injured nurse, and three people officially recorded as having been rescued after 02:00. It proves a route existed; it does not prove that every person could have used it safely.",
+        "activationHints": ["spare sail", "culvert list", "forty-one evacuees"],
+        "priority": 10,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_ivo_merrow"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_eli_receipts",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Flour Tin Receipts",
+        "cardType": "item",
+        "tags": ["eli", "pantry", "private"],
+        "canonicalBody": "The flour tin under the third pew contains seven years of municipal stipend receipts, all signed through Dorian’s office. The money kept people fed. The receipts also show that the amount increased each time someone requested a flood-record review.",
+        "activationHints": ["flour tin", "stipend receipts", "third pew"],
+        "priority": 9,
+        "tokenBudget": 420,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_eli_vale"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "storyCardLinks": [
+      {
+        "id": "link_public_storm_tomas",
+        "cardId": "card_public_three_bells",
+        "targetType": "entity",
+        "targetId": "entity_tomas_vale",
+        "relationType": "former_registrar",
+        "weight": 1
+      },
+      {
+        "id": "link_public_storm_nera",
+        "cardId": "card_public_three_bells",
+        "targetType": "entity",
+        "targetId": "entity_nera_quill",
+        "relationType": "survivor",
+        "weight": 1
+      },
+      {
+        "id": "link_public_storm_dorian",
+        "cardId": "card_public_three_bells",
+        "targetType": "entity",
+        "targetId": "entity_dorian_voss",
+        "relationType": "engineer",
+        "weight": 1
+      },
+      {
+        "id": "link_king_sluice",
+        "cardId": "card_public_king_tide",
+        "targetType": "location",
+        "targetId": "loc_north_sluice",
+        "relationType": "tests",
+        "weight": 1
+      },
+      {
+        "id": "link_bells_hessa",
+        "cardId": "card_public_bell_network",
+        "targetType": "entity",
+        "targetId": "entity_hessa_rill",
+        "relationType": "maintains",
+        "weight": 1
+      },
+      {
+        "id": "link_water_hessa",
+        "cardId": "card_public_water_charter",
+        "targetType": "entity",
+        "targetId": "entity_hessa_rill",
+        "relationType": "advocates",
+        "weight": 1
+      },
+      {
+        "id": "link_moth_nera",
+        "cardId": "card_public_moth",
+        "targetType": "entity",
+        "targetId": "entity_nera_quill",
+        "relationType": "captains",
+        "weight": 1
+      },
+      {
+        "id": "link_chapel_eli",
+        "cardId": "card_public_low_chapel",
+        "targetType": "entity",
+        "targetId": "entity_eli_vale",
+        "relationType": "keeps",
+        "weight": 1
+      },
+      {
+        "id": "link_black_copy_tomas",
+        "cardId": "card_tomas_black_copy",
+        "targetType": "entity",
+        "targetId": "entity_tomas_vale",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_rope_nera",
+        "cardId": "card_nera_rope",
+        "targetType": "entity",
+        "targetId": "entity_nera_quill",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_order_dorian",
+        "cardId": "card_dorian_order",
+        "targetType": "entity",
+        "targetId": "entity_dorian_voss",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_clapper_hessa",
+        "cardId": "card_hessa_clapper",
+        "targetType": "entity",
+        "targetId": "entity_hessa_rill",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_map_sable",
+        "cardId": "card_sable_original_map",
+        "targetType": "entity",
+        "targetId": "entity_sable_eren",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_sail_ivo",
+        "cardId": "card_ivo_evacuee_list",
+        "targetType": "entity",
+        "targetId": "entity_ivo_merrow",
+        "relationType": "owned_by",
+        "weight": 1
+      },
+      {
+        "id": "link_receipts_eli",
+        "cardId": "card_eli_receipts",
+        "targetType": "entity",
+        "targetId": "entity_eli_vale",
+        "relationType": "owned_by",
+        "weight": 1
+      }
+    ],
+    "plotArcs": [
+      {
+        "id": "arc_eighteen_minutes",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Eighteen Minutes",
+        "description": "A civic mystery about a warning time altered after the flood. The arc concerns evidence, responsibility, and the distinction between explaining a choice and excusing it.",
+        "pointIds": ["plot_brass_tab", "plot_eighteen_minutes", "plot_map_and_mother"],
+        "priority": 10,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "arc_livable_truth",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "A Livable Truth",
+        "description": "The people who survived the flood have reasons to fear disclosure. This arc asks what accountability must provide—material repair, consent, protection, memory, or all of these—before truth can be more than spectacle.",
+        "pointIds": ["plot_people_who_crossed", "plot_charter_not_martyrdom", "plot_the_hearing"],
+        "priority": 9,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "arc_king_tide",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The Water Returns",
+        "description": "The next king tide converts history into a present decision. The city must decide who is warned, which systems are repaired, and whether a public record can be made without repeating the harm it describes.",
+        "pointIds": ["plot_gate_crack", "plot_king_tide_choice"],
+        "priority": 10,
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "plotPoints": [
+      {
+        "id": "plot_brass_tab",
+        "arcId": "arc_eighteen_minutes",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The brass tally-tab",
+        "internalDescription": "The nailed tally-tab establishes that someone with access to current service records wants Tomas to return. It is an invitation, a threat, or both. The point should open questions, not identify the sender by fiat.",
+        "source": "player",
+        "priority": 8,
+        "status": "available",
+        "preconditions": ["Tomas has examined or discussed the tally-tab."],
+        "desiredOutcome": "Tomas identifies at least one current route from the tab to a living person or location.",
+        "forbiddenOutcomes": [
+          "The sender is automatically revealed by narration.",
+          "Tomas is forced to confront Dorian before he chooses to."
+        ],
+        "involvedEntityIds": ["entity_tomas_vale", "entity_eli_vale", "entity_dorian_voss"],
+        "involvedLocationIds": ["loc_stilled_house", "loc_service_gate"],
+        "foreshadowingCues": [
+          "The tab bears Tomas’s old clerk mark.",
+          "A service invoice uses the same numbering format."
+        ],
+        "escalationOptions": [
+          "A current gate inspection changes the urgency.",
+          "Eli admits he found the tab but not why it mattered."
+        ],
+        "resolutionConditions": [
+          "Tomas follows the invoice trail, asks Eli, ignores the tab, or seeks another interpretation."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_eighteen_minutes",
+        "arcId": "arc_eighteen_minutes",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The missing interval",
+        "internalDescription": "The apparent discrepancy between 01:42 and 02:00 should become an evidentiary problem with several sources: ledger copy, clapper timing, gate order, routes, and testimony. None alone determines the moral meaning of the delay.",
+        "source": "player",
+        "priority": 10,
+        "status": "available",
+        "preconditions": ["At least one physical or documentary trace of the third bell is found."],
+        "desiredOutcome": "The group understands what the eighteen minutes changed, who knew what, and what remains uncertain.",
+        "forbiddenOutcomes": [
+          "One document settles every dispute.",
+          "Tomas automatically confesses or is absolved."
+        ],
+        "involvedEntityIds": [
+          "entity_tomas_vale",
+          "entity_dorian_voss",
+          "entity_hessa_rill",
+          "entity_sable_eren"
+        ],
+        "involvedLocationIds": [
+          "loc_stilled_house",
+          "loc_bell_foundry",
+          "loc_archive_cistern",
+          "loc_service_gate"
+        ],
+        "foreshadowingCues": [
+          "Chalk marks at the north sluice count to eighteen.",
+          "Hessa’s clapper rings late in cold air."
+        ],
+        "escalationOptions": [
+          "A public meeting demands a simple answer before evidence is ready.",
+          "Dorian asks for private cooperation."
+        ],
+        "resolutionConditions": [
+          "Compare sources, reveal selected evidence, keep evidence private, challenge an interpretation, or let uncertainty stand."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_brass_tab"],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_people_who_crossed",
+        "arcId": "arc_livable_truth",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The people who crossed",
+        "internalDescription": "The culvert evacuee list and the Moth rescue story complicate the official record. Each witness acted under pressure and has reason to fear how the truth will be used. This point should create obligations and choices, not expose their secrets without consent.",
+        "source": "player",
+        "priority": 8,
+        "status": "available",
+        "preconditions": ["Tomas encounters Nera, Ivo, Eli, or evidence of an evacuation route."],
+        "desiredOutcome": "The player understands that rescue choices can be both brave and politically dangerous.",
+        "forbiddenOutcomes": [
+          "Nera, Ivo, or Eli is publicly exposed merely to advance Tomas’s investigation.",
+          "The player is told which witness deserves forgiveness."
+        ],
+        "involvedEntityIds": [
+          "entity_nera_quill",
+          "entity_ivo_merrow",
+          "entity_eli_vale",
+          "entity_tomas_vale"
+        ],
+        "involvedLocationIds": ["loc_coal_wharf", "loc_ferry_nine", "loc_low_chapel"],
+        "foreshadowingCues": [
+          "The Moth’s cut rope contains signal wire.",
+          "Ivo refuses a crossing above middle tide."
+        ],
+        "escalationOptions": [
+          "A council investigator seeks names.",
+          "The king tide makes the ferry route necessary."
+        ],
+        "resolutionConditions": [
+          "Ask consent, trade protection for testimony, keep names sealed, verify the route, or decide the list should remain private."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_charter_not_martyrdom",
+        "arcId": "arc_livable_truth",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "A charter, not a martyr",
+        "internalDescription": "Hessa’s evidence and water charter turn revelation into a material question: who gets maintained, warned, paid, and allowed to leave? The point should let the player argue for a concrete future rather than merely punish a past actor.",
+        "source": "player",
+        "priority": 7,
+        "status": "available",
+        "preconditions": ["Hessa’s interest in the clapper or the charter is known."],
+        "desiredOutcome": "A proposed remedy has named beneficiaries, costs, enforcement and failure risks.",
+        "forbiddenOutcomes": [
+          "A moving speech automatically produces binding reform.",
+          "Hessa abandons the workers she represents for Tomas’s personal closure."
+        ],
+        "involvedEntityIds": [
+          "entity_hessa_rill",
+          "entity_nera_quill",
+          "entity_dorian_voss",
+          "entity_tomas_vale"
+        ],
+        "involvedLocationIds": ["loc_bell_foundry", "loc_coal_wharf", "loc_service_gate"],
+        "foreshadowingCues": [
+          "The foundry keeps old alloy invoices.",
+          "Dock families queue at the chapel after water cuts."
+        ],
+        "escalationOptions": [
+          "The council offers symbolic memorial funding instead of repairs.",
+          "Nera demands immediate action before negotiations."
+        ],
+        "resolutionConditions": [
+          "Support the charter, challenge its terms, propose a different guarantee, make a limited bargain, or walk away from public leverage."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_map_and_mother",
+        "arcId": "arc_eighteen_minutes",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The map in the lining",
+        "internalDescription": "Sable’s original route map implicates the archive as well as the engineers. Its value depends on provenance, and its discovery threatens to turn Sable’s mother into another convenient villain. The player can treat the map as proof, a question, a family wound, or a bargaining tool.",
+        "source": "player",
+        "priority": 7,
+        "status": "available",
+        "preconditions": [
+          "Sable chooses to discuss a route map or Tomas reaches the archive cistern."
+        ],
+        "desiredOutcome": "The map’s provenance is investigated without forcing Sable to disclose her mother’s role before she chooses.",
+        "forbiddenOutcomes": [
+          "The map is declared authentic by authorial fiat.",
+          "Sable is forced to betray her mother’s memory."
+        ],
+        "involvedEntityIds": ["entity_sable_eren", "entity_dorian_voss", "entity_tomas_vale"],
+        "involvedLocationIds": ["loc_archive_cistern", "loc_stilled_house"],
+        "foreshadowingCues": [
+          "A map case lining is thicker than it should be.",
+          "Dorian corrects someone’s description of the canceled route."
+        ],
+        "escalationOptions": [
+          "The city announces an archive audit.",
+          "A leak publishes a low-resolution copy without context."
+        ],
+        "resolutionConditions": [
+          "Authenticate quietly, publish with caveats, give Sable control, compare the map with other evidence, or refuse to use it."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_eighteen_minutes"],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_gate_crack",
+        "arcId": "arc_king_tide",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "The crack behind the paint",
+        "internalDescription": "The coming king tide turns historical argument into a present systems problem. The Glass Ward gate can be repaired, held, opened, bypassed, or made into a public demonstration, each with different risks. No outcome should erase the need to decide who is warned and who bears cost.",
+        "source": "player",
+        "priority": 10,
+        "status": "dormant",
+        "preconditions": [
+          "The player learns of the king tide or sees evidence of recent patching."
+        ],
+        "desiredOutcome": "The gate’s condition and the consequences of each intervention are understood by the people who must live with them.",
+        "forbiddenOutcomes": [
+          "A single expert solution is treated as morally neutral.",
+          "The player is forced to risk civilians for a revelation."
+        ],
+        "involvedEntityIds": [
+          "entity_dorian_voss",
+          "entity_hessa_rill",
+          "entity_ivo_merrow",
+          "entity_tomas_vale"
+        ],
+        "involvedLocationIds": ["loc_service_gate", "loc_north_sluice", "loc_ferry_nine"],
+        "foreshadowingCues": [
+          "Fresh paint scars the lower hinge.",
+          "The pressure hum changes near high water."
+        ],
+        "escalationOptions": [
+          "A crack becomes visible during inspection.",
+          "Dorian requests a private repair crew."
+        ],
+        "resolutionConditions": [
+          "Repair through official channels, use the ferry route, insist on a public inspection, delay action, or develop a new plan."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_eighteen_minutes"],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_the_hearing",
+        "arcId": "arc_livable_truth",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "Who gets to sign the record",
+        "internalDescription": "A public hearing or dock assembly can convene only if the player or NPCs create enough reason and enough safety for it. It is not a mandatory climax. Its purpose is to decide what a shared account, a repair plan, and witness protection would require.",
+        "source": "player",
+        "priority": 6,
+        "status": "dormant",
+        "preconditions": [
+          "At least two independent traces are understood, or an imminent gate danger creates a need for collective decision."
+        ],
+        "desiredOutcome": "People affected by the account can contest it, demand material commitments, or refuse participation without being erased.",
+        "forbiddenOutcomes": [
+          "A hearing produces unanimous closure.",
+          "Private evidence is announced without regard for owner safety."
+        ],
+        "involvedEntityIds": [
+          "entity_tomas_vale",
+          "entity_nera_quill",
+          "entity_hessa_rill",
+          "entity_sable_eren",
+          "entity_dorian_voss",
+          "entity_eli_vale"
+        ],
+        "involvedLocationIds": ["loc_low_chapel", "loc_coal_wharf", "loc_bell_foundry"],
+        "foreshadowingCues": [
+          "Chapel lists show who misses water deliveries.",
+          "A draft charter leaves signature lines blank."
+        ],
+        "escalationOptions": [
+          "The council offers an emergency meeting with conditions.",
+          "The docks organize a meeting without council approval."
+        ],
+        "resolutionConditions": [
+          "Speak, listen, submit a record, withhold a record, negotiate protections, leave, or choose a smaller private repair."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_people_who_crossed", "plot_charter_not_martyrdom"],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_king_tide_choice",
+        "arcId": "arc_king_tide",
+        "revisionId": "rev_tide_ledger_1",
+        "title": "When the water returns",
+        "internalDescription": "At king tide, the north sluice, service gate, and ferry route produce a crisis that tests what has been learned. The climax should be about informed consent, trust and consequence—not about proving that one person was secretly right. A quiet repair, a public warning, a negotiated evacuation, a risky exposure, or a refusal to repeat the old decision can all be valid endings.",
+        "source": "player",
+        "priority": 10,
+        "status": "dormant",
+        "preconditions": ["King tide arrives or the gate crack becomes immediately dangerous."],
+        "desiredOutcome": "The player makes or participates in a choice with clear trade-offs while retaining agency and respecting other characters’ consent.",
+        "forbiddenOutcomes": [
+          "Tomas automatically reenacts or reverses Dorian’s choice.",
+          "Every relationship resolves into forgiveness.",
+          "The city is saved without cost or uncertainty."
+        ],
+        "involvedEntityIds": [
+          "entity_tomas_vale",
+          "entity_nera_quill",
+          "entity_dorian_voss",
+          "entity_hessa_rill",
+          "entity_sable_eren",
+          "entity_ivo_merrow",
+          "entity_eli_vale"
+        ],
+        "involvedLocationIds": [
+          "loc_north_sluice",
+          "loc_service_gate",
+          "loc_ferry_nine",
+          "loc_low_chapel"
+        ],
+        "foreshadowingCues": [
+          "The tide schedule keeps shortening the available safe window.",
+          "The gate teeth catch red cloth at low water."
+        ],
+        "escalationOptions": [
+          "Water reaches the catwalk.",
+          "A warning route must be chosen before every fact is known."
+        ],
+        "resolutionConditions": [
+          "Coordinate a repair, publish a warning with caveats, negotiate a protected evacuation, preserve a private record, expose the order, or choose another defensible action."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_gate_crack", "plot_the_hearing"],
+        "metadata": {
+          "createdAt": "2026-09-26T00:00:00.000Z",
+          "updatedAt": "2026-09-26T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ]
+  }
+}
