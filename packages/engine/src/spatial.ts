@@ -39,7 +39,6 @@ export type MovementIntent =
   | { readonly kind: 'travel'; readonly label: string };
 
 const loudSoundPattern = /\b(?:shout|yell|scream|bang|slam|knock|pound|call\s+out)\b/i;
-const spokenSoundPattern = /["“].+["”]|\b(?:say|ask|tell|reply|answer|call)\b/i;
 const interactionSoundPattern = /\b(?:knock|tap|bang|open|close|pull|push|rattle)\b/i;
 const exitPattern =
   /\b(?:leave|exit|walk|step|go|head|run)\b[^.]{0,80}\b(?:out|outside|away|back\s+out|through\s+(?:the\s+)?(?:door|gate|exit))\b/i;

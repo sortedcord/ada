@@ -239,7 +239,7 @@ Example environment contract:
 GENERATION_PROVIDER=aditya-gupta
 GENERATION_BASE_URL=https://ai.adityagupta.dev/v1
 GENERATION_API_KEY=replace-me
-GENERATION_API=openai-responses
+GENERATION_API=chat-completions
 GENERATION_MODELS_REFRESH_SECONDS=3600
 GENERATION_DEFAULT_MODEL=replace-with-discovered-id
 ```

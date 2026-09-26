@@ -209,7 +209,7 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
       GENERATION_PROVIDER: 'fake',
       GENERATION_BASE_URL: 'https://example.com',
       GENERATION_API_KEY: 'fake',
-      GENERATION_API: 'openai-responses',
+      GENERATION_API: 'chat-completions',
       GENERATION_MODELS_REFRESH_SECONDS: 3600,
       GENERATION_DEFAULT_MODEL: 'fake-model',
       GENERATION_MAX_RESPONSE_LENGTH: 150,

@@ -14,7 +14,7 @@ const environment = {
   GENERATION_PROVIDER: 'test',
   GENERATION_BASE_URL: 'https://example.com/v1',
   GENERATION_API_KEY: 'fake-generation-key',
-  GENERATION_API: 'openai-responses',
+  GENERATION_API: 'chat-completions',
   GENERATION_MODELS_REFRESH_SECONDS: 3600,
   GENERATION_DEFAULT_MODEL: 'fake-model',
   GENERATION_MAX_RESPONSE_LENGTH: 150,

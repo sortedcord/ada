@@ -19,7 +19,7 @@ export const serverEnvironmentSchema = z.object({
   GENERATION_PROVIDER: z.string().min(1),
   GENERATION_BASE_URL: z.string().url(),
   GENERATION_API_KEY: z.string().min(1),
-  GENERATION_API: z.enum(['openai-responses']).default('openai-responses'),
+  GENERATION_API: z.enum(['chat-completions']).default('chat-completions'),
   GENERATION_MODELS_REFRESH_SECONDS: z.coerce.number().int().positive().default(3600),
   GENERATION_DEFAULT_MODEL: z.string().min(1),
   GENERATION_MAX_RESPONSE_LENGTH: z.coerce.number().int().min(20).max(4000).default(150),
