@@ -62,21 +62,22 @@ const outputSchema = z.object({
   timeElapsedMinutes: z.number().int().min(0).max(1440).default(1),
   locationChange: z
     .object({
-      locationId: z.string().optional(),
-      locationName: z.string().optional(),
-      description: z.string().optional(),
-      parentLocationId: z.string().optional(),
+      locationId: z.string().nullable().optional(),
+      locationName: z.string().nullable().optional(),
+      description: z.string().nullable().optional(),
+      parentLocationId: z.string().nullable().optional(),
     })
+    .nullable()
     .optional(),
   discoveredNpcs: z
     .array(
       z.object({
         name: z.string(),
-        description: z.string().optional(),
+        description: z.string().nullable().optional(),
         personality: z.array(z.string()).optional(),
-        locationId: z.string().optional(),
-        locationName: z.string().optional(),
-        spatialRelation: z.enum(['same_location', 'adjacent', 'distant']).optional(),
+        locationId: z.string().nullable().optional(),
+        locationName: z.string().nullable().optional(),
+        spatialRelation: z.enum(['same_location', 'adjacent', 'distant']).nullable().optional(),
       }),
     )
     .default([]),
