@@ -8,10 +8,13 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests --config ../../vitest.config.ts"
   },
   "dependencies": {
     "@ada/config": "workspace:*"
   },
-  "devDependencies": { "tsx": "^4.20.5" }
+  "devDependencies": {
+    "tsx": "^4.20.5"
+  }
 }

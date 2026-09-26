@@ -5,7 +5,7 @@ import type { Queue } from 'bullmq';
 import { apiErrorSchema, healthResponseSchema, migrateScenarioExport } from '@ada/contracts';
 import { AdityaGuptaGenerationProvider, FakeGenerationProvider } from '@ada/ai';
 import { scenarioOperationSchema } from '@ada/scenario-tools';
-import { promptRegistry } from '@ada/prompts';
+import { CURRENT_AUTHORING_PROMPT_VERSION, promptRegistry } from '@ada/prompts';
 import type { ServerEnvironment } from '@ada/config';
 import { cloneScenarioRevision, type Database } from '@ada/db';
 import { OptimisticConflictError, ScenarioService } from './scenario-service.js';
@@ -91,18 +91,18 @@ export function buildApp(
   });
   const service = dependencies.db ? new ScenarioService(dependencies.db) : undefined;
   const runs = dependencies.db
-    ? new RunService(
-        dependencies.db,
-        dependencies.turnQueue,
-        environment.DEBUG_INSPECTORS_ENABLED,
-      )
+    ? new RunService(dependencies.db, dependencies.turnQueue, environment.DEBUG_INSPECTORS_ENABLED)
     : undefined;
   const readConfiguredModel = async (key: string, fallback: string): Promise<string> => {
     if (!dependencies.db) return fallback;
     try {
       const { appSettings } = await import('@ada/db');
       const { eq } = await import('drizzle-orm');
-      const [row] = await dependencies.db.select().from(appSettings).where(eq(appSettings.key, key)).limit(1);
+      const [row] = await dependencies.db
+        .select()
+        .from(appSettings)
+        .where(eq(appSettings.key, key))
+        .limit(1);
       return row?.value && typeof (row.value as { model?: unknown }).model === 'string'
         ? (row.value as { model: string }).model
         : fallback;
@@ -237,7 +237,10 @@ export function buildApp(
   }));
 
   app.get('/api/v1/settings/models', async () => {
-    const activeModel = await readConfiguredModel('active_model', environment.GENERATION_DEFAULT_MODEL);
+    const activeModel = await readConfiguredModel(
+      'active_model',
+      environment.GENERATION_DEFAULT_MODEL,
+    );
     const authoringModel = await readConfiguredModel('authoring_model', activeModel);
 
     // Discover available models from the provider using current API credentials
@@ -275,7 +278,10 @@ export function buildApp(
 
     // Ensure active model is in the list
     if (!discoveredModels.some((m) => m.id === activeModel)) {
-      discoveredModels.unshift({ id: activeModel, name: activeModel.split('/').pop() ?? activeModel });
+      discoveredModels.unshift({
+        id: activeModel,
+        name: activeModel.split('/').pop() ?? activeModel,
+      });
     }
 
     return {
@@ -338,7 +344,9 @@ export function buildApp(
       await writeConfiguredModel('authoring_model', model);
       return { ok: true, authoringModel: model };
     } catch (err: any) {
-      return reply.code(500).send({ error: err?.message || 'Failed to update scenario authoring model' });
+      return reply
+        .code(500)
+        .send({ error: err?.message || 'Failed to update scenario authoring model' });
     }
   });
 
@@ -355,7 +363,9 @@ export function buildApp(
         });
         if (res.ok) {
           const body = (await res.json()) as { data?: Array<{ id: string; name?: string }> };
-          discoveredModels = (body.data ?? []).filter((m) => typeof m?.id === 'string' && !m.id.includes('embedding'));
+          discoveredModels = (body.data ?? []).filter(
+            (m) => typeof m?.id === 'string' && !m.id.includes('embedding'),
+          );
         }
       } catch {
         // ignore
@@ -377,20 +387,23 @@ export function buildApp(
       return { ok: false, error: 'Provider not configured' };
     }
     try {
-      const res = await fetch(`${environment.GENERATION_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${environment.GENERATION_API_KEY}`,
-          'x-bf-vk': environment.GENERATION_API_KEY,
-          'content-type': 'application/json',
+      const res = await fetch(
+        `${environment.GENERATION_BASE_URL.replace(/\/$/, '')}/chat/completions`,
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${environment.GENERATION_API_KEY}`,
+            'x-bf-vk': environment.GENERATION_API_KEY,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: 'ping' }],
+            max_tokens: 10,
+          }),
+          signal: AbortSignal.timeout(6000),
         },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: 'ping' }],
-          max_tokens: 10,
-        }),
-        signal: AbortSignal.timeout(6000),
-      });
+      );
       const data = (await res.json()) as any;
       if (!res.ok) {
         return { ok: false, model, error: data?.error?.message || `HTTP ${res.status}` };
@@ -432,7 +445,10 @@ export function buildApp(
       const path = await import('node:path');
       const inboxPath = path.resolve(process.cwd(), '.pi/inbox.jsonl');
       fs.mkdirSync(path.dirname(inboxPath), { recursive: true });
-      fs.appendFileSync(inboxPath, JSON.stringify({ message, timestamp: new Date().toISOString() }) + '\n');
+      fs.appendFileSync(
+        inboxPath,
+        JSON.stringify({ message, timestamp: new Date().toISOString() }) + '\n',
+      );
       return { ok: true, message, dispatched: true };
     } catch (err: any) {
       return reply.code(500).send({ error: err?.message || 'Failed to dispatch' });
@@ -713,97 +729,306 @@ export function buildApp(
   );
   app.post('/api/v1/scenarios/:scenarioId/authoring/propose', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const scenarioId = (request.params as { scenarioId: string }).scenarioId;
     const body = request.body as { kind?: string; brief?: string; constraints?: string[] };
     const record = await service.get(scenarioId);
-    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
+    if (!record)
+      return reply.code(404).send({
+        code: 'not_found',
+        message: 'Scenario not found',
+        requestId: request.id,
+        retryable: false,
+      });
     const kind = body.kind ?? 'scenario';
     const brief = body.brief?.trim() ?? '';
-    if (!brief) return reply.code(400).send({ code: 'invalid_request', message: 'Authoring brief is required', requestId: request.id, retryable: false });
-    if (kind === 'continuity_review') return reply.code(400).send({ code: 'invalid_request', message: 'Use the authoring continuity-review endpoint for findings-only reviews', requestId: request.id, retryable: false });
-    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
-    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
-      ? new FakeGenerationProvider()
-      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
-    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : undefined;
-    if (!promptName) return reply.code(400).send({ code: 'invalid_request', message: `Unsupported authoring kind: ${kind}`, requestId: request.id, retryable: false });
-    const prompt = promptRegistry.get(`${promptName}@2`);
+    if (!brief)
+      return reply.code(400).send({
+        code: 'invalid_request',
+        message: 'Authoring brief is required',
+        requestId: request.id,
+        retryable: false,
+      });
+    if (kind === 'continuity_review')
+      return reply.code(400).send({
+        code: 'invalid_request',
+        message: 'Use the authoring continuity-review endpoint for findings-only reviews',
+        requestId: request.id,
+        retryable: false,
+      });
+    const aggregate = record.revision.aggregate as {
+      scenario: { title: string; premise: string };
+      [key: string]: unknown;
+    };
+    const provider =
+      environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+        ? new FakeGenerationProvider()
+        : new AdityaGuptaGenerationProvider({
+            baseUrl: environment.GENERATION_BASE_URL,
+            apiKey: environment.GENERATION_API_KEY,
+            provider: environment.GENERATION_PROVIDER,
+            retries: 1,
+          });
+    const promptName =
+      kind === 'character'
+        ? 'scenario-character-authoring'
+        : kind === 'location'
+          ? 'scenario-location-authoring'
+          : kind === 'historical_event'
+            ? 'scenario-historical-event-authoring'
+            : kind === 'story_card'
+              ? 'scenario-story-card-authoring'
+              : kind === 'plot_point'
+                ? 'scenario-plot-point-authoring'
+                : undefined;
+    if (!promptName)
+      return reply.code(400).send({
+        code: 'invalid_request',
+        message: `Unsupported authoring kind: ${kind}`,
+        requestId: request.id,
+        retryable: false,
+      });
+    const prompt = promptRegistry.get(`${promptName}@${CURRENT_AUTHORING_PROMPT_VERSION}`);
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
-    const rendered = prompt.render({ brief, constraints: body.constraints ?? [], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, counts: Object.fromEntries(Object.entries(aggregate).map(([key, value]) => [key, Array.isArray(value) ? value.length : undefined])) }) });
+    const rendered = prompt.render({
+      brief,
+      constraints: body.constraints ?? [],
+      context: JSON.stringify({
+        title: aggregate.scenario.title,
+        premise: aggregate.scenario.premise,
+        counts: Object.fromEntries(
+          Object.entries(aggregate).map(([key, value]) => [
+            key,
+            Array.isArray(value) ? value.length : undefined,
+          ]),
+        ),
+      }),
+    });
     const generated = await provider.generateObject({
       model: await readAuthoringModel(),
       system: rendered.system,
       input: rendered.user,
       schemaName: 'ScenarioAuthoringProposal',
-      schema: { type: 'object', additionalProperties: false, required: ['summary', 'operations'], properties: { summary: { type: 'string' }, operations: { type: 'array' } } },
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['summary', 'operations'],
+        properties: { summary: { type: 'string' }, operations: { type: 'array' } },
+      },
       outputTokenLimit: 4_000,
       parse: (value) => {
         const candidate = value as { summary?: unknown; operations?: unknown };
-        const operations = Array.isArray(candidate.operations) ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation)) : [];
+        const operations = Array.isArray(candidate.operations)
+          ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation))
+          : [];
         if (!operations.length) throw new Error('Authoring model returned no valid operations');
         return { summary: String(candidate.summary ?? brief), operations };
       },
     });
-    return reply.code(201).send(await service.createProposal(scenarioId, { toolName: `authoring.${kind}`, summary: generated.value.summary, operations: generated.value.operations, model: generated.model, promptVersion: prompt.version }, request.id));
+    return reply.code(201).send(
+      await service.createProposal(
+        scenarioId,
+        {
+          toolName: `authoring.${kind}`,
+          summary: generated.value.summary,
+          operations: generated.value.operations,
+          model: generated.model,
+          promptVersion: prompt.version,
+        },
+        request.id,
+      ),
+    );
   });
 
   app.post('/api/v1/scenarios/:scenarioId/authoring/chat', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const scenarioId = (request.params as { scenarioId: string }).scenarioId;
-    const body = request.body as { message?: string; kind?: string; history?: Array<{ role: string; content: string }>; mode?: 'fast' | 'deep' };
+    const body = request.body as {
+      message?: string;
+      kind?: string;
+      history?: Array<{ role: string; content: string }>;
+      mode?: 'fast' | 'deep';
+    };
     const message = body.message?.trim() ?? '';
-    if (!message) return reply.code(400).send({ code: 'invalid_request', message: 'Message is required', requestId: request.id, retryable: false });
+    if (!message)
+      return reply.code(400).send({
+        code: 'invalid_request',
+        message: 'Message is required',
+        requestId: request.id,
+        retryable: false,
+      });
     const record = await service.get(scenarioId);
-    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
-    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
+    if (!record)
+      return reply.code(404).send({
+        code: 'not_found',
+        message: 'Scenario not found',
+        requestId: request.id,
+        retryable: false,
+      });
+    const aggregate = record.revision.aggregate as {
+      scenario: { title: string; premise: string };
+      [key: string]: unknown;
+    };
     const kind = body.kind ?? 'scenario';
-    const promptName = kind === 'character' ? 'scenario-character-authoring' : kind === 'location' ? 'scenario-location-authoring' : kind === 'historical_event' ? 'scenario-historical-event-authoring' : kind === 'story_card' ? 'scenario-story-card-authoring' : kind === 'plot_point' ? 'scenario-plot-point-authoring' : 'scenario-continuity-review';
-    const prompt = promptRegistry.get(`${promptName}@2`);
+    const promptName =
+      kind === 'scenario'
+        ? 'scenario-authoring-chat'
+        : kind === 'character'
+          ? 'scenario-character-authoring'
+          : kind === 'location'
+            ? 'scenario-location-authoring'
+            : kind === 'historical_event'
+              ? 'scenario-historical-event-authoring'
+              : kind === 'story_card'
+                ? 'scenario-story-card-authoring'
+                : kind === 'plot_point'
+                  ? 'scenario-plot-point-authoring'
+                  : undefined;
+    if (!promptName)
+      return reply.code(400).send({
+        code: 'invalid_request',
+        message: `Unsupported authoring chat kind: ${kind}`,
+        requestId: request.id,
+        retryable: false,
+      });
+    const promptVersion =
+      promptName === 'scenario-authoring-chat' ? 1 : CURRENT_AUTHORING_PROMPT_VERSION;
+    const prompt = promptRegistry.get(`${promptName}@${promptVersion}`);
     if (!prompt) throw new Error(`Authoring prompt is not registered: ${promptName}`);
-    const historyText = (body.history ?? []).slice(-12).map((item) => `${item.role}: ${item.content}`).join('\n');
-    const rendered = prompt.render({ brief: `${historyText}\nuser: ${message}`, constraints: ['Ask clarifying questions when a safe typed proposal cannot be constructed.', 'Never apply changes directly.'], context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }) });
-    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
-      ? new FakeGenerationProvider()
-      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
+    const historyText = (body.history ?? [])
+      .slice(-12)
+      .map((item) => `${item.role}: ${item.content}`)
+      .join('\n');
+    const rendered = prompt.render({
+      brief: `${historyText}\nuser: ${message}`,
+      constraints: [
+        'Ask clarifying questions when a safe typed proposal cannot be constructed.',
+        'Never apply changes directly.',
+      ],
+      context: JSON.stringify({
+        title: aggregate.scenario.title,
+        premise: aggregate.scenario.premise,
+        aggregate,
+      }),
+    });
+    const provider =
+      environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+        ? new FakeGenerationProvider()
+        : new AdityaGuptaGenerationProvider({
+            baseUrl: environment.GENERATION_BASE_URL,
+            apiKey: environment.GENERATION_API_KEY,
+            provider: environment.GENERATION_PROVIDER,
+            retries: 1,
+          });
     const generated = await provider.generateObject({
       model: await readAuthoringModel(),
       system: `${rendered.system}\nAct as a helpful scenario-building agent. Return a natural-language reply plus optional typed operations.`,
       input: rendered.user,
       schemaName: 'ScenarioAuthoringChatResponse',
-      schema: { type: 'object', additionalProperties: false, required: ['reply', 'summary', 'operations'], properties: { reply: { type: 'string' }, summary: { type: 'string' }, operations: { type: 'array' } } },
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['reply', 'summary', 'operations'],
+        properties: {
+          reply: { type: 'string' },
+          summary: { type: 'string' },
+          operations: { type: 'array' },
+        },
+      },
       outputTokenLimit: body.mode === 'deep' ? 6_000 : 3_000,
       parse: (value) => {
         const candidate = value as { reply?: unknown; summary?: unknown; operations?: unknown };
-        const operations = Array.isArray(candidate.operations) ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation)) : [];
-        return { reply: String(candidate.reply ?? 'I could not form a safe proposal yet.'), summary: String(candidate.summary ?? message), operations };
+        const operations = Array.isArray(candidate.operations)
+          ? candidate.operations.map((operation) => scenarioOperationSchema.parse(operation))
+          : [];
+        return {
+          reply: String(candidate.reply ?? 'I could not form a safe proposal yet.'),
+          summary: String(candidate.summary ?? message),
+          operations,
+        };
       },
     });
     let proposalId: string | null = null;
     if (generated.value.operations.length) {
-      const proposal = await service.createProposal(scenarioId, { toolName: `authoring.chat.${kind}`, summary: generated.value.summary, operations: generated.value.operations, model: generated.model, promptVersion: prompt.version }, request.id);
+      const proposal = await service.createProposal(
+        scenarioId,
+        {
+          toolName: `authoring.chat.${kind}`,
+          summary: generated.value.summary,
+          operations: generated.value.operations,
+          model: generated.model,
+          promptVersion: prompt.version,
+        },
+        request.id,
+      );
       proposalId = proposal.id;
     }
-    return { reply: generated.value.reply, proposalId, model: generated.model, mode: body.mode ?? 'fast' };
+    return {
+      reply: generated.value.reply,
+      proposalId,
+      model: generated.model,
+      mode: body.mode ?? 'fast',
+    };
   });
 
   app.post('/api/v1/scenarios/:scenarioId/authoring/continuity-review', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const scenarioId = (request.params as { scenarioId: string }).scenarioId;
     const record = await service.get(scenarioId);
-    if (!record) return reply.code(404).send({ code: 'not_found', message: 'Scenario not found', requestId: request.id, retryable: false });
-    const aggregate = record.revision.aggregate as { scenario: { title: string; premise: string }; [key: string]: unknown };
-    const prompt = promptRegistry.get('scenario-continuity-review@2');
+    if (!record)
+      return reply.code(404).send({
+        code: 'not_found',
+        message: 'Scenario not found',
+        requestId: request.id,
+        retryable: false,
+      });
+    const aggregate = record.revision.aggregate as {
+      scenario: { title: string; premise: string };
+      [key: string]: unknown;
+    };
+    const prompt = promptRegistry.get(
+      `scenario-continuity-review@${CURRENT_AUTHORING_PROMPT_VERSION}`,
+    );
     if (!prompt) throw new Error('Authoring prompt is not registered: scenario-continuity-review');
-    const provider = environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
-      ? new FakeGenerationProvider()
-      : new AdityaGuptaGenerationProvider({ baseUrl: environment.GENERATION_BASE_URL, apiKey: environment.GENERATION_API_KEY, provider: environment.GENERATION_PROVIDER, retries: 1 });
+    const provider =
+      environment.GENERATION_PROVIDER === 'fake' || environment.GENERATION_API_KEY === 'fake'
+        ? new FakeGenerationProvider()
+        : new AdityaGuptaGenerationProvider({
+            baseUrl: environment.GENERATION_BASE_URL,
+            apiKey: environment.GENERATION_API_KEY,
+            provider: environment.GENERATION_PROVIDER,
+            retries: 1,
+          });
     const rendered = prompt.render({
-      brief: 'Review the complete scenario and return findings only. Do not propose or apply operations.',
-      constraints: ['Return findings only.', 'Do not apply changes.', 'Distinguish deterministic structural issues from craft recommendations.'],
-      context: JSON.stringify({ title: aggregate.scenario.title, premise: aggregate.scenario.premise, aggregate }),
+      brief:
+        'Review the complete scenario and return findings only. Do not propose or apply operations.',
+      constraints: [
+        'Return findings only.',
+        'Do not apply changes.',
+        'Distinguish deterministic structural issues from craft recommendations.',
+      ],
+      context: JSON.stringify({
+        title: aggregate.scenario.title,
+        premise: aggregate.scenario.premise,
+        aggregate,
+      }),
     });
     const generated = await provider.generateObject({
       model: await readAuthoringModel(),
@@ -835,19 +1060,36 @@ export function buildApp(
       outputTokenLimit: 4_000,
       parse: (value) => {
         const candidate = value as { findings?: unknown };
-        const findings = Array.isArray(candidate.findings) ? candidate.findings.flatMap((item) => {
-          if (!item || typeof item !== 'object') return [];
-          const finding = item as Record<string, unknown>;
-          const severity = finding.severity === 'error' ? 'error' : finding.severity === 'warning' ? 'warning' : null;
-          if (!severity || typeof finding.path !== 'string' || typeof finding.message !== 'string' || typeof finding.section !== 'string') return [];
-          return [{
-            path: finding.path,
-            message: finding.message,
-            severity,
-            section: finding.section,
-            ...(typeof finding.resourceId === 'string' ? { resourceId: finding.resourceId } : {}),
-          }];
-        }) : [];
+        const findings = Array.isArray(candidate.findings)
+          ? candidate.findings.flatMap((item) => {
+              if (!item || typeof item !== 'object') return [];
+              const finding = item as Record<string, unknown>;
+              const severity =
+                finding.severity === 'error'
+                  ? 'error'
+                  : finding.severity === 'warning'
+                    ? 'warning'
+                    : null;
+              if (
+                !severity ||
+                typeof finding.path !== 'string' ||
+                typeof finding.message !== 'string' ||
+                typeof finding.section !== 'string'
+              )
+                return [];
+              return [
+                {
+                  path: finding.path,
+                  message: finding.message,
+                  severity,
+                  section: finding.section,
+                  ...(typeof finding.resourceId === 'string'
+                    ? { resourceId: finding.resourceId }
+                    : {}),
+                },
+              ];
+            })
+          : [];
         return { findings };
       },
     });
@@ -863,44 +1105,96 @@ export function buildApp(
 
   app.get('/api/v1/scenarios/:scenarioId/continuity-review', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     return service.continuityReview((request.params as { scenarioId: string }).scenarioId);
   });
   app.get('/api/v1/scenarios/:scenarioId/proposals', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     return service.listProposals((request.params as { scenarioId: string }).scenarioId);
   });
   app.post('/api/v1/scenarios/:scenarioId/proposals', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
-    const body = request.body as { toolName?: string; summary?: string; operations?: unknown; model?: string; promptVersion?: number };
-    return reply.code(201).send(await service.createProposal((request.params as { scenarioId: string }).scenarioId, {
-      toolName: body.toolName ?? 'scenario.authoring',
-      summary: body.summary ?? 'Scenario authoring proposal',
-      operations: body.operations,
-      ...(body.model ? { model: body.model } : {}),
-      ...(body.promptVersion ? { promptVersion: body.promptVersion } : {}),
-    }, request.id));
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
+    const body = request.body as {
+      toolName?: string;
+      summary?: string;
+      operations?: unknown;
+      model?: string;
+      promptVersion?: number;
+    };
+    return reply.code(201).send(
+      await service.createProposal(
+        (request.params as { scenarioId: string }).scenarioId,
+        {
+          toolName: body.toolName ?? 'scenario.authoring',
+          summary: body.summary ?? 'Scenario authoring proposal',
+          operations: body.operations,
+          ...(body.model ? { model: body.model } : {}),
+          ...(body.promptVersion ? { promptVersion: body.promptVersion } : {}),
+        },
+        request.id,
+      ),
+    );
   });
   app.patch('/api/v1/scenarios/:scenarioId/proposals/:proposalId', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const params = request.params as { scenarioId: string; proposalId: string };
     const body = request.body as { summary?: string; operations?: unknown };
-    return service.editProposal(params.scenarioId, params.proposalId, { ...(body.summary ? { summary: body.summary } : {}), operations: body.operations }, request.id);
+    return service.editProposal(
+      params.scenarioId,
+      params.proposalId,
+      { ...(body.summary ? { summary: body.summary } : {}), operations: body.operations },
+      request.id,
+    );
   });
   app.post('/api/v1/scenarios/:scenarioId/proposals/:proposalId/reject', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const params = request.params as { scenarioId: string; proposalId: string };
     return service.rejectProposal(params.scenarioId, params.proposalId, request.id);
   });
   app.post('/api/v1/scenarios/:scenarioId/proposals/:proposalId/apply', async (request, reply) => {
     if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
+      return reply.code(503).send({
+        code: 'dependency_unavailable',
+        message: 'Database is not configured',
+        requestId: request.id,
+        retryable: true,
+      });
     const body = request.body as { expectedVersion?: number };
-    return service.applyProposal((request.params as { scenarioId: string; proposalId: string }).scenarioId, (request.params as { scenarioId: string; proposalId: string }).proposalId, body.expectedVersion ?? 0, request.id);
+    return service.applyProposal(
+      (request.params as { scenarioId: string; proposalId: string }).scenarioId,
+      (request.params as { scenarioId: string; proposalId: string }).proposalId,
+      body.expectedVersion ?? 0,
+      request.id,
+    );
   });
   app.post('/api/v1/scenarios/:scenarioId/publish-revision', async (request, reply) => {
     if (!service)
@@ -912,23 +1206,55 @@ export function buildApp(
       });
     return service.publish((request.params as { scenarioId: string }).scenarioId, request.id);
   });
-  app.get('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals', async (request, reply) => {
-    if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
-    return service.listCardMutationProposals((request.params as { cardId: string }).cardId);
-  });
-  app.post('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals', async (request, reply) => {
-    if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
-    const body = request.body as Parameters<ScenarioService['createCardMutationProposal']>[1];
-    return reply.code(201).send(await service.createCardMutationProposal((request.params as { cardId: string }).cardId, body, request.id));
-  });
-  app.post('/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals/:proposalId/apply', async (request, reply) => {
-    if (!service)
-      return reply.code(503).send({ code: 'dependency_unavailable', message: 'Database is not configured', requestId: request.id, retryable: true });
-    const params = request.params as { cardId: string; proposalId: string };
-    return service.applyCardMutationProposal(params.cardId, params.proposalId, request.id);
-  });
+  app.get(
+    '/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals',
+    async (request, reply) => {
+      if (!service)
+        return reply.code(503).send({
+          code: 'dependency_unavailable',
+          message: 'Database is not configured',
+          requestId: request.id,
+          retryable: true,
+        });
+      return service.listCardMutationProposals((request.params as { cardId: string }).cardId);
+    },
+  );
+  app.post(
+    '/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals',
+    async (request, reply) => {
+      if (!service)
+        return reply.code(503).send({
+          code: 'dependency_unavailable',
+          message: 'Database is not configured',
+          requestId: request.id,
+          retryable: true,
+        });
+      const body = request.body as Parameters<ScenarioService['createCardMutationProposal']>[1];
+      return reply
+        .code(201)
+        .send(
+          await service.createCardMutationProposal(
+            (request.params as { cardId: string }).cardId,
+            body,
+            request.id,
+          ),
+        );
+    },
+  );
+  app.post(
+    '/api/v1/scenarios/:scenarioId/story-cards/:cardId/mutation-proposals/:proposalId/apply',
+    async (request, reply) => {
+      if (!service)
+        return reply.code(503).send({
+          code: 'dependency_unavailable',
+          message: 'Database is not configured',
+          requestId: request.id,
+          retryable: true,
+        });
+      const params = request.params as { cardId: string; proposalId: string };
+      return service.applyCardMutationProposal(params.cardId, params.proposalId, request.id);
+    },
+  );
   app.get('/api/v1/scenarios/:scenarioId/story-cards/:cardId/versions', async (request, reply) => {
     if (!service)
       return reply.code(503).send({
