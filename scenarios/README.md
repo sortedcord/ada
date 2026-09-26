@@ -20,15 +20,30 @@ The premise deliberately avoids a single reveal or required moral answer. Tomas 
 
 The endgame is a decision at the North Sluice, not a prescribed ending. It should test consent, trust, warning routes, material repair, and who bears risk rather than rewarding the player for finding a single "correct" culprit.
 
+## The Last Slot
+
+[`the-last-slot.scenario.json`](./the-last-slot.scenario.json) is a modern college-life scenario for **Eli Mendoza**, a male junior transfer student in a media studies program.
+
+It begins on a Thursday evening in a campus Media Lab that is about to lose overnight access. Eli’s capstone partner is recording behind the closed door of Sound Booth B; his roommate has an aid appeal hidden in their dorm room; the student paper holds a facilities calendar that could expose a staged consultation; and a community-garden organizer wants to know whether Eli’s audio walk offers more than a beautiful story about somebody else’s life.
+
+The scenario is authored with **separate rooms, hallways, and portal doors**. A closed dorm-room or sound-booth door blocks sight and muffles sound, so characters do not become magically present after the player leaves a room. Its central choices include the final studio slot, Benji’s housing appeal, the campus-paper source, the sponsor agreement, the garden’s consent terms, and Friday’s showcase. It does not force a romance, public disclosure, activism, a single moral answer, or a polished ending.
+
 ### Import
 
-Start the local stack, then import the package through the public API endpoint:
+Start the local stack, then import either package through the public API endpoint:
 
 ```bash
+# The Tide Keeps Its Ledger
 curl --fail-with-body \
   -X POST http://127.0.0.1:4173/api/v1/scenarios/import \
   -H 'content-type: application/json' \
   --data-binary @scenarios/the-tide-keeps-its-ledger.scenario.json
+
+# The Last Slot
+curl --fail-with-body \
+  -X POST http://127.0.0.1:4173/api/v1/scenarios/import \
+  -H 'content-type: application/json' \
+  --data-binary @scenarios/the-last-slot.scenario.json
 ```
 
 Publish the returned scenario ID, then retrieve its aggregate to find the playable entity ID:
@@ -37,7 +52,7 @@ Publish the returned scenario ID, then retrieve its aggregate to find the playab
 curl --fail-with-body "http://127.0.0.1:4173/api/v1/scenarios/$SCENARIO_ID"
 ```
 
-On the first import, Tomas is `entity_tomas_vale`. If the API remaps IDs because a scenario with the same ID already exists, use the remapped entity ID from `revision.aggregate.entities[]` whose `playable` field is `true`.
+On a first import, the playable IDs are `entity_tomas_vale` for **The Tide Keeps Its Ledger** and `entity_eli_mendoza` for **The Last Slot**. If the API remaps IDs because a scenario with the same ID already exists, use the remapped entity ID from `revision.aggregate.entities[]` whose `playable` field is `true`.
 
 ```bash
 curl --fail-with-body \

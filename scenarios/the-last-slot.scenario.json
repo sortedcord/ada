@@ -1,0 +1,3067 @@
+{
+  "kind": "scenario",
+  "schemaVersion": "scenario.v1",
+  "scenarioId": "scenario_last_slot",
+  "revision": 1,
+  "aggregate": {
+    "scenario": {
+      "id": "scenario_last_slot",
+      "revisionId": "rev_last_slot_1",
+      "slug": "the-last-slot",
+      "title": "The Last Slot",
+      "subtitle": "A modern college-life drama about a final studio booking, a community story, and what students owe one another.",
+      "description": "At Northbridge College, junior transfer Eli Mendoza has one week before the Media Lab loses overnight access. A final sound-booth slot, a student showcase, a community-garden oral-history project, a housing appeal, and a facilities calendar all create competing reasons to speak, publish, wait, help, or leave something private.",
+      "premise": "Thursday evening. Eli’s capstone partner is recording alone behind the closed door of Sound Booth B. His roommate has an aid appeal hidden beneath a whiteboard tray. The campus paper has a calendar suggesting the Media Lab closure was decided before students were consulted. Across town, a garden organizer has asked whether Eli’s audio walk can promise anything more than a beautiful recording. Friday’s showcase could amplify all of it—or simplify it beyond recognition.",
+      "tags": ["college-life", "modern", "campus", "relationships", "audio", "player-agency"],
+      "genre": "Modern college-life drama",
+      "tone": "Contemporary, intimate, funny in small places, and materially grounded about deadlines, money, consent, friendship, and institutional pressure.",
+      "themes": [
+        "belonging",
+        "consent",
+        "student-work",
+        "friendship",
+        "money",
+        "public-story",
+        "creative-labor"
+      ],
+      "contentBoundaries": [
+        "No sexual violence.",
+        "Do not force romance, a confession, forgiveness, publication, activism, or a single political conclusion.",
+        "Treat financial aid, housing insecurity, family pressure, and community consent with specificity rather than melodrama.",
+        "Do not use mental health, disability, identity, or poverty as plot decoration."
+      ],
+      "worldRules": [
+        "Campus rooms, studios, dorm rooms, booths, and offices are distinct micro-locations. Closed doors block sight and muffle sound; someone inside cannot visually observe the hallway.",
+        "People know only what they experience, are told, read, or plausibly infer. A private message, a source document, or an unheard voice note is not public context.",
+        "A student organization, faculty adviser, sponsor, or newspaper can create pressure without controlling Eli’s choices, emotions, consent, or relationships.",
+        "Publication, recording, and public performance require attention to consent, source protection, context, and material consequences.",
+        "Modern college life includes classes, shifts, transit, food, roommates, schedules, and ordinary pauses; not every scene must escalate or reveal a secret."
+      ],
+      "kickoffText": "Sound Booth B is occupied, its little red light on behind the closed acoustic door. Through the Media Lab window, Maya is only a blurred shoulder and a pair of green headphones. The booking calendar on the wall says FINAL OVERNIGHT SESSION — THURSDAY. In your bag, a field recorder waits beside a message from Lucia: Before you come back to Harlow, tell me what this recording is for.",
+      "defaultNarrationStyle": "Close second-person present. Modern campus detail: keys, laundry, transit, food, booking systems, messages, schedules, work shifts, and rooms with physical boundaries. Let people be unfinished, specific, and occasionally funny. Honor privacy, consent, and player agency.",
+      "chronologyMarker": "Thursday evening, five days before the Northbridge Futures showcase",
+      "startLocationId": "loc_media_lab",
+      "config": {
+        "narration": {
+          "person": "second",
+          "tense": "present",
+          "omniscient": false
+        },
+        "pacing": {
+          "interventionThreshold": 0.72,
+          "interventionCooldownTurns": 3,
+          "tensionTarget": 0.5,
+          "quietSceneMaxTurns": 8
+        },
+        "retrieval": {
+          "maxCandidates": 40,
+          "maxSelected": 10
+        },
+        "modelOverrides": {},
+        "allowNarrationOverride": true
+      },
+      "status": "valid",
+      "currentRevision": 1,
+      "metadata": {
+        "createdAt": "2026-09-27T00:00:00.000Z",
+        "updatedAt": "2026-09-27T00:00:00.000Z",
+        "version": 1,
+        "schemaVersion": 1,
+        "attribution": {
+          "source": "player",
+          "sourceIds": []
+        }
+      }
+    },
+    "entities": [
+      {
+        "id": "entity_eli_mendoza",
+        "revisionId": "rev_last_slot_1",
+        "name": "Eli Mendoza",
+        "aliases": ["Eli", "Mendoza"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["media-studies", "junior", "transfer"],
+        "publicDescription": "Eli Mendoza is a twenty-one-year-old transfer student in Northbridge College’s media studies program. He works evening shifts in the Media Lab, knows where every adapter has gone missing, and has spent a year becoming useful enough that people forget he is still new here. His capstone is an audio walk through the campus and the adjacent neighborhood.",
+        "privateDescription": "Last winter, Eli used a departmental equipment account to lend a high-quality recorder to his younger sister’s community center after their own equipment was stolen. The account was later reconciled, but Eli quietly altered the checkout time so the discrepancy would look like a clerical error. Professor Shah noticed and chose not to report him. Eli does not know whether that was mercy, leverage, or both. He has also kept the unsent voice note Maya left after he stopped answering her messages during the same week.",
+        "history": "Eli grew up helping his mother translate utility bills for neighbors and learned audio editing because it made people’s stories feel less disposable. He transferred to Northbridge after two years at a community college, arriving with enough credits to be technically a junior and none of the easy friendships that make campus feel navigable. He is good at listening in the edit room and bad at explaining why he goes silent when someone wants something personal. His audio walk began as a portfolio piece, then Lucia asked whether it could include the neighborhood garden that the university calls “underutilized land.”",
+        "historicalEvents": [
+          {
+            "id": "event_eli_transfer",
+            "title": "The transfer orientation",
+            "summary": "Eli met Maya during an orientation lab when both reached for the same broken XLR cable.",
+            "participants": ["entity_eli_mendoza", "entity_maya_kwon"],
+            "chronology": "Eighteen months ago",
+            "consequences": [
+              "They became collaborators before either called the other a friend.",
+              "Maya knows Eli’s work habits better than his plans."
+            ],
+            "visibility": "public"
+          },
+          {
+            "id": "event_eli_recorder",
+            "title": "The borrowed recorder",
+            "summary": "Eli borrowed a department recorder for his sister’s community center and corrected the checkout time afterward.",
+            "participants": ["entity_eli_mendoza", "entity_anika_shah"],
+            "chronology": "Last winter",
+            "consequences": [
+              "Professor Shah noticed the mismatch.",
+              "Eli now worries the equipment account makes his fellowship conditional."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_eli_voice_note",
+            "title": "The unheard voice note",
+            "summary": "Maya sent Eli a voice note after an argument about the audio walk; he has not played it.",
+            "participants": ["entity_eli_mendoza", "entity_maya_kwon"],
+            "chronology": "Last winter",
+            "consequences": [
+              "Maya believes Eli ignored her deliberately.",
+              "Eli has built a story about the message without hearing it."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Lean, usually underdressed for the weather, with paint on one thumbnail from labeling cables. He carries a canvas messenger bag with a cracked pair of headphones and a field notebook full of room tone timestamps.",
+        "personality": [
+          "observant",
+          "reliable under deadlines",
+          "avoidant with conflict",
+          "quietly funny"
+        ],
+        "speechStyle": "He starts with practical questions and uses “I can handle it” when he means he is overwhelmed. When he trusts someone, his jokes arrive late and under his breath. He avoids saying “I need help.”",
+        "values": ["care with other people’s words", "fair access to equipment", "follow-through"],
+        "drives": [
+          "make the audio walk worth the people who agreed to speak",
+          "stay enrolled without becoming a departmental favor"
+        ],
+        "goals": [
+          "secure the final studio session",
+          "decide what the audio walk owes Lucia and the garden",
+          "show up honestly for Benji and Maya"
+        ],
+        "fears": [
+          "being treated as a charity case",
+          "losing access to the lab",
+          "discovering that usefulness is all he offers people"
+        ],
+        "desires": [
+          "a portfolio piece he can stand behind",
+          "an uncomplicated night with friends",
+          "to stop making every decision alone"
+        ],
+        "capabilities": [
+          "field recording",
+          "audio editing",
+          "schedule logistics",
+          "patient interviewing"
+        ],
+        "limitations": [
+          "limited money",
+          "no authority over departmental space",
+          "tends to withdraw instead of clarifying",
+          "cannot promise publication or funding to sources"
+        ],
+        "secrets": [
+          "The altered equipment checkout is documented in a screenshot on his old phone.",
+          "Maya’s unheard voice note is still saved in his cloud account."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": true,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_media_lab",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_maya_kwon",
+        "revisionId": "rev_last_slot_1",
+        "name": "Maya Kwon",
+        "aliases": ["Maya", "Kwon"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["sound-design", "radio", "senior"],
+        "publicDescription": "Maya Kwon is a senior sound design student and the overnight host of the campus radio show *No Fixed Address*. She is technically Eli’s capstone partner and practically the person who can tell whether a room is lying by how long it takes to answer. She is recording an ambient piece in the closed sound booth when the scenario begins.",
+        "privateDescription": "Maya did not reserve the final Media Lab slot to punish Eli. She reserved it because Cal asked her to make a polished sponsor reel for the university’s redevelopment showcase, and the payment would cover the rent on the off-campus room she shares with her cousin. She hates the reel’s premise, but she is tired of pretending she can refuse paid work without consequences. The voice note Eli never heard was not a confession; it was an apology for accusing him of turning the garden recordings into a portfolio without asking what the garden needed.",
+        "history": "Maya has been at Northbridge long enough to know which student organizations survive by becoming useful to administrators and which burn out trying not to. She and Eli built early versions of the audio walk together, spending too many late nights in the sound booth and never deciding what their closeness meant. When Eli disappeared after the recorder issue, Maya filled the silence with an explanation that hurt less than uncertainty. Nora has offered to publish an accompanying investigation; Maya wants the sound piece to remain accountable to the people recorded, not to a headline.",
+        "historicalEvents": [
+          {
+            "id": "event_maya_radio",
+            "title": "No Fixed Address begins",
+            "summary": "Maya started an overnight campus radio show after the station cut most student programming.",
+            "participants": ["entity_maya_kwon", "entity_cal_avery"],
+            "chronology": "Two years ago",
+            "consequences": [
+              "Cal helped obtain a student-union grant.",
+              "Maya owes the union access but not editorial control."
+            ],
+            "visibility": "public"
+          },
+          {
+            "id": "event_maya_note",
+            "title": "The voice note",
+            "summary": "Maya sent Eli a voice note after a disagreement about consent for the audio walk.",
+            "participants": ["entity_maya_kwon", "entity_eli_mendoza"],
+            "chronology": "Last winter",
+            "consequences": [
+              "Eli never replied.",
+              "Maya changed the project calendar to avoid depending on him."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Short hair tucked behind one ear, oversized green headphones around her neck, and a mug that says QUIET IS NOT EMPTY in chipped black letters.",
+        "personality": [
+          "precise",
+          "impatient with euphemism",
+          "protective of collaborators",
+          "funny when tired"
+        ],
+        "speechStyle": "Clear, quick, and careful with names. She stops herself before saying something cruel, then sometimes says a smaller true thing instead. She avoids calling a project “ours” until she trusts the room.",
+        "values": ["informed consent", "craft", "people being paid for their work"],
+        "drives": [
+          "finish a piece that does not exploit its subjects",
+          "keep a roof over her cousin and herself"
+        ],
+        "goals": [
+          "use the final studio slot well",
+          "decide whether to make the sponsor reel",
+          "hear Eli explain his silence without making him perform guilt"
+        ],
+        "fears": [
+          "being bought cheaply",
+          "letting resentment become her only editing principle",
+          "making Lucia’s story unsafe"
+        ],
+        "desires": [
+          "a clean recording session",
+          "someone else to carry a cable case for once",
+          "clarity without spectacle"
+        ],
+        "capabilities": ["sound design", "interview editing", "live radio", "grant writing"],
+        "limitations": [
+          "financial pressure",
+          "limited access after graduation",
+          "cannot force Eli to listen or explain"
+        ],
+        "secrets": [
+          "Cal’s sponsor reel request pays more than the Media Lab fellowship.",
+          "She knows about the equipment discrepancy but not the full reason behind it."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_sound_booth",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_benji_okafor",
+        "revisionId": "rev_last_slot_1",
+        "name": "Benji Okafor",
+        "aliases": ["Benji", "Okafor"],
+        "pronouns": "he/him",
+        "kind": "character",
+        "tags": ["computer-science", "resident", "comedian"],
+        "publicDescription": "Benji Okafor is Eli’s roommate, a computer science student with an overfull whiteboard and a talent for turning a minor inconvenience into a story everyone wants to hear. He works late shifts at the campus help desk, makes excellent instant noodles, and keeps saying he is “fine” in a tone that asks not to be believed.",
+        "privateDescription": "Benji’s financial aid package was recalculated after his mother took a new job, and he will lose his housing grant at the end of the term unless he can appeal. He has been using Cal’s student-union event stipend to cover small gaps, but the payments are tied to a showcase he has not told Eli he is helping organize. He also copied a restricted facilities calendar to help Nora prove the Media Lab closure was decided before student consultation; he worries that the copy could cost a help-desk job he needs.",
+        "history": "Benji and Eli were assigned together during a housing shuffle after both previous roommates left. Their friendship grew out of groceries, shared deadlines, and Benji refusing to let Eli eat cereal for dinner three nights in a row. Benji knows enough about Eli’s recorder issue to recognize avoidance, but not enough to understand why Professor Shah’s name makes him change the subject. He trusts Nora’s reporting and distrusts what publication can do to people who cannot afford consequences.",
+        "historicalEvents": [
+          {
+            "id": "event_benji_housing",
+            "title": "The housing shuffle",
+            "summary": "Benji and Eli became roommates after a midyear housing reassignment.",
+            "participants": ["entity_benji_okafor", "entity_eli_mendoza"],
+            "chronology": "Last spring",
+            "consequences": [
+              "They learned each other’s schedules through necessity.",
+              "Benji became one of the few people who notices when Eli is isolating."
+            ],
+            "visibility": "public"
+          },
+          {
+            "id": "event_benji_calendar",
+            "title": "The copied calendar",
+            "summary": "Benji copied a restricted facilities calendar showing the Media Lab closure plan predates the public consultation.",
+            "participants": ["entity_benji_okafor", "entity_nora_iyer"],
+            "chronology": "This week",
+            "consequences": [
+              "Nora has a lead that needs verification.",
+              "Benji risks his help-desk job if identified."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Tall, expressive, with one sock always sliding down and a laptop covered in stickers from student clubs he joined once. He keeps a small screwdriver tucked into his hoodie pocket.",
+        "personality": ["warm", "performative under stress", "resourceful", "loyal"],
+        "speechStyle": "Fast, image-heavy, and often funny on purpose. When scared, he gets logistical and starts listing tasks. He avoids saying the word “money.”",
+        "values": ["friendship with receipts", "accessibility", "not wasting food"],
+        "drives": [
+          "stay enrolled and housed",
+          "keep the people around him from carrying crises alone"
+        ],
+        "goals": [
+          "file the aid appeal before Friday",
+          "decide what to do with the facilities calendar",
+          "help Eli finish something"
+        ],
+        "fears": [
+          "being pitied",
+          "losing the room he shares with Eli",
+          "turning a favor into a debt"
+        ],
+        "desires": [
+          "an appeal that works",
+          "a quiet game night",
+          "to be taken seriously when he stops joking"
+        ],
+        "capabilities": [
+          "systems troubleshooting",
+          "event logistics",
+          "coding",
+          "making strangers less awkward"
+        ],
+        "limitations": [
+          "financial precarity",
+          "overcommits",
+          "cannot safely reveal the calendar source without risk"
+        ],
+        "secrets": [
+          "His housing grant ends unless the aid appeal succeeds.",
+          "He copied the facilities calendar from a restricted help-desk account."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_eli_room",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_nora_iyer",
+        "revisionId": "rev_last_slot_1",
+        "name": "Nora Iyer",
+        "aliases": ["Nora", "Iyer"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["journalism", "editor", "commuter"],
+        "publicDescription": "Nora Iyer is the campus paper’s investigations editor, a commuter student whose backpack contains three chargers, two notebooks, and an apple she will forget to eat. She has been reporting on the Media Lab renovation and knows the student consultation meeting was scheduled after a donor announcement.",
+        "privateDescription": "Nora’s first instinct is to publish the facilities calendar immediately. She knows the story could make Benji’s source status obvious, and she has not told him that the paper’s faculty adviser has already asked for corroboration. Lucia gave Nora one guarded quote about the garden but did not consent to a story framing the garden as a campus scandal. Nora wants the truth public and is still learning that those are different asks.",
+        "history": "Nora and Maya met through campus radio, where Nora learned that a clean edit can be more misleading than a messy recording. She respects Cal’s ability to get rooms and funding, but believes he mistakes visibility for accountability. She sees Eli’s audio walk as the missing human scale in her story—and is trying not to treat him as a resource before treating him as a person.",
+        "historicalEvents": [
+          {
+            "id": "event_nora_calendar",
+            "title": "The closure calendar",
+            "summary": "Nora received a copied facilities calendar indicating that the Media Lab closure was planned before public consultation.",
+            "participants": ["entity_nora_iyer", "entity_benji_okafor"],
+            "chronology": "This week",
+            "consequences": [
+              "The paper has a potential story.",
+              "Benji is exposed if the source trail is careless."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_nora_lucia_quote",
+            "title": "The garden interview",
+            "summary": "Nora interviewed Lucia about the community garden and received a quote with conditions.",
+            "participants": ["entity_nora_iyer", "entity_lucia_reyes"],
+            "chronology": "Two days ago",
+            "consequences": [
+              "Lucia asked not to be made into a symbol.",
+              "Nora needs consent before publishing the full recording."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Square glasses, bike helmet clipped to her bag, and a pencil behind one ear that she loses when it matters. Her coat pocket is full of transit receipts.",
+        "personality": [
+          "persistent",
+          "ethical but impatient",
+          "observant",
+          "easily embarrassed by praise"
+        ],
+        "speechStyle": "Careful questions, direct follow-ups, and an occasional “off the record?” that she says like a request, not a trap. She avoids making promises about publication she cannot keep.",
+        "values": ["accountability", "source protection", "plain language"],
+        "drives": [
+          "publish reporting that does not burn its sources",
+          "keep student media independent"
+        ],
+        "goals": [
+          "verify the closure timeline",
+          "understand what Lucia wants from the story",
+          "protect Benji if the calendar becomes public"
+        ],
+        "fears": [
+          "mistaking access for consent",
+          "missing a story because she waited too long",
+          "hurting a friend for a headline"
+        ],
+        "desires": [
+          "a corroborated document",
+          "a long train ride with no notifications",
+          "to make the paper worth the people who trust it"
+        ],
+        "capabilities": [
+          "document research",
+          "interviewing",
+          "fact checking",
+          "public records requests"
+        ],
+        "limitations": [
+          "editorial deadlines",
+          "commute limits her late-night availability",
+          "cannot guarantee anonymity against a subpoena"
+        ],
+        "secrets": [
+          "The faculty adviser has already questioned the calendar’s provenance.",
+          "Lucia’s full quote criticizes the university and the student organizers alike."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_newsroom",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_cal_avery",
+        "revisionId": "rev_last_slot_1",
+        "name": "Cal Avery",
+        "aliases": ["Cal", "Avery"],
+        "pronouns": "they/them",
+        "kind": "character",
+        "tags": ["student-union", "organizer", "senior"],
+        "publicDescription": "Cal Avery is the student-union programming chair, which means they can get a room, a projector, or a modest budget with alarming speed. They are organizing the Friday “Northbridge Futures” showcase and keep insisting the event can make space for everyone if everyone stops treating each other like enemies.",
+        "privateDescription": "Cal accepted a redevelopment sponsor’s money for the showcase after the university cut the union budget. The agreement does not explicitly ban criticism, but the sponsor has approval rights over event branding and has asked to see Maya’s reel. Cal has hidden this because they think the showcase is the only remaining platform where students and neighborhood organizers will be in the same room. They also used part of Benji’s event stipend to fill a staffing gap and have not told him how precarious the sponsor arrangement is.",
+        "history": "Cal joined student government after a first-year protest was ignored, then learned that institutions often reward the person who can make a disagreement legible to donors. They are friends with Maya from radio grant work, have argued with Nora about access journalism, and think Eli is talented enough to be worth recruiting. Their instinct is mediation; their flaw is believing mediation is neutral.",
+        "historicalEvents": [
+          {
+            "id": "event_cal_showcase",
+            "title": "Northbridge Futures",
+            "summary": "Cal secured sponsor money for a student-neighborhood showcase after the union budget was reduced.",
+            "participants": ["entity_cal_avery", "entity_maya_kwon", "entity_benji_okafor"],
+            "chronology": "This month",
+            "consequences": [
+              "Maya was asked to make a sponsor reel.",
+              "Benji received an event stipend."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_cal_forum",
+            "title": "The canceled forum",
+            "summary": "Cal tried to host a student forum on the renovation, but facilities moved it to a smaller room without notice.",
+            "participants": ["entity_cal_avery", "entity_nora_iyer"],
+            "chronology": "Last month",
+            "consequences": ["Nora wrote a short brief.", "Cal promised a second forum."],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "Curly hair clipped back with whatever is nearest, lanyard full of room keys, and a tote bag with a stack of posters bending out of it. Their shoes are always damp from crossing campus too fast.",
+        "personality": [
+          "energetic",
+          "earnest",
+          "politically skilled",
+          "conflict-avoidant in private"
+        ],
+        "speechStyle": "Fast, inclusive, and full of “we” until someone asks who has authority. They avoid saying “sponsor” unless a meeting requires it.",
+        "values": ["participation", "student access", "making rooms available"],
+        "drives": [
+          "keep the showcase from collapsing",
+          "turn attention into actual campus resources"
+        ],
+        "goals": [
+          "fill the Friday program without censoring anyone",
+          "keep the sponsor arrangement from swallowing the event"
+        ],
+        "fears": [
+          "being exposed as a facilitator of institutional branding",
+          "letting friends lose opportunities because of purity tests"
+        ],
+        "desires": [
+          "a full room that listens",
+          "one event that does not require an emergency spreadsheet"
+        ],
+        "capabilities": [
+          "event production",
+          "bureaucratic navigation",
+          "coalition building",
+          "finding rooms"
+        ],
+        "limitations": [
+          "sponsor agreement",
+          "union budget",
+          "cannot give away money they do not control"
+        ],
+        "secrets": [
+          "The sponsor can veto event branding and requested Maya’s reel.",
+          "Benji’s stipend comes from the same fragile event budget."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_union_room",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_anika_shah",
+        "revisionId": "rev_last_slot_1",
+        "name": "Dr. Anika Shah",
+        "aliases": ["Professor Shah", "Anika"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["faculty", "media-ethics", "advisor"],
+        "publicDescription": "Dr. Anika Shah teaches media ethics and supervises the Media Lab. She is exacting about consent forms, generous with equipment when she can justify it, and visibly tired of defending a lab that administrators describe as “underutilized” whenever budgets tighten.",
+        "privateDescription": "Anika noticed Eli’s altered equipment checkout and chose to correct it quietly because the recorder had genuinely been used for community work. She did not tell him that the department’s insurance audit had already flagged the account. She is also on a faculty committee advising the renovation, where she has argued unsuccessfully that removing overnight access will exclude commuters and working students. She cannot publicly oppose the plan without risking the small fellowship fund that pays Eli and Maya.",
+        "history": "Anika joined Northbridge after working in public radio and has spent years trying to make university resources useful beyond the campus boundary. Maya trusts her as an advisor but resents her institutional caution. Lucia knows Anika from the garden’s oral-history pilot and worries that faculty “support” turns community work into a grant application.",
+        "historicalEvents": [
+          {
+            "id": "event_anika_checkout",
+            "title": "The corrected checkout",
+            "summary": "Anika noticed Eli’s borrowed-recorder discrepancy and corrected the departmental record without filing a report.",
+            "participants": ["entity_anika_shah", "entity_eli_mendoza"],
+            "chronology": "Last winter",
+            "consequences": [
+              "Eli remained eligible for lab access.",
+              "Anika acquired unspoken leverage over him."
+            ],
+            "visibility": "entity_private"
+          },
+          {
+            "id": "event_anika_committee",
+            "title": "The renovation committee",
+            "summary": "Anika argued for preserving overnight Media Lab access during renovation planning.",
+            "participants": ["entity_anika_shah", "entity_cal_avery"],
+            "chronology": "This semester",
+            "consequences": [
+              "The committee retained one final studio slot.",
+              "The plan still reduces access next term."
+            ],
+            "visibility": "public"
+          }
+        ],
+        "appearance": "Silver-streaked braid, canvas shoes dusted with dry-erase marker, and a rolling cart that squeaks on the left wheel. She carries consent forms in a folder labeled BORING IS KIND.",
+        "personality": ["principled", "patient", "strategic", "overextended"],
+        "speechStyle": "Slow, precise, and free of filler. She asks “what happens after that?” when someone proposes a dramatic solution. She avoids discussing her committee votes outside office hours.",
+        "values": ["consent", "access", "teaching people to keep their own records"],
+        "drives": [
+          "keep the Media Lab usable for students who need it",
+          "prevent community recordings from becoming university property"
+        ],
+        "goals": [
+          "secure a defensible final session",
+          "help Eli make a decision he can live with",
+          "keep the audit from becoming a disciplinary weapon"
+        ],
+        "fears": [
+          "being made responsible for a system she cannot control",
+          "protecting students so quietly that no structural change occurs"
+        ],
+        "desires": [
+          "a budget without strings",
+          "a finished consent form before the recording starts"
+        ],
+        "capabilities": [
+          "audio production",
+          "ethics review",
+          "institutional navigation",
+          "teaching"
+        ],
+        "limitations": [
+          "faculty committee constraints",
+          "limited funding",
+          "cannot promise protection from all institutional consequences"
+        ],
+        "secrets": [
+          "The insurance audit already noticed the recorder account.",
+          "The fellowship fund depends on the renovation committee’s goodwill."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_faculty_office",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "entity_lucia_reyes",
+        "revisionId": "rev_last_slot_1",
+        "name": "Lucia Reyes",
+        "aliases": ["Lucia", "Reyes"],
+        "pronouns": "she/her",
+        "kind": "character",
+        "tags": ["community-garden", "alumni", "organizer"],
+        "publicDescription": "Lucia Reyes is a recent Northbridge graduate who organizes at the Harlow Street Community Garden, three bus stops from campus. She invited Eli and Maya to record oral histories there because she wants people to hear the garden as a place with names, not a backdrop for a university service project.",
+        "privateDescription": "Lucia’s father signed an early redevelopment support letter because he feared losing his maintenance job; she has never told the garden committee. The university’s proposed “community partnership” would preserve a decorative strip of the garden while moving its kitchen and mutual-aid table. Lucia does not want Nora’s article or Eli’s audio walk to turn her father into a villain or the garden into a symbol that students visit once.",
+        "history": "Lucia worked at campus dining while finishing her degree and knows exactly how student organizations arrive in neighborhoods with good intentions and no transportation budget. She trusts Maya’s listening more than Eli’s current reliability, respects Anika’s care with consent, and argues with Cal because Cal treats the showcase as a platform while Lucia treats it as a promise that can break.",
+        "historicalEvents": [
+          {
+            "id": "event_lucia_pilot",
+            "title": "The garden pilot",
+            "summary": "Lucia invited Maya and Eli to record oral histories after a neighborhood meeting about redevelopment.",
+            "participants": ["entity_lucia_reyes", "entity_maya_kwon", "entity_eli_mendoza"],
+            "chronology": "This fall",
+            "consequences": [
+              "The audio walk has community participants.",
+              "No one has agreed to a sponsor-branded release."
+            ],
+            "visibility": "public"
+          },
+          {
+            "id": "event_lucia_letter",
+            "title": "The support letter",
+            "summary": "Lucia found her father’s signed redevelopment support letter in an old maintenance file.",
+            "participants": ["entity_lucia_reyes"],
+            "chronology": "Last month",
+            "consequences": [
+              "She fears the letter will fracture the garden committee.",
+              "The letter lacks context about his job insecurity."
+            ],
+            "visibility": "entity_private"
+          }
+        ],
+        "appearance": "Work boots, an old Northbridge hoodie with the sleeves cut off, and dirt under one thumbnail from turning soil before taking the bus. Her recorder bag is patched with a library barcode.",
+        "personality": [
+          "direct",
+          "protective",
+          "funny when comfortable",
+          "suspicious of easy solidarity"
+        ],
+        "speechStyle": "Concrete, economical, and occasionally dry. She asks what a person can actually promise before she asks what they believe. She avoids speaking for her father.",
+        "values": ["community consent", "practical care", "being specific about who benefits"],
+        "drives": [
+          "keep the garden useful to the people who rely on it",
+          "prevent the audio walk from becoming institutional branding"
+        ],
+        "goals": [
+          "set terms for any recording release",
+          "learn whether the showcase can offer anything material"
+        ],
+        "fears": [
+          "being reduced to a campus story",
+          "her father’s letter becoming a weapon",
+          "losing the kitchen and mutual-aid table"
+        ],
+        "desires": [
+          "a recording that sounds like the garden on an ordinary day",
+          "a fund for bus fare and groceries, not another plaque"
+        ],
+        "capabilities": [
+          "community organizing",
+          "gardening",
+          "oral-history facilitation",
+          "reading institutional promises"
+        ],
+        "limitations": [
+          "not on campus every day",
+          "cannot consent for every garden member",
+          "limited time before redevelopment hearing"
+        ],
+        "secrets": [
+          "Her father signed the early support letter under job pressure.",
+          "The proposed partnership preserves only a decorative strip of the garden."
+        ],
+        "stats": {},
+        "structuredAttributes": {},
+        "constraints": [
+          "This character may refuse, change the subject, leave, misread a situation, or negotiate according to their knowledge and current pressure.",
+          "No private document, message, feeling, or prior relationship fact becomes public without an observable source, consent, disclosure, or plausible evidence."
+        ],
+        "aiMutationPolicy": "manual_only",
+        "playable": false,
+        "cognitive": true,
+        "alive": true,
+        "active": true,
+        "startingLocationId": "loc_harlow_garden",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_eli_maya",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_maya_kwon",
+        "type": "capstone-partners",
+        "publicState": "Capstone partners with a strained friendship and a final studio slot between them.",
+        "sourcePrivateState": "Eli has not listened to Maya’s voice note; he wants a clean professional collaboration without admitting how personal the rupture became.",
+        "canonicalFacts": [
+          "They co-created the audio walk.",
+          "Maya reserved the final studio session."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0.35,
+          "authority": 0,
+          "conflict": 0.55
+        },
+        "historySummary": "They work well together when the task is clear and badly when the silence matters.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_maya_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_maya_kwon",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "capstone-partners",
+        "publicState": "Maya sees Eli as a gifted collaborator who becomes unavailable when accountability feels personal.",
+        "sourcePrivateState": "Maya’s sponsor reel is paid work she needs, and she has not told Eli because she expects him to call it a compromise before asking why she needs it.",
+        "canonicalFacts": [
+          "Eli did not respond to Maya’s voice note.",
+          "Maya knows the final studio slot matters to both projects."
+        ],
+        "dimensions": {
+          "trust": 0.2,
+          "intimacy": 0.25,
+          "authority": 0,
+          "conflict": 0.6
+        },
+        "historySummary": "Maya has stopped guessing whether Eli will show up and started making plans that do not require him.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_benji",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_benji_okafor",
+        "type": "roommates",
+        "publicState": "Roommates who share groceries, deadlines, and more care than either calls dependency.",
+        "sourcePrivateState": "Eli suspects Benji is stressed about something but has been grateful not to ask.",
+        "canonicalFacts": [
+          "They became roommates after a housing shuffle.",
+          "Benji knows Eli avoids conflict."
+        ],
+        "dimensions": {
+          "trust": 0.7,
+          "intimacy": 0.55,
+          "authority": 0,
+          "conflict": 0.2
+        },
+        "historySummary": "Benji is the person Eli calls when a hard drive fails; Eli is the person Benji trusts with a key.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_benji_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_benji_okafor",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "roommates",
+        "publicState": "Benji trusts Eli’s steadiness and resents how often Eli mistakes silence for self-sufficiency.",
+        "sourcePrivateState": "Benji has not told Eli about the housing grant because he cannot stand being made into a crisis in their shared room.",
+        "canonicalFacts": [
+          "They share a Meridian Hall room.",
+          "Eli’s Media Lab access matters to his capstone."
+        ],
+        "dimensions": {
+          "trust": 0.75,
+          "intimacy": 0.6,
+          "authority": 0,
+          "conflict": 0.25
+        },
+        "historySummary": "They understand each other’s routines well enough to notice absence before explanation.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_nora",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_nora_iyer",
+        "type": "uneasy-allies",
+        "publicState": "Nora needs Eli’s sound work to make the renovation story human; Eli needs her reporting to understand the decision.",
+        "sourcePrivateState": "Eli fears Nora will turn people he cares about into sources before she learns what disclosure costs them.",
+        "canonicalFacts": [
+          "Nora investigates the Media Lab closure.",
+          "Eli’s audio walk includes Harlow Street."
+        ],
+        "dimensions": {
+          "trust": 0.35,
+          "intimacy": 0.05,
+          "authority": 0,
+          "conflict": 0.25
+        },
+        "historySummary": "They speak carefully because each knows the other can make something public.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nora_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_nora_iyer",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "uneasy-allies",
+        "publicState": "Nora believes Eli is a source with an ethical instinct, not merely an access point.",
+        "sourcePrivateState": "Nora has not told Eli that the paper adviser already questioned Benji’s calendar provenance.",
+        "canonicalFacts": [
+          "Eli knows the lab’s daily access pattern.",
+          "Nora has a closure timeline document."
+        ],
+        "dimensions": {
+          "trust": 0.4,
+          "intimacy": 0.05,
+          "authority": 0,
+          "conflict": 0.2
+        },
+        "historySummary": "Nora is trying to ask Eli for help without making him pay for her story.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_cal",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_cal_avery",
+        "type": "student-organizer-acquaintances",
+        "publicState": "Cal has offered Eli showcase space and calls his project a bridge between campus and Harlow Street.",
+        "sourcePrivateState": "Eli senses Cal needs the event to succeed and cannot tell whether that makes the invitation generous or instrumental.",
+        "canonicalFacts": [
+          "Cal controls showcase scheduling.",
+          "Eli’s project could appear at the showcase."
+        ],
+        "dimensions": {
+          "trust": 0.2,
+          "intimacy": 0,
+          "authority": 0.2,
+          "conflict": 0.15
+        },
+        "historySummary": "They know each other through committees and introductions, not yet through a direct conversation.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_cal_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_cal_avery",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "student-organizer-acquaintances",
+        "publicState": "Cal sees Eli as a careful maker who could make the showcase feel less like a donor event.",
+        "sourcePrivateState": "Cal knows the sponsor agreement could constrain Eli’s work but hopes the event can still create useful contact.",
+        "canonicalFacts": [
+          "Eli has a final Media Lab booking.",
+          "The sponsor wants polished student media."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0,
+          "authority": 0.25,
+          "conflict": 0.15
+        },
+        "historySummary": "Cal wants Eli’s work on the program and is trying not to turn that want into pressure.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_anika",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_anika_shah",
+        "type": "student-and-advisor",
+        "publicState": "Professor Shah is Eli’s advisor and the person who controls lab access.",
+        "sourcePrivateState": "Eli has never asked Anika why she protected him over the recorder checkout.",
+        "canonicalFacts": ["Anika oversees the Media Lab.", "Eli altered a checkout record."],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.1,
+          "authority": 0.65,
+          "conflict": 0.3
+        },
+        "historySummary": "Their trust is real but lopsided: Anika knows a fact that could change Eli’s semester.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_anika_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_anika_shah",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "advisor-and-student",
+        "publicState": "Anika sees Eli as capable and overcommitted.",
+        "sourcePrivateState": "Anika chose discretion about the recorder because the community center needed it, then regretted how much leverage the discretion gave her.",
+        "canonicalFacts": [
+          "Eli’s equipment account was flagged.",
+          "Eli’s capstone could become a model for consent-centered work."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.05,
+          "authority": 0.75,
+          "conflict": 0.2
+        },
+        "historySummary": "Anika tries to teach without turning every mistake into a disciplinary record.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_eli_lucia",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_eli_mendoza",
+        "targetEntityId": "entity_lucia_reyes",
+        "type": "community-collaborators",
+        "publicState": "Lucia invited Eli to record garden stories and expects him to earn every additional hour of trust.",
+        "sourcePrivateState": "Eli wants Lucia to approve the audio walk but has not told her the Media Lab fellowship may depend on a polished campus version.",
+        "canonicalFacts": [
+          "Lucia consented to a pilot recording.",
+          "Eli’s project includes Harlow Street."
+        ],
+        "dimensions": {
+          "trust": 0.3,
+          "intimacy": 0.05,
+          "authority": 0,
+          "conflict": 0.25
+        },
+        "historySummary": "Lucia has given Eli work to do, not a story to own.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_lucia_eli",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_lucia_reyes",
+        "targetEntityId": "entity_eli_mendoza",
+        "type": "community-collaborators",
+        "publicState": "Lucia considers Eli thoughtful when he listens and unreliable when he arrives with a campus deadline.",
+        "sourcePrivateState": "Lucia worries the audio walk will become proof that the university “consulted” the garden without offering anything material.",
+        "canonicalFacts": [
+          "Eli recorded pilot interviews at the garden.",
+          "Lucia set conditions for any release."
+        ],
+        "dimensions": {
+          "trust": 0.25,
+          "intimacy": 0,
+          "authority": 0,
+          "conflict": 0.35
+        },
+        "historySummary": "Lucia will talk to Eli about sound, not redevelopment, until he demonstrates that he understands the difference.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_maya_nora",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_maya_kwon",
+        "targetEntityId": "entity_nora_iyer",
+        "type": "media-collaborators",
+        "publicState": "Maya and Nora have collaborated on radio segments and argue productively about what editing owes a listener.",
+        "sourcePrivateState": "Maya believes Nora’s closure story could make the garden recording unsafe if publication outruns consent.",
+        "canonicalFacts": [
+          "Nora edits investigations.",
+          "Maya knows the oral-history participants."
+        ],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.2,
+          "authority": 0,
+          "conflict": 0.3
+        },
+        "historySummary": "They send each other drafts with too many comments and still answer after midnight.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nora_maya",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_nora_iyer",
+        "targetEntityId": "entity_maya_kwon",
+        "type": "media-collaborators",
+        "publicState": "Nora trusts Maya’s ear for what a cut removes.",
+        "sourcePrivateState": "Nora worries Maya’s caution can become an excuse for never naming the people with power.",
+        "canonicalFacts": ["Maya is making a sponsor reel.", "Nora has a closure calendar."],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.15,
+          "authority": 0,
+          "conflict": 0.3
+        },
+        "historySummary": "Their disagreement is not whether the story matters but when it becomes safe enough to tell.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_maya_cal",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_maya_kwon",
+        "targetEntityId": "entity_cal_avery",
+        "type": "grant-and-showcase-allies",
+        "publicState": "Cal helped Maya keep campus radio funded; Maya helps Cal make events sound less institutional.",
+        "sourcePrivateState": "Maya knows Cal accepted sponsor terms but not their exact scope.",
+        "canonicalFacts": [
+          "Cal secured radio grant support.",
+          "Maya was asked to make the sponsor reel."
+        ],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.15,
+          "authority": 0.1,
+          "conflict": 0.25
+        },
+        "historySummary": "They are good at getting things done and bad at admitting when a compromise has become a pattern.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_cal_maya",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_cal_avery",
+        "targetEntityId": "entity_maya_kwon",
+        "type": "grant-and-showcase-allies",
+        "publicState": "Cal relies on Maya’s production skills and trusts her to tell them when a room sounds wrong.",
+        "sourcePrivateState": "Cal has not told Maya the sponsor specifically requested approval over branding because they fear she will refuse the reel.",
+        "canonicalFacts": ["Maya hosts campus radio.", "Cal controls the showcase program."],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.15,
+          "authority": 0.25,
+          "conflict": 0.2
+        },
+        "historySummary": "Cal keeps asking Maya for one more favor because Maya is usually capable of it.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_benji_nora",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_benji_okafor",
+        "targetEntityId": "entity_nora_iyer",
+        "type": "source-and-reporter",
+        "publicState": "Benji gave Nora the facilities calendar because he trusts her more than he trusts the help desk.",
+        "sourcePrivateState": "Benji wants Nora to use the calendar without tracing it back to him, but knows that may be impossible.",
+        "canonicalFacts": ["Benji copied the closure calendar.", "Nora is verifying it."],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.1,
+          "authority": 0,
+          "conflict": 0.2
+        },
+        "historySummary": "They trade bad jokes in the newsroom and serious messages afterward.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_nora_benji",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_nora_iyer",
+        "targetEntityId": "entity_benji_okafor",
+        "type": "source-and-reporter",
+        "publicState": "Nora sees Benji as a friend whose source protection matters more than a quick publication date.",
+        "sourcePrivateState": "Nora has not told Benji the paper adviser questioned the document’s provenance.",
+        "canonicalFacts": ["Benji has a restricted calendar copy.", "Nora needs corroboration."],
+        "dimensions": {
+          "trust": 0.6,
+          "intimacy": 0.1,
+          "authority": 0,
+          "conflict": 0.2
+        },
+        "historySummary": "Nora wants the calendar verified before it becomes a burden Benji carries alone.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_benji_cal",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_benji_okafor",
+        "targetEntityId": "entity_cal_avery",
+        "type": "event-stipend-and-friends",
+        "publicState": "Benji works occasional union events for Cal and appreciates being paid on time.",
+        "sourcePrivateState": "Benji knows Cal’s stipend is helping him cover housing gaps and feels ashamed that gratitude has made him easier to recruit.",
+        "canonicalFacts": ["Cal pays Benji an event stipend.", "Benji needs housing aid."],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.1,
+          "authority": 0.25,
+          "conflict": 0.2
+        },
+        "historySummary": "Benji jokes that Cal owes him snacks; both know the money is not a joke.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_cal_benji",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_cal_avery",
+        "targetEntityId": "entity_benji_okafor",
+        "type": "event-stipend-and-friends",
+        "publicState": "Cal values Benji’s technical reliability and wants him to remain enrolled.",
+        "sourcePrivateState": "Cal used the showcase budget to cover a staffing gap without explaining how dependent the money is on sponsor approval.",
+        "canonicalFacts": ["Benji staffs union events.", "The sponsor agreement is fragile."],
+        "dimensions": {
+          "trust": 0.55,
+          "intimacy": 0.15,
+          "authority": 0.35,
+          "conflict": 0.15
+        },
+        "historySummary": "Cal has offered Benji opportunities without asking whether opportunities are what he needs.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_anika_maya",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_anika_shah",
+        "targetEntityId": "entity_maya_kwon",
+        "type": "advisor-and-artist",
+        "publicState": "Anika advises Maya’s sound work and insists consent is part of craft.",
+        "sourcePrivateState": "Anika worries Maya will take sponsor work out of financial necessity and call it a choice because no better choice is available.",
+        "canonicalFacts": ["Maya uses the Media Lab.", "Anika sits on the renovation committee."],
+        "dimensions": {
+          "trust": 0.65,
+          "intimacy": 0.2,
+          "authority": 0.55,
+          "conflict": 0.15
+        },
+        "historySummary": "They can discuss microphones for hours and committee politics for about three minutes.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_maya_anika",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_maya_kwon",
+        "targetEntityId": "entity_anika_shah",
+        "type": "advisor-and-artist",
+        "publicState": "Maya respects Anika’s care and resents the institutional caution that comes with it.",
+        "sourcePrivateState": "Maya suspects Anika knows more about Eli’s account issue than she says.",
+        "canonicalFacts": [
+          "Anika manages lab access.",
+          "Maya’s graduation portfolio depends on the final session."
+        ],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.1,
+          "authority": -0.45,
+          "conflict": 0.25
+        },
+        "historySummary": "Maya wants advice from Anika but not another reason to be grateful to the institution.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_anika_lucia",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_anika_shah",
+        "targetEntityId": "entity_lucia_reyes",
+        "type": "faculty-and-community-partners",
+        "publicState": "Anika supports Lucia’s oral-history work and follows Lucia’s consent rules.",
+        "sourcePrivateState": "Anika knows the garden partnership could be used in a grant report and has not told Lucia how often administrators invoke it.",
+        "canonicalFacts": ["Lucia led the oral-history pilot.", "Anika advised consent practices."],
+        "dimensions": {
+          "trust": 0.5,
+          "intimacy": 0.1,
+          "authority": 0.2,
+          "conflict": 0.2
+        },
+        "historySummary": "Anika asks before bringing students to the garden; Lucia notices that this is rarer than it should be.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_lucia_anika",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_lucia_reyes",
+        "targetEntityId": "entity_anika_shah",
+        "type": "faculty-and-community-partners",
+        "publicState": "Lucia considers Anika unusually careful for faculty.",
+        "sourcePrivateState": "Lucia worries Anika’s support still routes community work through university priorities.",
+        "canonicalFacts": [
+          "Anika helped design the consent process.",
+          "The garden faces redevelopment pressure."
+        ],
+        "dimensions": {
+          "trust": 0.45,
+          "intimacy": 0.05,
+          "authority": -0.2,
+          "conflict": 0.2
+        },
+        "historySummary": "Lucia accepts Anika’s help one meeting at a time, never as a blank check.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_lucia_cal",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_lucia_reyes",
+        "targetEntityId": "entity_cal_avery",
+        "type": "showcase-adversaries",
+        "publicState": "Lucia thinks Cal’s showcase might create useful leverage or turn the garden into branding.",
+        "sourcePrivateState": "Lucia has not told Cal about her father’s support letter because she does not trust a public event to hold that complexity.",
+        "canonicalFacts": [
+          "Cal invited garden organizers to the showcase.",
+          "Lucia has conditions for participation."
+        ],
+        "dimensions": {
+          "trust": 0.1,
+          "intimacy": 0,
+          "authority": 0,
+          "conflict": 0.45
+        },
+        "historySummary": "Cal keeps calling the showcase a conversation; Lucia keeps asking who owns the microphone.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "rel_cal_lucia",
+        "revisionId": "rev_last_slot_1",
+        "sourceEntityId": "entity_cal_avery",
+        "targetEntityId": "entity_lucia_reyes",
+        "type": "showcase-adversaries",
+        "publicState": "Cal wants Lucia’s participation because it would make the showcase meaningful.",
+        "sourcePrivateState": "Cal knows the sponsor will prefer a hopeful garden story and fears Lucia will see that pressure immediately.",
+        "canonicalFacts": [
+          "Lucia represents the garden project.",
+          "The showcase has sponsor branding restrictions."
+        ],
+        "dimensions": {
+          "trust": 0.2,
+          "intimacy": 0,
+          "authority": 0.25,
+          "conflict": 0.4
+        },
+        "historySummary": "Cal has offered Lucia a speaking slot before asking what she would need to accept it.",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "locations": [
+      {
+        "id": "loc_meridian_hall",
+        "revisionId": "rev_last_slot_1",
+        "name": "Meridian Hall",
+        "aliases": ["Meridian", "the dorm"],
+        "type": "residence-hall",
+        "tags": ["dorm", "housing"],
+        "publicDescription": "Meridian Hall is a renovated residence building with mismatched carpet, malfunctioning laundry alerts, and an RA bulletin board that has been repainted over too many times. The lobby smells faintly of pizza boxes and industrial cleaner.",
+        "privateDetails": "The residence life office plans to move several students during winter break because a pipe inspection found mold in two rooms. Benji has seen the list and his room number is circled.",
+        "parentLocationId": null,
+        "environment": {
+          "time": "Thursday evening",
+          "weather": "cold drizzle"
+        },
+        "capacity": 500,
+        "accessRules": ["Residents and guests must use an ID card after 10pm."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 80
+        },
+        "hazards": ["Slippery lobby tile during rain"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_meridian_hallway",
+        "revisionId": "rev_last_slot_1",
+        "name": "Third-floor hallway",
+        "aliases": ["hallway", "third floor"],
+        "type": "hallway",
+        "tags": ["dorm", "threshold"],
+        "publicDescription": "The third-floor hallway is narrow enough that two laundry baskets create a traffic problem. Doors carry hand-lettered name tags, and a vending machine hums near the stairwell.",
+        "privateDetails": "The RA key box was left open after a maintenance visit. A facilities notice about room inspections is taped behind the vending machine.",
+        "parentLocationId": "loc_meridian_hall",
+        "environment": {
+          "light": "fluorescent",
+          "sound": "vending machine hum"
+        },
+        "capacity": 60,
+        "accessRules": ["Residents and escorted guests."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 35
+        },
+        "hazards": [],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_eli_room",
+        "revisionId": "rev_last_slot_1",
+        "name": "Eli and Benji’s room",
+        "aliases": ["our room", "room 317"],
+        "type": "dorm-room",
+        "tags": ["dorm", "roommates"],
+        "publicDescription": "Room 317 contains two desks, a soldering iron that is technically not allowed, and a small fridge held shut with a sticker of a crying banana. Eli’s cables occupy one wall; Benji’s whiteboard occupies the other.",
+        "privateDetails": "Benji’s aid appeal letter is tucked beneath the whiteboard tray. Eli’s old phone, containing Maya’s unheard voice note and the equipment screenshot, is in the back of his desk drawer.",
+        "parentLocationId": "loc_meridian_hallway",
+        "environment": {
+          "light": "desk lamps",
+          "sound": "rain against window",
+          "temperature": "too warm"
+        },
+        "capacity": 4,
+        "accessRules": ["Residents or invited guests."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 15
+        },
+        "hazards": ["Overloaded power strip"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_media_lab",
+        "revisionId": "rev_last_slot_1",
+        "name": "Media Lab",
+        "aliases": ["the lab", "media center"],
+        "type": "campus-lab",
+        "tags": ["audio", "editing", "campus"],
+        "publicDescription": "The Media Lab is a long room of edit stations, tangled cable bins, and equipment lockers whose labels have been peeled off and replaced three times. A printed sign says FINAL ACCESS WEEK in an optimistic font.",
+        "privateDetails": "The facilities calendar shows that the renovation closure was planned before the student consultation. The equipment audit file includes Eli’s corrected checkout entry.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "monitor glow",
+          "sound": "computer fans",
+          "time": "Thursday evening"
+        },
+        "capacity": 40,
+        "accessRules": [
+          "Students with lab authorization.",
+          "Equipment checkout requires a current account."
+        ],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 45
+        },
+        "hazards": ["Cables across the floor"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_sound_booth",
+        "revisionId": "rev_last_slot_1",
+        "name": "Sound Booth B",
+        "aliases": ["the booth", "booth b"],
+        "type": "recording-booth",
+        "tags": ["audio", "private", "studio"],
+        "publicDescription": "Sound Booth B is lined with dark acoustic foam and has a small square window into the Media Lab. The door seals with a heavy rubber strip; when it closes, the room feels briefly underwater.",
+        "privateDetails": "Maya’s private session folder contains the sponsor reel brief and her unplayed mix of Eli’s field recordings. The booth booking system records who opens the door and when.",
+        "parentLocationId": "loc_media_lab",
+        "environment": {
+          "light": "soft LED",
+          "sound": "near silence",
+          "air": "stale warm fabric"
+        },
+        "capacity": 3,
+        "accessRules": ["Booked users and invited collaborators only."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 5
+        },
+        "hazards": ["Door can lock if the latch is forced"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_newsroom",
+        "revisionId": "rev_last_slot_1",
+        "name": "The Campus Ledger newsroom",
+        "aliases": ["newsroom", "Ledger"],
+        "type": "student-office",
+        "tags": ["journalism", "student-media"],
+        "publicDescription": "The newsroom has old carpet, a wall of past front pages, and a coffee maker everyone mistrusts but uses. Half the desks are covered by annotated printouts; the other half are covered by apologies for missed deadlines.",
+        "privateDetails": "Nora’s locked cabinet holds the copied facilities calendar, Lucia’s conditioned quote, and a note from the faculty adviser asking for provenance before publication.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "desk lamps",
+          "sound": "keyboard clatter",
+          "time": "late afternoon"
+        },
+        "capacity": 25,
+        "accessRules": ["Student media staff and invited sources."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 30
+        },
+        "hazards": [],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_union_room",
+        "revisionId": "rev_last_slot_1",
+        "name": "Student Union Room 204",
+        "aliases": ["union room", "room 204"],
+        "type": "meeting-room",
+        "tags": ["student-union", "showcase"],
+        "publicDescription": "Room 204 has movable chairs, a projector that requires a ceremonial amount of patience, and windows facing the rain-dark quad. Posters for the Northbridge Futures showcase cover one wall.",
+        "privateDetails": "The sponsor agreement is stored in Cal’s shared-drive folder. It permits branding approval but does not explicitly forbid criticism; Cal’s fear is larger than the text.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "overhead warm",
+          "sound": "HVAC rattle",
+          "time": "evening"
+        },
+        "capacity": 70,
+        "accessRules": ["Bookable through the student union."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 45
+        },
+        "hazards": [],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_faculty_office",
+        "revisionId": "rev_last_slot_1",
+        "name": "Professor Shah’s office",
+        "aliases": ["Professor Shah office", "Anika office"],
+        "type": "faculty-office",
+        "tags": ["faculty", "advising"],
+        "publicDescription": "Professor Shah’s office is crowded with microphones, consent-form binders, and a rolling cart that squeaks on the left wheel. A sign on the door reads BORING IS KIND.",
+        "privateDetails": "A locked cabinet contains the insurance-audit email about the borrowed recorder and committee minutes about overnight lab access.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "desk lamp",
+          "sound": "hallway footsteps",
+          "time": "office hours"
+        },
+        "capacity": 5,
+        "accessRules": ["Office hours or invitation."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 20
+        },
+        "hazards": [],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_library_cafe",
+        "revisionId": "rev_last_slot_1",
+        "name": "Kline Library Cafe",
+        "aliases": ["cafe", "library cafe"],
+        "type": "cafe",
+        "tags": ["library", "public", "study"],
+        "publicDescription": "The library cafe has small tables, expensive coffee, and a wall outlet everyone has silently agreed belongs to the person who arrived first. Students revise presentations under the blue light of the library stacks.",
+        "privateDetails": "A barista overheard Cal negotiating the sponsor’s signage delivery but does not know the people involved. A community bulletin has a Harlow Street bus-fare fundraiser taped beneath a tutoring flyer.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "late evening blue",
+          "sound": "espresso machine",
+          "smell": "coffee and wet coats"
+        },
+        "capacity": 90,
+        "accessRules": ["Public campus space during library hours."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 60
+        },
+        "hazards": [],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "loc_harlow_garden",
+        "revisionId": "rev_last_slot_1",
+        "name": "Harlow Street Community Garden",
+        "aliases": ["the garden", "Harlow"],
+        "type": "community-garden",
+        "tags": ["community", "garden", "off-campus"],
+        "publicDescription": "The Harlow Street Community Garden sits behind a row of repair shops, with raised beds, a shared kitchen shed, and a painted sign asking visitors to take only photographs with permission. The campus shuttle stop is three blocks away.",
+        "privateDetails": "A folder in the kitchen shed contains the redevelopment support letter Lucia’s father signed under job pressure, plus a proposal showing the university partnership preserves a decorative strip but removes the mutual-aid kitchen.",
+        "parentLocationId": null,
+        "environment": {
+          "light": "late afternoon",
+          "sound": "traffic and wind chimes",
+          "smell": "wet soil and cilantro"
+        },
+        "capacity": 120,
+        "accessRules": ["Open during daylight; kitchen use requires organizer permission."],
+        "sensoryProperties": {
+          "sight": true,
+          "sound": true,
+          "hearingRange": 100
+        },
+        "hazards": ["Uneven paths after rain"],
+        "aiMutationPolicy": "manual_only",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "locationEdges": [
+      {
+        "id": "portal_eli_room_door",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_meridian_hallway",
+        "destinationLocationId": "loc_eli_room",
+        "directed": false,
+        "directionLabel": "Room 317 door",
+        "travelText": "A locked dorm-room door separates the hallway from Eli and Benji’s room.",
+        "travelTime": 1,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "portal",
+        "portal": {
+          "name": "Room 317 door",
+          "defaultState": "closed",
+          "transmission": {
+            "open": {
+              "sight": 1,
+              "sound": 1
+            },
+            "ajar": {
+              "sight": 0.35,
+              "sound": 0.65
+            },
+            "closed": {
+              "sight": 0,
+              "sound": 0.15
+            },
+            "locked": {
+              "sight": 0,
+              "sound": 0.08
+            },
+            "barred": {
+              "sight": 0.1,
+              "sound": 0.25
+            }
+          }
+        },
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_hallway_lobby",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_meridian_hallway",
+        "destinationLocationId": "loc_meridian_hall",
+        "directed": false,
+        "directionLabel": "down the stairwell",
+        "travelText": "The stairwell smells of wet umbrellas and someone’s microwave dinner.",
+        "travelTime": 2,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_hall_lobby",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_meridian_hall",
+        "destinationLocationId": "loc_library_cafe",
+        "directed": false,
+        "directionLabel": "across the quad",
+        "travelText": "A paved path crosses the rain-dark quad to Kline Library.",
+        "travelTime": 7,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "portal_sound_booth_door",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_media_lab",
+        "destinationLocationId": "loc_sound_booth",
+        "directed": false,
+        "directionLabel": "Sound Booth B door",
+        "travelText": "The heavy studio door seals the booth from the edit room.",
+        "travelTime": 1,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "portal",
+        "portal": {
+          "name": "Sound Booth B door",
+          "defaultState": "closed",
+          "transmission": {
+            "open": {
+              "sight": 1,
+              "sound": 1
+            },
+            "ajar": {
+              "sight": 0.35,
+              "sound": 0.65
+            },
+            "closed": {
+              "sight": 0,
+              "sound": 0.15
+            },
+            "locked": {
+              "sight": 0,
+              "sound": 0.08
+            },
+            "barred": {
+              "sight": 0.1,
+              "sound": 0.25
+            }
+          }
+        },
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_lab_cafe",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_media_lab",
+        "destinationLocationId": "loc_library_cafe",
+        "directed": false,
+        "directionLabel": "through the library walk",
+        "travelText": "A covered walkway links the Media Lab to the library entrance.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_lab_union",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_media_lab",
+        "destinationLocationId": "loc_union_room",
+        "directed": false,
+        "directionLabel": "through the student center",
+        "travelText": "A busy hallway leads toward the Student Union.",
+        "travelTime": 6,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_newsroom_cafe",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_newsroom",
+        "destinationLocationId": "loc_library_cafe",
+        "directed": false,
+        "directionLabel": "past the stacks",
+        "travelText": "A narrow passage links the newsroom floor to the cafe.",
+        "travelTime": 3,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_union_cafe",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_union_room",
+        "destinationLocationId": "loc_library_cafe",
+        "directed": false,
+        "directionLabel": "across the quad",
+        "travelText": "Room 204 opens toward the library side of campus.",
+        "travelTime": 5,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_office_lab",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_faculty_office",
+        "destinationLocationId": "loc_media_lab",
+        "directed": false,
+        "directionLabel": "down the faculty corridor",
+        "travelText": "A faculty corridor joins the office wing to the Media Lab.",
+        "travelTime": 2,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "edge_cafe_garden",
+        "revisionId": "rev_last_slot_1",
+        "sourceLocationId": "loc_library_cafe",
+        "destinationLocationId": "loc_harlow_garden",
+        "directed": false,
+        "directionLabel": "to the shuttle stop",
+        "travelText": "The campus shuttle and a short walk lead to Harlow Street.",
+        "travelTime": 18,
+        "travelCost": 0,
+        "accessRequirements": [],
+        "discoverability": 1,
+        "blocked": false,
+        "connectionKind": "route",
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "storyCards": [
+      {
+        "id": "card_public_last_slot",
+        "revisionId": "rev_last_slot_1",
+        "title": "The Last Slot",
+        "cardType": "lore",
+        "tags": ["media-lab", "deadline"],
+        "canonicalBody": "The Media Lab will lose overnight access after this weekend’s renovation handoff. The final bookable sound-booth session is Thursday night. A polished showcase reel, an audio-walk recording, a personal project, or silence can use that time—but not all of them.",
+        "playerVisibleBody": "The Media Lab’s last overnight slot is Thursday night. Who uses it, and for what, matters.",
+        "activationHints": ["final slot", "sound booth", "renovation", "Thursday"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_showcase",
+        "revisionId": "rev_last_slot_1",
+        "title": "Northbridge Futures",
+        "cardType": "lore",
+        "tags": ["showcase", "student-union"],
+        "canonicalBody": "The Friday Northbridge Futures showcase is a student-union event about campus and neighborhood futures. It has sponsor money, student programming, a public audience, and more political weight than its cheerful posters admit.",
+        "playerVisibleBody": "Friday’s showcase can be a platform, a performance, a negotiation, or a room people decide not to enter.",
+        "activationHints": ["showcase", "Friday", "Cal", "sponsor"],
+        "priority": 8,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_garden",
+        "revisionId": "rev_last_slot_1",
+        "title": "Harlow Street Garden",
+        "cardType": "location",
+        "tags": ["garden", "oral-history"],
+        "canonicalBody": "Harlow Street Community Garden hosts food, mutual-aid work, and oral-history sessions. Students are welcome only if they respect organizer consent and do not treat the site as an aesthetic backdrop.",
+        "playerVisibleBody": "The Harlow Street garden is a living community space, not a campus project.",
+        "activationHints": ["Harlow", "garden", "Lucia", "oral history"],
+        "priority": 9,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "location",
+          "locationId": "loc_harlow_garden"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_media_lab",
+        "revisionId": "rev_last_slot_1",
+        "title": "Media Lab access",
+        "cardType": "rule",
+        "tags": ["access", "equipment"],
+        "canonicalBody": "Media Lab access is granted through accounts, bookings, and the goodwill of people who can make exceptions. Equipment is not neutral when only some students can afford to lose access.",
+        "playerVisibleBody": "The Media Lab is a resource with rules, gaps, and people who decide how forgiving those rules are.",
+        "activationHints": ["equipment", "booking", "lab account"],
+        "priority": 7,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "location",
+          "locationId": "loc_media_lab"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_public_choices",
+        "revisionId": "rev_last_slot_1",
+        "title": "College does not choose for you",
+        "cardType": "style",
+        "tags": ["agency", "college-life"],
+        "canonicalBody": "Deadlines, money, friendships, grades, and public attention create pressure; they do not determine Eli’s feelings, relationships, or moral answer. A person may ask for care without earning it through a performance.",
+        "playerVisibleBody": "You can prioritize work, friendship, privacy, consent, money, craft, or another route. Consequences should be specific, not compulsory.",
+        "activationHints": ["choice", "no forced romance", "no forced confession"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "global"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_eli_checkout",
+        "revisionId": "rev_last_slot_1",
+        "title": "The corrected checkout",
+        "cardType": "item",
+        "tags": ["Eli", "private", "equipment"],
+        "canonicalBody": "Eli’s old phone contains a screenshot showing the recorder account’s original checkout time. The discrepancy is small, but its explanation is not: he lent university equipment to his sister’s community center after a theft, then altered the record. Professor Shah’s quiet correction did not erase the audit trail.",
+        "playerVisibleBody": "",
+        "activationHints": ["old phone", "recorder", "checkout", "audit"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_eli_mendoza"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_eli_voice_note",
+        "revisionId": "rev_last_slot_1",
+        "title": "Maya’s unheard voice note",
+        "cardType": "item",
+        "tags": ["Eli", "Maya", "private"],
+        "canonicalBody": "A 2:17 voice note from Maya remains unheard in Eli’s cloud account. It begins with an apology for assuming the worst about the garden recordings and ends before she can decide what she wants from him. Eli has treated not listening as a form of safety.",
+        "playerVisibleBody": "",
+        "activationHints": ["voice note", "Maya", "last winter"],
+        "priority": 8,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_eli_mendoza"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_maya_reel",
+        "revisionId": "rev_last_slot_1",
+        "title": "The sponsor reel brief",
+        "cardType": "item",
+        "tags": ["Maya", "sponsor", "private"],
+        "canonicalBody": "The sponsor reel brief asks for “forward-looking stories of student innovation and neighborhood partnership.” It promises payment, a useful credit, and no explicit censorship clause. It does reserve approval over event branding, which could make a careful recording look like endorsement.",
+        "playerVisibleBody": "",
+        "activationHints": ["sponsor reel", "branding", "payment"],
+        "priority": 9,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_maya_kwon"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_benji_aid",
+        "revisionId": "rev_last_slot_1",
+        "title": "The aid appeal",
+        "cardType": "item",
+        "tags": ["Benji", "housing", "private"],
+        "canonicalBody": "Benji’s aid recalculation means he loses his housing grant unless his appeal succeeds. The letter is half drafted beneath the whiteboard tray. He has told almost everyone he is busy rather than tell anyone he is scared.",
+        "playerVisibleBody": "",
+        "activationHints": ["aid appeal", "housing grant", "whiteboard"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_benji_okafor"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_nora_calendar",
+        "revisionId": "rev_last_slot_1",
+        "title": "The facilities calendar",
+        "cardType": "item",
+        "tags": ["Nora", "newsroom", "private"],
+        "canonicalBody": "The copied calendar shows that the Media Lab closure was placed on a facilities planning schedule before the public student consultation. It suggests the consultation was not meaningful, but the copy’s source trail could cost Benji his job if publication is careless.",
+        "playerVisibleBody": "",
+        "activationHints": ["facilities calendar", "closure", "source"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_nora_iyer"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_cal_sponsor",
+        "revisionId": "rev_last_slot_1",
+        "title": "The sponsor agreement",
+        "cardType": "item",
+        "tags": ["Cal", "sponsor", "private"],
+        "canonicalBody": "The sponsor agreement funds the showcase but gives the donor approval over branding and event materials. It does not literally forbid criticism. Cal has been treating the uncertainty as if it were a prohibition because they fear losing the only available budget.",
+        "playerVisibleBody": "",
+        "activationHints": ["agreement", "sponsor", "branding"],
+        "priority": 9,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_cal_avery"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_anika_audit",
+        "revisionId": "rev_last_slot_1",
+        "title": "The insurance audit",
+        "cardType": "item",
+        "tags": ["Anika", "audit", "private"],
+        "canonicalBody": "The insurance audit email identifies the recorder account discrepancy but does not demand discipline. Anika’s committee notes argue that removing overnight access will disproportionately exclude commuters, working students, and students without private recording space.",
+        "playerVisibleBody": "",
+        "activationHints": ["audit", "committee notes", "overnight access"],
+        "priority": 9,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_anika_shah"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "card_lucia_letter",
+        "revisionId": "rev_last_slot_1",
+        "title": "The support letter",
+        "cardType": "item",
+        "tags": ["Lucia", "garden", "private"],
+        "canonicalBody": "Lucia’s father signed an early redevelopment support letter while afraid of losing his maintenance job. The letter reads like agreement without recording the pressure behind it. Lucia is protecting him from becoming a convenient villain in a campus story.",
+        "playerVisibleBody": "",
+        "activationHints": ["support letter", "father", "redevelopment"],
+        "priority": 10,
+        "tokenBudget": 400,
+        "scope": {
+          "kind": "entity_private",
+          "ownerEntityId": "entity_lucia_reyes"
+        },
+        "mutationPolicy": "manual_only",
+        "locked": true,
+        "source": "player",
+        "currentVersion": 1,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "storyCardLinks": [
+      {
+        "id": "link_last_slot_eli",
+        "cardId": "card_public_last_slot",
+        "targetType": "entity",
+        "targetId": "entity_eli_mendoza",
+        "relationType": "capstone-stake",
+        "weight": 1
+      },
+      {
+        "id": "link_last_slot_maya",
+        "cardId": "card_public_last_slot",
+        "targetType": "entity",
+        "targetId": "entity_maya_kwon",
+        "relationType": "studio-stake",
+        "weight": 1
+      },
+      {
+        "id": "link_showcase_cal",
+        "cardId": "card_public_showcase",
+        "targetType": "entity",
+        "targetId": "entity_cal_avery",
+        "relationType": "organizes",
+        "weight": 1
+      },
+      {
+        "id": "link_garden_lucia",
+        "cardId": "card_public_garden",
+        "targetType": "entity",
+        "targetId": "entity_lucia_reyes",
+        "relationType": "organizes",
+        "weight": 1
+      },
+      {
+        "id": "link_lab_anika",
+        "cardId": "card_public_media_lab",
+        "targetType": "entity",
+        "targetId": "entity_anika_shah",
+        "relationType": "supervises",
+        "weight": 1
+      },
+      {
+        "id": "link_checkout_eli",
+        "cardId": "card_eli_checkout",
+        "targetType": "entity",
+        "targetId": "entity_eli_mendoza",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_voice_eli",
+        "cardId": "card_eli_voice_note",
+        "targetType": "entity",
+        "targetId": "entity_eli_mendoza",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_reel_maya",
+        "cardId": "card_maya_reel",
+        "targetType": "entity",
+        "targetId": "entity_maya_kwon",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_aid_benji",
+        "cardId": "card_benji_aid",
+        "targetType": "entity",
+        "targetId": "entity_benji_okafor",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_calendar_nora",
+        "cardId": "card_nora_calendar",
+        "targetType": "entity",
+        "targetId": "entity_nora_iyer",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_sponsor_cal",
+        "cardId": "card_cal_sponsor",
+        "targetType": "entity",
+        "targetId": "entity_cal_avery",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_audit_anika",
+        "cardId": "card_anika_audit",
+        "targetType": "entity",
+        "targetId": "entity_anika_shah",
+        "relationType": "owned-by",
+        "weight": 1
+      },
+      {
+        "id": "link_letter_lucia",
+        "cardId": "card_lucia_letter",
+        "targetType": "entity",
+        "targetId": "entity_lucia_reyes",
+        "relationType": "owned-by",
+        "weight": 1
+      }
+    ],
+    "plotArcs": [
+      {
+        "id": "arc_last_session",
+        "revisionId": "rev_last_slot_1",
+        "title": "The Last Session",
+        "description": "A creative deadline with limited access asks who gets a room, who gets paid, and whether a polished result is worth the terms attached to it.",
+        "pointIds": ["plot_final_session", "plot_showcase_night"],
+        "priority": 10,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "arc_people_not_projects",
+        "revisionId": "rev_last_slot_1",
+        "title": "People are not projects",
+        "description": "Eli’s friendships, financial pressures, equipment history, and institutional relationships cannot be solved by a single generous act or dramatic confession.",
+        "pointIds": ["plot_housing_appeal", "plot_sponsor_terms", "plot_recorder_truth"],
+        "priority": 9,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "arc_story_with_names",
+        "revisionId": "rev_last_slot_1",
+        "title": "A Story With Names In It",
+        "description": "The garden recording and facilities calendar ask what student media owes subjects, sources, neighbors, and people who cannot absorb publicity as easily as campus institutions can.",
+        "pointIds": ["plot_calendar_story", "plot_garden_consent"],
+        "priority": 10,
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ],
+    "plotPoints": [
+      {
+        "id": "plot_final_session",
+        "arcId": "arc_last_session",
+        "revisionId": "rev_last_slot_1",
+        "title": "Who gets the booth?",
+        "internalDescription": "The final studio session creates a genuine scheduling conflict, not a puzzle with a correct owner. Eli and Maya can share it, trade it, use it for the sponsor reel, use it for the garden recordings, or decide the slot should not be the story’s center.",
+        "source": "player",
+        "priority": 9,
+        "status": "available",
+        "preconditions": ["The final slot is known."],
+        "desiredOutcome": "The people affected by the booking can make a clear, informed arrangement.",
+        "forbiddenOutcomes": [
+          "Eli automatically gets the booth because he is the player.",
+          "Maya gives up paid work without discussion."
+        ],
+        "involvedEntityIds": ["entity_eli_mendoza", "entity_maya_kwon", "entity_anika_shah"],
+        "involvedLocationIds": ["loc_media_lab", "loc_sound_booth"],
+        "foreshadowingCues": [
+          "The booking calendar shows one remaining overnight session.",
+          "The booth door is closed while Maya records."
+        ],
+        "escalationOptions": [
+          "A facilities worker asks for final equipment inventory.",
+          "Maya receives the sponsor reel deadline."
+        ],
+        "resolutionConditions": [
+          "Share the session, trade it, record separately, decline it, or make another plan."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_housing_appeal",
+        "arcId": "arc_people_not_projects",
+        "revisionId": "rev_last_slot_1",
+        "title": "Benji’s appeal",
+        "internalDescription": "Benji’s housing appeal is not a side quest that exists to reward Eli for kindness. It asks whether Eli notices, asks permission before helping, and can support a friend without turning the friend into a problem to solve.",
+        "source": "player",
+        "priority": 7,
+        "status": "available",
+        "preconditions": [
+          "Eli notices a practical sign of Benji’s financial stress or Benji chooses to disclose."
+        ],
+        "desiredOutcome": "Benji has more options and more say over who knows about his housing situation.",
+        "forbiddenOutcomes": [
+          "Benji is publicly exposed for emotional payoff.",
+          "Eli makes a promise he cannot keep."
+        ],
+        "involvedEntityIds": ["entity_eli_mendoza", "entity_benji_okafor", "entity_cal_avery"],
+        "involvedLocationIds": ["loc_eli_room", "loc_union_room"],
+        "foreshadowingCues": [
+          "A half-drafted appeal is under the whiteboard tray.",
+          "Benji avoids saying “money.”"
+        ],
+        "escalationOptions": [
+          "The appeal deadline approaches.",
+          "Cal asks Benji to staff another event shift."
+        ],
+        "resolutionConditions": [
+          "Listen, help edit, connect Benji to resources, offer practical support, respect a refusal, or focus elsewhere."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_calendar_story",
+        "arcId": "arc_story_with_names",
+        "revisionId": "rev_last_slot_1",
+        "title": "The closure calendar",
+        "internalDescription": "Nora’s document may show that the consultation was staged. It also has a vulnerable source. The point asks whether corroboration, consent, timing, and source protection can matter as much as publication.",
+        "source": "player",
+        "priority": 8,
+        "status": "available",
+        "preconditions": ["Nora or Benji offers access to the calendar."],
+        "desiredOutcome": "The document’s claims are verified and the source’s risks are understood.",
+        "forbiddenOutcomes": [
+          "The calendar is published with a source trail that identifies Benji.",
+          "A headline automatically counts as accountability."
+        ],
+        "involvedEntityIds": [
+          "entity_eli_mendoza",
+          "entity_nora_iyer",
+          "entity_benji_okafor",
+          "entity_anika_shah"
+        ],
+        "involvedLocationIds": ["loc_newsroom", "loc_media_lab", "loc_library_cafe"],
+        "foreshadowingCues": [
+          "The closure plan predates the student meeting.",
+          "The faculty adviser requests provenance."
+        ],
+        "escalationOptions": [
+          "The campus paper’s deadline arrives.",
+          "Facilities announces final access procedures."
+        ],
+        "resolutionConditions": [
+          "Corroborate, publish with safeguards, hold the story, seek a response, protect the source, or decline involvement."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_garden_consent",
+        "arcId": "arc_story_with_names",
+        "revisionId": "rev_last_slot_1",
+        "title": "A recording with conditions",
+        "internalDescription": "Lucia’s oral-history project has terms. The audio walk can become a useful record, a sponsor asset, a source of leverage, or a broken promise depending on who controls the edit and what the garden receives in return.",
+        "source": "player",
+        "priority": 9,
+        "status": "available",
+        "preconditions": ["Lucia’s conditions for recording or publication are known."],
+        "desiredOutcome": "Any release has clear consent, material benefit or honest limits, and a way for participants to challenge representation.",
+        "forbiddenOutcomes": [
+          "Lucia is forced to speak for the garden.",
+          "The garden is used as an aesthetic backdrop without consent."
+        ],
+        "involvedEntityIds": [
+          "entity_eli_mendoza",
+          "entity_maya_kwon",
+          "entity_lucia_reyes",
+          "entity_nora_iyer",
+          "entity_anika_shah"
+        ],
+        "involvedLocationIds": ["loc_harlow_garden", "loc_sound_booth", "loc_newsroom"],
+        "foreshadowingCues": [
+          "A sign requests photographs only with permission.",
+          "Lucia asks what the project can actually promise."
+        ],
+        "escalationOptions": [
+          "The showcase asks for a finished segment.",
+          "A garden member withdraws consent from a prior recording."
+        ],
+        "resolutionConditions": [
+          "Revise the project, record privately, make a mutual-aid version, publish with terms, decline the showcase, or choose another route."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_sponsor_terms",
+        "arcId": "arc_people_not_projects",
+        "revisionId": "rev_last_slot_1",
+        "title": "What the sponsor owns",
+        "internalDescription": "Cal’s agreement is not proof that the showcase is corrupt, nor proof that it is safe. It creates a material question about branding, funding, and who can say no when a platform is the only available room.",
+        "source": "player",
+        "priority": 7,
+        "status": "dormant",
+        "preconditions": ["The sponsor reel or agreement is discussed."],
+        "desiredOutcome": "The terms are read rather than guessed, and participants choose what they will accept.",
+        "forbiddenOutcomes": [
+          "Cal is treated as a villain for needing funding.",
+          "The sponsor’s presence automatically erases every useful possibility."
+        ],
+        "involvedEntityIds": [
+          "entity_cal_avery",
+          "entity_maya_kwon",
+          "entity_eli_mendoza",
+          "entity_benji_okafor",
+          "entity_lucia_reyes"
+        ],
+        "involvedLocationIds": ["loc_union_room", "loc_sound_booth", "loc_library_cafe"],
+        "foreshadowingCues": [
+          "Cal avoids saying “sponsor.”",
+          "The agreement has branding approval language."
+        ],
+        "escalationOptions": [
+          "A donor representative arrives early.",
+          "The event budget becomes public."
+        ],
+        "resolutionConditions": [
+          "Read the terms, negotiate, withdraw, use the room with a disclaimer, redirect the event, or make a smaller gathering."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_final_session"],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_recorder_truth",
+        "arcId": "arc_people_not_projects",
+        "revisionId": "rev_last_slot_1",
+        "title": "The recorder account",
+        "internalDescription": "Eli’s equipment record ties personal necessity to institutional access. Anika’s discretion can be acknowledged, questioned, or left alone; it must not force Eli into a confession or turn the community center into evidence against him.",
+        "source": "player",
+        "priority": 6,
+        "status": "dormant",
+        "preconditions": ["Eli or Anika chooses to discuss the recorder issue."],
+        "desiredOutcome": "Eli understands the audit risk and can decide what, if anything, to disclose or repair.",
+        "forbiddenOutcomes": [
+          "Eli is automatically disciplined or forgiven.",
+          "The community center is blamed for institutional rules."
+        ],
+        "involvedEntityIds": ["entity_eli_mendoza", "entity_anika_shah", "entity_maya_kwon"],
+        "involvedLocationIds": ["loc_faculty_office", "loc_media_lab"],
+        "foreshadowingCues": [
+          "Eli’s old phone contains the checkout screenshot.",
+          "Anika’s office contains audit materials."
+        ],
+        "escalationOptions": [
+          "The audit office requests a follow-up.",
+          "Maya asks why Eli disappeared last winter."
+        ],
+        "resolutionConditions": [
+          "Ask Anika, review records, explain selectively, make a repair plan, refuse to discuss it, or seek advice."
+        ],
+        "playerVisible": false,
+        "parentPointIds": [],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      },
+      {
+        "id": "plot_showcase_night",
+        "arcId": "arc_last_session",
+        "revisionId": "rev_last_slot_1",
+        "title": "Friday, with an audience",
+        "internalDescription": "The showcase is a convergence point, not a mandatory climax. It can become a public screening, an honest explanation, a sponsored performance, a quiet withdrawal, a resource meeting, or a room where people choose not to give the institution a clean ending.",
+        "source": "player",
+        "priority": 10,
+        "status": "dormant",
+        "preconditions": ["The final session is resolved or the showcase date arrives."],
+        "desiredOutcome": "Participants decide what they will show, withhold, negotiate, or do after the event.",
+        "forbiddenOutcomes": [
+          "Every relationship resolves into approval.",
+          "A public performance is required for a meaningful ending."
+        ],
+        "involvedEntityIds": [
+          "entity_eli_mendoza",
+          "entity_maya_kwon",
+          "entity_benji_okafor",
+          "entity_nora_iyer",
+          "entity_cal_avery",
+          "entity_anika_shah",
+          "entity_lucia_reyes"
+        ],
+        "involvedLocationIds": ["loc_union_room", "loc_sound_booth", "loc_harlow_garden"],
+        "foreshadowingCues": [
+          "Posters promise a “future” before anyone agrees what that means.",
+          "The last session ends before the Friday program."
+        ],
+        "escalationOptions": [
+          "The program begins.",
+          "A participant changes their mind about public use."
+        ],
+        "resolutionConditions": [
+          "Show work, withhold work, redirect the audience, protect a source, ask for material commitments, leave, or make another choice."
+        ],
+        "playerVisible": false,
+        "parentPointIds": ["plot_final_session", "plot_calendar_story", "plot_garden_consent"],
+        "metadata": {
+          "createdAt": "2026-09-27T00:00:00.000Z",
+          "updatedAt": "2026-09-27T00:00:00.000Z",
+          "version": 1,
+          "schemaVersion": 1,
+          "attribution": {
+            "source": "player",
+            "sourceIds": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -19,6 +19,9 @@ import { migrateScenarioExport } from './scenario-export.js';
 const tideLedgerPath = fileURLToPath(
   new URL('../../../scenarios/the-tide-keeps-its-ledger.scenario.json', import.meta.url),
 );
+const lastSlotPath = fileURLToPath(
+  new URL('../../../scenarios/the-last-slot.scenario.json', import.meta.url),
+);
 
 describe('curated scenario packages', () => {
   it('keeps The Tide Keeps Its Ledger importable, playable, interconnected, and privacy-aware', async () => {
@@ -91,5 +94,50 @@ describe('curated scenario packages', () => {
         .map((card) => ({ body: card.canonicalBody, playerVisibleBody: card.playerVisibleBody })),
     });
     for (const canary of privateCanaries) expect(publicText).not.toContain(canary);
+  });
+
+  it('keeps The Last Slot importable, portal-aware, and centered on a male playable student', async () => {
+    const file = await readFile(lastSlotPath, 'utf8');
+    const scenarioExport = migrateScenarioExport(JSON.parse(file));
+    const aggregate = scenarioExport.aggregate as unknown as ScenarioAggregate;
+    scenarioSchema.parse(aggregate.scenario);
+    aggregate.entities.forEach((entity) => entitySchema.parse(entity));
+    aggregate.relationships.forEach((relationship) => relationshipSchema.parse(relationship));
+    aggregate.locations.forEach((location) => locationSchema.parse(location));
+    aggregate.locationEdges.forEach((edge) => locationEdgeSchema.parse(edge));
+    aggregate.storyCards.forEach((card) => storyCardSchema.parse(card));
+    aggregate.storyCardLinks.forEach((link) => storyCardLinkSchema.parse(link));
+    aggregate.plotArcs.forEach((arc) => plotArcSchema.parse(arc));
+    aggregate.plotPoints.forEach((point) => plotPointSchema.parse(point));
+
+    expect(validateScenarioAggregate(aggregate)).toEqual({ valid: true, errors: [], warnings: [] });
+    expect(aggregate.scenario.slug).toBe('the-last-slot');
+    expect(
+      aggregate.entities.filter((entity) => entity.playable).map((entity) => entity.id),
+    ).toEqual(['entity_eli_mendoza']);
+    expect(aggregate.entities).toHaveLength(7);
+    expect(aggregate.relationships.length).toBeGreaterThanOrEqual(24);
+    expect(aggregate.locations).toHaveLength(10);
+    expect(aggregate.plotArcs).toHaveLength(3);
+    expect(aggregate.plotPoints).toHaveLength(7);
+
+    const closedPortals = aggregate.locationEdges.filter(
+      (edge) => edge.connectionKind === 'portal' && edge.portal?.defaultState === 'closed',
+    );
+    expect(closedPortals.map((edge) => edge.id)).toEqual(
+      expect.arrayContaining(['portal_eli_room_door', 'portal_sound_booth_door']),
+    );
+    expect(closedPortals.every((edge) => edge.portal?.transmission.closed.sight === 0)).toBe(true);
+
+    const directedPairs = new Set(
+      aggregate.relationships.map(
+        (relationship) => `${relationship.sourceEntityId}->${relationship.targetEntityId}`,
+      ),
+    );
+    for (const relationship of aggregate.relationships) {
+      expect(directedPairs).toContain(
+        `${relationship.targetEntityId}->${relationship.sourceEntityId}`,
+      );
+    }
   });
 });
