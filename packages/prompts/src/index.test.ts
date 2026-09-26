@@ -66,10 +66,20 @@ describe('anti-slop writing guidance', () => {
 
 describe('prompt builders', () => {
   it('registers the versioned authoring prompts with craft guidance', () => {
-    const rendered = characterAuthoringPrompt.render({ brief: 'A dockworker who lies about one missing bell.', context: '{}', constraints: [] });
+    const rendered = characterAuthoringPrompt.render({
+      brief: 'A dockworker who lies about one missing bell.',
+      context: '{}',
+      constraints: [],
+    });
     expect(authoringPromptDefinitions).toHaveLength(6);
     expect(authoringPromptDefinitions.every((prompt) => prompt.version === 2)).toBe(true);
-    expect(authoringPromptDefinitions.every((prompt) => prompt.render({ brief: 'brief', context: '{}', constraints: [] }).system.includes('CRAFT EXAMPLE'))).toBe(true);
+    expect(
+      authoringPromptDefinitions.every((prompt) =>
+        prompt
+          .render({ brief: 'brief', context: '{}', constraints: [] })
+          .system.includes('CRAFT EXAMPLE'),
+      ),
+    ).toBe(true);
     expect(characterAuthoringPrompt.version).toBe(2);
     expect(locationAuthoringPrompt.version).toBe(2);
     expect(rendered.system).toContain('specific speech style');
