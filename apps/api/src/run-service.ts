@@ -119,6 +119,36 @@ export class RunService {
           playable?: boolean;
         }>
       | undefined;
+    const authoredLocations = new Map(
+      ((rev?.aggregate as { locations?: Array<{ id: string; name: string }> } | undefined)?.locations ?? [])
+        .map((location) => [location.id, location.name]),
+    );
+    const runtimeLocations = new Map(locations.map((location) => [location.locationId, location]));
+    const usableName = (name: unknown, id: string): string | undefined => {
+      if (typeof name !== 'string') return undefined;
+      const trimmed = name.trim();
+      return trimmed && trimmed !== id && !/^a nearby distinct place$/i.test(trimmed) &&
+        !/^(?:loc|location)_[a-z0-9_]+$/i.test(trimmed) ? trimmed : undefined;
+    };
+    const locationNames: Record<string, string> = {};
+    for (const [id, name] of authoredLocations) {
+      locationNames[id] = usableName(name, id) ?? 'Location';
+    }
+    for (const location of locations) {
+      if (authoredLocations.has(location.locationId)) continue;
+      const state = location.state as { environment?: { name?: unknown }; parentLocationId?: string };
+      const parentId = state.parentLocationId;
+      const parentName = parentId ? locationNames[parentId] ?? usableName(
+        (runtimeLocations.get(parentId)?.state as { environment?: { name?: unknown } } | undefined)?.environment?.name,
+        parentId,
+      ) : undefined;
+      locationNames[location.locationId] = usableName(state.environment?.name, location.locationId)
+        ?? (parentName && parentName !== 'Location' ? `Near ${parentName}` : 'Nearby location');
+    }
+    const playerLocationId = (entities.find((entity) => entity.entityId === run.playerEntityId)?.state as
+      | { locationId?: string }
+      | undefined)?.locationId;
+    const currentLocationName = playerLocationId ? locationNames[playerLocationId] ?? 'Current location' : 'Current location';
 
     const nameMap = new Map<
       string,
@@ -145,6 +175,8 @@ export class RunService {
       branchId: run.activeBranchId,
       playerEntityId: run.playerEntityId,
       worldTime: run.worldTime,
+      locationNames,
+      currentLocationName,
       entities: await Promise.all(
         entities.map(async (row) => {
           const meta = nameMap.get(row.entityId);

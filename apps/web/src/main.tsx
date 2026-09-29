@@ -531,7 +531,7 @@ function RunsPage(): React.JSX.Element {
             <div className="flex items-center gap-2.5 px-2 overflow-x-auto">
               <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider shrink-0 mr-1 flex items-center gap-1.5">
                 <Compass className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="text-foreground font-semibold">{currentSceneLocationId.replace(/_/g, ' ')}</span>
+                <span className="text-foreground font-semibold">{scene.data?.currentLocationName ?? 'Current location'}</span>
               </span>
 
               {/* Deterministic In-World Time Display */}
@@ -732,7 +732,7 @@ function RunsPage(): React.JSX.Element {
                         {activeNpcModal.isPresent ? 'Present in current scene' : 'Elsewhere'}
                       </Badge>
                       <span className="text-[10px] text-muted-foreground">
-                        {String(activeNpcModal.state?.locationId ?? 'unknown').replace(/_/g, ' ')}
+                        {scene.data?.locationNames?.[activeNpcModal.state?.locationId] ?? 'Location unknown'}
                       </span>
                     </div>
                   </div>

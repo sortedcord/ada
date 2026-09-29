@@ -14,3 +14,5 @@
 ```
 
 The transcript uses semantic landmarks and live regions for stage updates. The composer preserves drafts and disables duplicate submissions while applying. Details is an explicit fetch and displays only fictional thoughts, persistence class, perceived stimulus, and concise character-level rationale. It never displays provider reasoning or unrelated secrets. Refresh rehydrates persisted state and reconnects to the turn stream using `Last-Event-ID`.
+
+The scene header and character-location display show human-readable location names, never canonical location IDs. Authored location names take precedence; dynamic locations use a stored scene name or a safe parent-based label when their stored name is a generated ID or generic placeholder. IDs remain internal for co-location checks.
