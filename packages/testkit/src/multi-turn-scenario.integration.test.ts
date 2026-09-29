@@ -4,8 +4,10 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createDatabase, createRunFromPublishedRevision, snapshotChecksum } from '@ada/db';
 import { processTurn } from '@ada/worker';
+import { processPlotEvaluation } from '@ada/worker/plot-evaluation';
+import { plotPointSchema } from '@ada/domain';
 import type { ServerEnvironment } from '@ada/config';
-import { FakeGenerationProvider } from '@ada/ai';
+import { FakeGenerationProvider, type GenerationProvider } from '@ada/ai';
 import { SqlRetrievalService, indexRetrievalChunk, projectEntity } from '@ada/retrieval';
 import { makeScenarioAggregate } from './factories.js';
 import {
@@ -65,6 +67,7 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
 
     // 1. Create a rich scenario with Player and 2 NPCs: Alice (present) and AbsentBob (away)
     const aggregate = makeScenarioAggregate();
+    aggregate.locations.push({ ...aggregate.locations[0]!, id: 'location_2', name: 'Courtyard', parentLocationId: 'location_1' });
     aggregate.entities.push(
       {
         id: 'npc_alice',
@@ -147,6 +150,17 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
         },
       },
     );
+    const plot = plotPointSchema.parse({
+      id: 'plot_game_1', arcId: 'arc_game_1', revisionId: 'revision_1', title: 'The courtyard',
+      internalDescription: '', source: 'player', priority: 1, status: 'dormant',
+      preconditions: ['The player visits the courtyard.'], desiredOutcome: '', forbiddenOutcomes: ['Do not force a visit.'],
+      involvedEntityIds: [], involvedLocationIds: [], foreshadowingCues: [], escalationOptions: [],
+      resolutionConditions: ['Explore, wait, or leave.'],
+      factConditions: { preconditions: [{ key: 'plot.game.courtyard_entered', trigger: { type: 'player_enters_location', locationId: 'location_2' } }], resolutionConditions: [], forbiddenOutcomes: [] },
+      playerVisible: false, parentPointIds: [], metadata: aggregate.scenario.metadata,
+    });
+    aggregate.plotPoints.push(plot);
+    aggregate.plotArcs.push({ id: 'arc_game_1', revisionId: 'revision_1', title: 'The courtyard', description: '', pointIds: [plot.id], priority: 1, metadata: plot.metadata });
 
     await sql.unsafe(
       "insert into scenarios (id, slug, title, status, attribution) values ('scenario_game', 'game', 'Game', 'valid', $1)",
@@ -231,7 +245,7 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
     const turnInputs = [
       'Hello Alice, do you know where the ancient key is?',
       'I look around the room for any hidden cupboards.',
-      'Thank you Alice, I step toward the old wooden door.',
+      'I walk to Courtyard.',
     ];
 
     for (let i = 0; i < turnInputs.length; i++) {
@@ -253,11 +267,20 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
       );
 
       // Setup fake generation actions for NPC decisions and turn resolver
-      const fakeProvider = new FakeGenerationProvider([
-        {
-          kind: 'value',
-          value: {
-            decisions: [
+      const fakeProvider: GenerationProvider = {
+        discoverModels: () => new FakeGenerationProvider().discoverModels(),
+        streamText: () => new FakeGenerationProvider().streamText(),
+        generateObject(request) {
+          return Promise.resolve({
+            model: request.model,
+            value: request.parse(request.schemaName === 'TurnResult'
+              ? {
+                  narrative: `You speak with Alice. She smiles warmly and tends to her herbs. "${playerText}"`,
+                  eventDescription: i === 0 ? 'Player interacted with Alice.' : 'The player entered the courtyard in the resolved scene.',
+                  patches: [],
+                  discoveredNpcs: [],
+                }
+              : { decisions: [
               {
                 entityId: 'npc_alice',
                 attention: 'focused',
@@ -276,23 +299,14 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
                 goalUpdates: [],
                 perceivedEvidenceIds: [],
               },
-            ],
-          },
+              ] }),
+          });
         },
-        {
-          kind: 'value',
-          value: {
-            narrative: `You speak with Alice. She smiles warmly and tends to her herbs. "${playerText}"`,
-            eventDescription: 'Player interacted with Alice.',
-            timeElapsedMinutes: 2,
-            patches: [],
-            discoveredNpcs: [],
-          },
-        },
-      ]);
+      };
 
       // Execute full turn pipeline
       await processTurn(db, testEnv, turnId, 'run_game_1', undefined, fakeProvider);
+      if (i === 2) await processTurn(db, testEnv, turnId, 'run_game_1', undefined, new FakeGenerationProvider([]));
 
       // Verify turn completed
       const [completedTurn] = await sql<
@@ -300,10 +314,55 @@ describe('multi-turn gameplay execution and privacy invariants', () => {
       >`select status, stage, failure from turns where id = ${turnId}`;
       expect(completedTurn?.status).toBe('completed');
       expect(completedTurn?.stage).toBe('COMPLETED');
+      if (i === 2) {
+        const [eventCount] = await sql<{ count: number }[]>`select count(*)::int as count from events where turn_id = ${turnId}`;
+        expect(eventCount?.count).toBe(1);
+      }
+      const [factCount] = await sql<{ count: number }[]>`select count(*)::int as count from event_facts where event_id = ${`event:${turnId}:0`}`;
+      expect(factCount?.count).toBe(i === 2 ? 1 : 0);
+      await processPlotEvaluation(db, `${turnId}:plots`, { runId: 'run_game_1', turnId });
+      if (i === 2) {
+        const [stage] = await sql<{ validated_output: { eventFacts: string[]; resolverOutput: Record<string, unknown> } }[]>`select validated_output from turn_stage_results where id = ${`${turnId}:resolution`}`;
+        expect(stage?.validated_output.eventFacts).toEqual(['plot.game.courtyard_entered']);
+        expect(stage?.validated_output.resolverOutput).not.toHaveProperty('eventFacts');
+      }
+      if (i === 2) {
+        const [storedFact] = await sql<{ key: string; value: boolean; visibility: string; source: { id: string; trigger: { type: string; locationId: string } } }[]>`select key, value, visibility, source from event_facts where event_id = ${`event:${turnId}:0`}`;
+        expect(storedFact).toMatchObject({ key: 'plot.game.courtyard_entered', value: true, visibility: 'scene_observable', source: { id: `event:${turnId}:0`, trigger: { type: 'player_enters_location', locationId: 'location_2' } } });
+      }
+      const [projection] = await sql<{ state: { plotStatuses: Record<string, string>; plotEvidence: Record<string, string[]> } }[]>`select state from architect_state where run_id = 'run_game_1' and branch_id = 'branch_game_1'`;
+      expect(projection?.state.plotStatuses.plot_game_1).toBe(i === 2 ? 'available' : 'dormant');
+      expect(projection?.state.plotEvidence.plot_game_1).toEqual(i === 2 ? [`event:${turnId}:0`] : []);
+      await processPlotEvaluation(db, `${turnId}:plots`, { runId: 'run_game_1', turnId });
+      const [replayed] = await sql<{ state: { plotEvidence: Record<string, string[]> } }[]>`select state from architect_state where run_id = 'run_game_1' and branch_id = 'branch_game_1'`;
+      expect(replayed?.state.plotEvidence.plot_game_1).toEqual(projection?.state.plotEvidence.plot_game_1);
 
-      // Update run expected version for next turn
-      await sql`update runs set expected_version = expected_version + 1 where id = 'run_game_1'`;
     }
+
+    const rejectedTurnId = 'turn_game_unknown';
+    await sql.unsafe(
+      `insert into turns (id, run_id, branch_id, turn_number, raw_player_input, status, stage, idempotency_key, expected_version, attribution)
+       values ($1, 'run_game_1', 'branch_game_1', 4, 'I ask for a key.', 'pending', 'ACCEPTED', $1, 4, $2)`,
+      [rejectedTurnId, JSON.stringify(metadata)],
+    );
+    await processTurn(db, testEnv, rejectedTurnId, 'run_game_1', undefined, {
+      discoverModels: () => new FakeGenerationProvider().discoverModels(),
+      streamText: () => new FakeGenerationProvider().streamText(),
+      generateObject(request) {
+        return Promise.resolve({ model: request.model, value: request.parse(request.schemaName === 'TurnResult'
+          ? { narrative: 'The player asks for the key.', eventDescription: 'The request was heard.', patches: [],
+              eventFacts: [{ key: 'plot.game.unapproved', observedOutcome: 'A key was granted.' }], locationChange: { locationId: 'unreachable_location' } }
+          : { entityId: 'npc_alice', attention: 'noticed', reaction: 'none', speech: '', generatedThoughts: ['Observing quietly.'] }) });
+      },
+    });
+    const [rejected] = await sql<{ status: string }[]>`select status from turns where id = ${rejectedTurnId}`;
+    expect(rejected?.status).toBe('completed');
+    const [rejectedCount] = await sql<{ count: number }[]>`select count(*)::int as count from event_facts where event_id = ${`event:${rejectedTurnId}:0`}`;
+    expect(rejectedCount?.count).toBe(0);
+    await processPlotEvaluation(db, `${rejectedTurnId}:plots`, { runId: 'run_game_1', turnId: rejectedTurnId });
+    const [unaffected] = await sql<{ state: { plotStatuses: Record<string, string>; plotEvidence: Record<string, string[]> } }[]>`select state from architect_state where run_id = 'run_game_1' and branch_id = 'branch_game_1'`;
+    expect(unaffected?.state.plotStatuses.plot_game_1).toBe('available');
+    expect(unaffected?.state.plotEvidence.plot_game_1).toEqual(['event:turn_game_3:0']);
 
     // 5. Test Principal-Aware Retrieval & Epistemic Canary Isolation
     const retrieval = new SqlRetrievalService(db);

@@ -303,6 +303,18 @@ export const storyCardLinkSchema = z.object({
 });
 export type StoryCardLink = z.infer<typeof storyCardLinkSchema>;
 
+// A machine condition can be asserted only from an applied, server-derived spatial transition.
+export const plotFactConditionSchema = z.object({
+  key: z.string().min(1).max(128).regex(/^plot\.[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/),
+  trigger: z.object({ type: z.literal('player_enters_location'), locationId: idSchema }).strict(),
+}).strict();
+export type PlotFactCondition = z.infer<typeof plotFactConditionSchema>;
+export const plotFactConditionsSchema = z.object({
+  preconditions: z.array(plotFactConditionSchema).max(100),
+  resolutionConditions: z.array(plotFactConditionSchema).max(100),
+  forbiddenOutcomes: z.array(plotFactConditionSchema).max(100),
+}).strict();
+
 export const plotPointSchema = z.object({
   id: idSchema,
   arcId: idSchema,
@@ -329,6 +341,7 @@ export const plotPointSchema = z.object({
   foreshadowingCues: z.array(z.string().max(2_000)).max(100),
   escalationOptions: z.array(z.string().max(2_000)).max(100),
   resolutionConditions: z.array(z.string().max(2_000)).max(100),
+  factConditions: plotFactConditionsSchema.optional(),
   earliestTurn: z.number().int().nonnegative().optional(),
   latestTurn: z.number().int().nonnegative().optional(),
   playerVisible: z.boolean(),
@@ -559,6 +572,52 @@ export function validateScenarioAggregate(aggregate: ScenarioAggregate): Scenari
         resourceId: point.id,
         section: 'plot',
       });
+  for (const point of aggregate.plotPoints) {
+    const parsed = plotPointSchema.safeParse(point);
+    if (!parsed.success) {
+      issue('error', {
+        path: `plotPoints.${point.id}.factConditions`,
+        message: 'plot point machine conditions are invalid',
+        severity: 'error', resourceId: point.id, section: 'plot',
+      });
+      continue;
+    }
+    const conditions = parsed.data.factConditions;
+    if (!conditions) continue;
+    const keys = [...conditions.preconditions, ...conditions.resolutionConditions, ...conditions.forbiddenOutcomes]
+      .map((condition) => condition.key);
+    if (new Set(keys).size !== keys.length)
+      issue('error', {
+        path: `plotPoints.${point.id}.factConditions`,
+        message: 'machine fact keys must be unique within a plot point',
+        severity: 'error', resourceId: point.id, section: 'plot',
+      });
+  }
+  const definitions = new Map<string, string>();
+  for (const point of aggregate.plotPoints) {
+    const parsed = plotPointSchema.safeParse(point);
+    if (!parsed.success) continue;
+    for (const condition of [
+      ...(parsed.data.factConditions?.preconditions ?? []),
+      ...(parsed.data.factConditions?.resolutionConditions ?? []),
+      ...(parsed.data.factConditions?.forbiddenOutcomes ?? []),
+    ]) {
+      const previous = definitions.get(condition.key);
+      if (previous && previous !== JSON.stringify(condition.trigger))
+        issue('error', {
+          path: `plotPoints.${point.id}.factConditions`,
+          message: 'machine fact key has conflicting trigger definitions',
+          severity: 'error', resourceId: point.id, section: 'plot',
+        });
+      if (!locationIds.has(condition.trigger.locationId))
+        issue('error', {
+          path: `plotPoints.${point.id}.factConditions`,
+          message: 'machine fact trigger references an unknown location',
+          severity: 'error', resourceId: point.id, section: 'plot',
+        });
+      definitions.set(condition.key, JSON.stringify(condition.trigger));
+    }
+  }
   const children = new Map<string, string[]>();
   for (const location of aggregate.locations)
     if (location.parentLocationId)

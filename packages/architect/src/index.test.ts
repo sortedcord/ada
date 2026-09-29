@@ -13,7 +13,7 @@ describe('phase 9 architect policies', () => {
     expect(validateArchitectGuidance(['The player could investigate the seal.', 'An alternative is to wait.']).affordanceCount).toBe(2);
   });
   it('requires evidence for plot resolution and multiple affordances for sudden events', () => {
-    expect(evaluatePlotPoint({ status: 'active', preconditions: [], resolutionConditions: ['seal_found'], forbiddenOutcomes: [] }, new Set(['seal_found']), ['event_1']).status).toBe('resolved');
+    expect(evaluatePlotPoint({ status: 'active', factConditions: { preconditions: [], resolutionConditions: [{ key: 'plot.seal.found', trigger: { type: 'player_enters_location', locationId: 'loc_2' } }], forbiddenOutcomes: [] } }, new Set(['plot.seal.found']), ['event_1']).status).toBe('resolved');
     const state = initialArchitectState([]);
     expect(applyPlotEvaluation(state, 'plot_1', { status: 'active', evidenceIds: ['event_1'], reason: 'evidence' }).activePlotPoints).toContain('plot_1');
     expect(() => validateSuddenEventProposal({ rationale: 'pressure', eventType: 'alarm', participantIds: ['npc_1'], locationId: 'loc_1', severity: 0.8, affordances: ['run'], dependencyIds: [], cooldownTurns: 3, sourceIds: ['event_1'] }, new Set(['event_1']))).toThrow();
@@ -22,15 +22,16 @@ describe('phase 9 architect policies', () => {
     expect(mutationTriggerReasons({ entityChanged: true, explicitRefresh: true })).toEqual(['entity-change', 'explicit-refresh']);
   });
   it('respects authored plot transition graph and never promotes without matching evidence', () => {
-    const point = { status: 'proposed' as const, preconditions: ['key_found'], resolutionConditions: ['door_open'], forbiddenOutcomes: ['key_lost'] };
-    expect(evaluatePlotPoint(point, new Set(['door_open']), ['event_1']).status).toBe('unchanged');
-    expect(evaluatePlotPoint(point, new Set(['key_lost']), ['event_1']).status).toBe('unchanged');
-    expect(evaluatePlotPoint(point, new Set(['key_found']), ['event_1']).status).toBe('available');
-    expect(evaluatePlotPoint({ ...point, status: 'available' }, new Set(['key_found']), ['event_1']).status).toBe('active');
-    expect(evaluatePlotPoint({ ...point, status: 'active' }, new Set(['key_lost']), ['event_2']).status).toBe('failed');
-    expect(evaluatePlotPoint({ ...point, status: 'resolved' }, new Set(['key_lost']), ['event_2']).status).toBe('unchanged');
+    const point = { status: 'proposed' as const, factConditions: { preconditions: [{ key: 'plot.key.found', trigger: { type: 'player_enters_location' as const, locationId: 'loc_2' } }], resolutionConditions: [{ key: 'plot.door.open', trigger: { type: 'player_enters_location' as const, locationId: 'loc_3' } }], forbiddenOutcomes: [{ key: 'plot.key.lost', trigger: { type: 'player_enters_location' as const, locationId: 'loc_4' } }] } };
+    expect(evaluatePlotPoint(point, new Set(['plot.door.open']), ['event_1']).status).toBe('unchanged');
+    expect(evaluatePlotPoint(point, new Set(['plot.key.lost']), ['event_1']).status).toBe('unchanged');
+    expect(evaluatePlotPoint(point, new Set(['plot.key.found']), ['event_1']).status).toBe('available');
+    expect(evaluatePlotPoint({ ...point, status: 'available' }, new Set(['plot.key.found']), ['event_1']).status).toBe('active');
+    expect(evaluatePlotPoint({ ...point, status: 'active' }, new Set(['plot.key.lost']), ['event_2']).status).toBe('failed');
+    expect(evaluatePlotPoint({ ...point, status: 'resolved' }, new Set(['plot.key.lost']), ['event_2']).status).toBe('unchanged');
     expect(evaluatePlotPoint({ ...point, status: 'available' }, new Set(), []).status).toBe('unchanged');
-    expect(evaluatePlotPoint({ ...point, status: 'available', preconditions: [] }, new Set(), ['unrelated_event']).status).toBe('unchanged');
+    expect(evaluatePlotPoint({ ...point, status: 'available', factConditions: { ...point.factConditions, preconditions: [] } }, new Set(), ['unrelated_event']).status).toBe('unchanged');
+    expect(evaluatePlotPoint({ status: 'dormant' }, new Set(['The key was found.']), ['event_1']).status).toBe('unchanged');
   });
   it('removes activated plots from future beats and includes newly available plots', () => {
     const initial = initialArchitectState([]);

@@ -4,15 +4,24 @@ import { architectState, eventFacts, events, outbox, runs, scenarioRevisions, tu
 import { withTransactionRetry } from '@ada/db';
 import { plotPointSchema, transitionPlot, type PlotPoint, type ScenarioAggregate } from '@ada/domain';
 
-/** Only an explicitly asserted canonical fact key can satisfy an authored condition. */
+/** Only a sourced, observable machine-keyed canonical fact can satisfy a condition. */
 function evidencedConditions(
   point: PlotPoint,
-  rows: readonly { key: string; value: unknown; eventId: string }[],
+  rows: readonly { key: string; value: unknown; eventId: string; source: unknown; locationId: string }[],
 ): { keys: Set<string>; evidenceByKey: Map<string, string[]> } {
-  const conditions = new Set([...point.preconditions, ...point.resolutionConditions, ...point.forbiddenOutcomes]);
+  const conditions = new Map([
+    ...(point.factConditions?.preconditions ?? []),
+    ...(point.factConditions?.resolutionConditions ?? []),
+    ...(point.factConditions?.forbiddenOutcomes ?? []),
+  ].map((condition) => [condition.key, condition.trigger]));
   const evidenceByKey = new Map<string, string[]>();
   for (const row of rows) {
-    if (row.value !== true || !conditions.has(row.key)) continue;
+    const trigger = conditions.get(row.key);
+    if (row.value !== true || !trigger || trigger.locationId !== row.locationId ||
+      !row.source || typeof row.source !== 'object' ||
+      !('type' in row.source) || row.source.type !== 'event' ||
+      !('id' in row.source) || row.source.id !== row.eventId ||
+      !('trigger' in row.source) || JSON.stringify(row.source.trigger) !== JSON.stringify(trigger)) continue;
     const ids = evidenceByKey.get(row.key) ?? [];
     if (!ids.includes(row.eventId)) ids.push(row.eventId);
     evidenceByKey.set(row.key, ids);
@@ -52,7 +61,7 @@ export async function processPlotEvaluation(db: Database, outboxId: string, payl
       .limit(1);
     if (earlier) throw new Error('plot.evaluate waiting for earlier branch turn');
 
-    const facts = await tx.select({ key: eventFacts.key, value: eventFacts.value, eventId: eventFacts.eventId })
+    const facts = await tx.select({ key: eventFacts.key, value: eventFacts.value, eventId: eventFacts.eventId, sourceTurnId: events.turnId, visibility: eventFacts.visibility, source: eventFacts.source, locationId: events.locationId })
       .from(eventFacts).innerJoin(events, eq(events.id, eventFacts.eventId))
       .innerJoin(turns, eq(turns.id, events.turnId))
       .where(and(eq(events.runId, runId), eq(events.branchId, turn.branchId),
@@ -65,18 +74,21 @@ export async function processPlotEvaluation(db: Database, outboxId: string, payl
     if (!Array.isArray(aggregate.plotPoints)) throw new Error('Published scenario plot definitions are invalid');
     for (const definition of aggregate.plotPoints) {
       const point = plotPointSchema.parse(definition);
-      if (point.revisionId !== run.revisionId) throw new Error('Published plot point has mismatched revision');
+      if (point.revisionId !== aggregate.scenario.revisionId) throw new Error('Published plot point has mismatched revision');
       const status = state.plotStatuses[point.id];
       if (!status) throw new Error(`Missing architect plot status: ${point.id}`);
-      const { keys, evidenceByKey } = evidencedConditions(point, facts);
-      const matchedConditions = status === 'active' ? [...point.forbiddenOutcomes, ...point.resolutionConditions]
-        : point.preconditions;
-      const candidateEvidenceIds = [...new Set(matchedConditions.flatMap((key) => evidenceByKey.get(key) ?? []))];
+      const { keys, evidenceByKey } = evidencedConditions(point, facts.filter((fact) => fact.visibility === 'scene_observable'));
+      const conditions = point.factConditions;
+      const matchedConditions = status === 'active' ? [...(conditions?.forbiddenOutcomes ?? []), ...(conditions?.resolutionConditions ?? [])]
+        : conditions?.preconditions ?? [];
+      const candidateEvidenceIds = [...new Set(matchedConditions.flatMap(({ key }) => evidenceByKey.get(key) ?? []))];
       const result = evaluatePlotPoint({ ...point, status }, keys, candidateEvidenceIds);
       if (result.status === 'unchanged') continue;
-      const matched = result.status === 'failed' ? point.forbiddenOutcomes
-        : result.status === 'resolved' ? point.resolutionConditions : point.preconditions;
-      const evidenceIds = [...new Set(matched.flatMap((key) => evidenceByKey.get(key) ?? []))];
+      const matched = result.status === 'failed' ? conditions?.forbiddenOutcomes ?? []
+        : result.status === 'resolved' ? conditions?.resolutionConditions ?? [] : conditions?.preconditions ?? [];
+      const evidenceIds = [...new Set(matched.flatMap(({ key }) => evidenceByKey.get(key) ?? []))];
+      // A previously processed fact cannot promote the same point again on a later turn.
+      if (!facts.some((fact) => fact.sourceTurnId === turnId && evidenceIds.includes(fact.eventId))) continue;
       transitionPlot({ ...point, status }, result.status, evidenceIds);
       state = applyPlotEvaluation(state, point.id, { ...result, evidenceIds });
     }

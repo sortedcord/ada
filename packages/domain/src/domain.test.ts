@@ -3,6 +3,7 @@ import {
   entitySchema,
   locationSchema,
   scenarioSchema,
+  plotPointSchema,
   validateScenarioAggregate,
   type Entity,
   type Location,
@@ -171,6 +172,26 @@ describe('scenario and runtime schemas', () => {
       metadata: metadata(),
     });
     expect(() => validateThought(entity('player_1', true), thought, 'player_1')).toThrow();
+  });
+  it('requires distinct atomic machine keys and preserves legacy prose without interpreting it', () => {
+    const point = plotPointSchema.parse({
+      id: 'plot_1', arcId: 'arc_1', revisionId: 'revision_1', title: 'Discussion',
+      internalDescription: '', source: 'player', priority: 0, status: 'dormant',
+      preconditions: ['An agreement is discussed.'], desiredOutcome: '', forbiddenOutcomes: ['Do not force a choice.'],
+      resolutionConditions: ['Accept or reject the agreement.'],
+      involvedEntityIds: [], involvedLocationIds: [], foreshadowingCues: [], escalationOptions: [],
+      factConditions: { preconditions: [{ key: 'plot.agreement.discussed', trigger: { type: 'player_enters_location', locationId: 'location_1' } }], resolutionConditions: [], forbiddenOutcomes: [] },
+      playerVisible: false, parentPointIds: [], metadata: metadata(),
+    });
+    const aggregate = { scenario: scenario(), entities: [entity('player_1', true)], relationships: [],
+      locations: [location('location_1')], locationEdges: [], storyCards: [], storyCardLinks: [],
+      plotArcs: [{ id: 'arc_1', revisionId: 'revision_1', title: 'Arc', description: '', pointIds: ['plot_1'], priority: 0, metadata: metadata() }], plotPoints: [point] };
+    expect(validateScenarioAggregate(aggregate).valid).toBe(true);
+    const duplicate = { ...point, factConditions: { ...point.factConditions!, resolutionConditions: [point.factConditions!.preconditions[0]!] } };
+    expect(validateScenarioAggregate({ ...aggregate, plotPoints: [duplicate] }).errors.some((issue) => issue.message.includes('unique'))).toBe(true);
+    expect(plotPointSchema.safeParse({ ...point, factConditions: { ...point.factConditions!, preconditions: [{ key: 'An agreement is discussed.', trigger: { type: 'player_enters_location', locationId: 'location_1' } }] } }).success).toBe(false);
+    const unreachable = { ...point, factConditions: { ...point.factConditions!, preconditions: [{ key: 'plot.agreement.discussed', trigger: { type: 'player_enters_location' as const, locationId: 'unknown_location' } }] } };
+    expect(validateScenarioAggregate({ ...aggregate, plotPoints: [unreachable] }).errors.some((issue) => issue.message.includes('unknown location'))).toBe(true);
   });
 });
 

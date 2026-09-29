@@ -87,11 +87,12 @@ export function validateArchitectGuidance(guidance: readonly string[]): { valid:
 }
 
 export interface PlotEvaluation { status: 'unchanged' | 'available' | 'active' | 'resolved' | 'failed'; evidenceIds: string[]; reason: string; }
-export function evaluatePlotPoint(point: Pick<PlotPoint, 'status' | 'preconditions' | 'resolutionConditions' | 'forbiddenOutcomes'>, facts: ReadonlySet<string>, evidenceIds: readonly string[]): PlotEvaluation {
+export function evaluatePlotPoint(point: Pick<PlotPoint, 'status' | 'factConditions'>, facts: ReadonlySet<string>, evidenceIds: readonly string[]): PlotEvaluation {
   if (!evidenceIds.length) return { status: 'unchanged', evidenceIds: [], reason: 'Deterministic evidence is insufficient.' };
-  const preconditionsMet = point.preconditions.length > 0 && point.preconditions.every((condition) => facts.has(condition));
-  const resolved = point.resolutionConditions.length > 0 && point.resolutionConditions.every((condition) => facts.has(condition));
-  const forbidden = point.forbiddenOutcomes.some((condition) => facts.has(condition));
+  const conditions = point.factConditions;
+  const preconditionsMet = !!conditions?.preconditions.length && conditions.preconditions.every(({ key }) => facts.has(key));
+  const resolved = !!conditions?.resolutionConditions.length && conditions.resolutionConditions.every(({ key }) => facts.has(key));
+  const forbidden = conditions?.forbiddenOutcomes.some(({ key }) => facts.has(key)) ?? false;
   if (forbidden && canTransitionPlot(point.status, 'failed'))
     return { status: 'failed', evidenceIds: [...evidenceIds], reason: 'A forbidden outcome has canonical evidence.' };
   if (resolved && canTransitionPlot(point.status, 'resolved'))

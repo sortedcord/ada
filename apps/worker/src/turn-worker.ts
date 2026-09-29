@@ -14,6 +14,7 @@ import {
   validateCanonicalPatch,
   validateNpcPrincipalDecision,
 } from '@ada/domain';
+import { plotPointSchema } from '@ada/domain';
 import {
   NpcContextService,
   computeEligiblePerceptions,
@@ -35,6 +36,7 @@ import {
   architectState,
   applyNpcGoals,
   events,
+  eventFacts,
   innerThoughts,
   jobRuns,
   memories,
@@ -137,6 +139,7 @@ export async function processTurn(
   const [run] = await database.select().from(runs).where(eq(runs.id, runId)).limit(1);
   if (!turn || !run) throw new Error('Turn or run not found');
   if (signal?.aborted) return;
+  if (turn.status === 'completed') return;
   const updateJob = (status: string, stage: string, safeError?: unknown) =>
     database
       .update(jobRuns)
@@ -253,6 +256,7 @@ export async function processTurn(
   const aggregate = revision?.aggregate as
     | {
         scenario?: {
+          revisionId?: string;
           startLocationId?: string;
           defaultNarrationStyle?: string;
           config?: {
@@ -1530,13 +1534,13 @@ export async function processTurn(
           provider: environment.GENERATION_PROVIDER,
           modelId: activeModel,
           promptVersionId: 'v1.0',
-          authorizedDocumentIds: [run.playerEntityId],
+          authorizedDocumentIds: [],
           usage: {
             inputTokens: generated.usage?.inputTokens ?? 0,
             outputTokens: generated.usage?.outputTokens ?? 0,
           },
           latencyMs: Date.now() - startResolverTime,
-          validation: { inputPayload: resolverInputJson },
+          validation: { valid: true },
           retryCount: 0,
           correlationId: turnId,
           attribution: { source: 'system', sourceIds: [turnId] },
@@ -1661,7 +1665,35 @@ export async function processTurn(
     ];
   });
 
+  // Facts record applied state changes, never model assertions, attempted action text,
+  // or a resolver-authored location. This movement policy recognizes explicit commands;
+  // it cannot independently infer whether an ambiguous real-world attempt succeeded.
+  const authoredLocations = new Set(aggregate?.locations?.map((location) => location.id) ?? []);
+  const fromLocation = runtimeLocations.find((location) => location.id === playerCurrentLocationId);
+  const toLocation = runtimeLocations.find((location) => location.id === targetLoc);
+  const confirmedFallback = useMovementFallback && targetLoc !== playerCurrentLocationId &&
+    authoredLocations.has(targetLoc) && !!toLocation &&
+    (toLocation.parentLocationId === playerCurrentLocationId || fromLocation?.parentLocationId === targetLoc ||
+      (!!fromLocation?.parentLocationId && fromLocation.parentLocationId === toLocation.parentLocationId));
+  const eligibleLocationFactKeys = new Set<string>();
+  if (confirmedFallback) for (const definition of aggregate?.plotPoints ?? []) {
+    const point = plotPointSchema.parse(definition);
+    if (point.revisionId !== aggregate?.scenario?.revisionId) continue;
+    for (const condition of [
+      ...(point.factConditions?.preconditions ?? []),
+      ...(point.factConditions?.resolutionConditions ?? []),
+    ]) if (condition.trigger.type === 'player_enters_location' && condition.trigger.locationId === targetLoc)
+      eligibleLocationFactKeys.add(condition.key);
+  }
+  const eventId = `event:${turnId}:0`;
+  const segmentId = `segment:${turnId}:narration:v1:0`;
+  const eventLocationId = targetLoc;
   await database.transaction(async (tx) => {
+    const [latestTurn] = await tx.select({ status: turns.status, cancellationRequested: turns.cancellationRequested })
+      .from(turns).where(eq(turns.id, turnId)).for('update');
+    if (latestTurn?.status === 'completed' || latestTurn?.status === 'cancelled' || latestTurn?.cancellationRequested)
+      throw new Error('Turn is not eligible for canonical resolution');
+    const appliedLocationFactKeys: string[] = [];
     // 1. Persist portal changes before updating character positions. The state
     // is immutable per branch/turn unless a later canonical action changes it.
     for (const change of validPortalChanges)
@@ -1713,7 +1745,7 @@ export async function processTurn(
         })
         .onConflictDoNothing();
 
-      await tx
+      const [appliedPlayerMove] = await tx
         .update(runEntityState)
         .set({
           state: {
@@ -1722,13 +1754,14 @@ export async function processTurn(
           },
           updatedAt: new Date(),
         })
-        .where(
-          and(
-            eq(runEntityState.runId, runId),
-            eq(runEntityState.branchId, turn.branchId),
-            eq(runEntityState.entityId, run.playerEntityId),
-          ),
-        );
+        .where(and(
+          eq(runEntityState.runId, runId),
+          eq(runEntityState.branchId, turn.branchId),
+          eq(runEntityState.entityId, run.playerEntityId),
+          sql`${runEntityState.state}->>'locationId' = ${playerCurrentLocationId}`,
+        ))
+        .returning({ entityId: runEntityState.entityId });
+      if (appliedPlayerMove && confirmedFallback) appliedLocationFactKeys.push(...eligibleLocationFactKeys);
     }
 
     // 3. New NPCs cannot silently inherit player co-location when the resolver
@@ -1799,12 +1832,6 @@ export async function processTurn(
         })
         .onConflictDoNothing();
     }
-  });
-
-  const eventId = `event:${turnId}:0`;
-  const segmentId = `segment:${turnId}:narration:v1:0`;
-  const eventLocationId = targetLoc;
-  await database.transaction(async (tx) => {
     if (isTextCommunication && communicationRecipients.length > 0) {
       await tx
         .insert(communications)
@@ -1837,6 +1864,8 @@ export async function processTurn(
         inputSnapshot: { runId, branchId: turn.branchId },
         validatedOutput: {
           eventIds: [eventId],
+          resolverOutput: result,
+          eventFacts: appliedLocationFactKeys,
           locationId: targetLoc,
           portalChanges: validPortalChanges.map((change) => ({
             portalId: change.portalId,
@@ -1865,6 +1894,15 @@ export async function processTurn(
         attribution: { source: 'resolver', sourceIds: [turnId] },
       })
       .onConflictDoNothing();
+    if (appliedLocationFactKeys.length) await tx.insert(eventFacts).values(appliedLocationFactKeys.map((key, index) => ({
+      id: `fact:${turnId}:${index}`,
+      eventId,
+      key,
+      value: true,
+      visibility: 'scene_observable',
+      source: { type: 'event', id: eventId, trigger: { type: 'player_enters_location', locationId: targetLoc } },
+      attribution: { source: 'system', sourceIds: [eventId] },
+    }))).onConflictDoNothing();
     // Record distinct, modality-specific observations derived from canonical events
     await tx
       .insert(observations)

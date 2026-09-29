@@ -18,6 +18,7 @@ const point: PlotPoint = plotPointSchema.parse({
   preconditions: [], desiredOutcome: '', forbiddenOutcomes: ['vault_destroyed'],
   involvedEntityIds: [], involvedLocationIds: [], foreshadowingCues: [], escalationOptions: [],
   resolutionConditions: ['vault_unlocked'], playerVisible: true, parentPointIds: [],
+  factConditions: { preconditions: [], resolutionConditions: [{ key: 'plot.vault.unlocked', trigger: { type: 'player_enters_location', locationId: 'location_1' } }], forbiddenOutcomes: [{ key: 'plot.vault.destroyed', trigger: { type: 'player_enters_location', locationId: 'location_1' } }] },
   metadata: { createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z',
     version: 1, schemaVersion: 1, attribution },
 });
@@ -28,12 +29,12 @@ async function insertTurn(id: string, branchId: string, number: number, status =
   await connection.client`insert into outbox (id, topic, key, payload)
     values (${id + ':plots'}, 'plot.evaluate', ${id + ':plots'}, ${JSON.stringify({ runId: 'run_1', turnId: id })}::jsonb)`;
 }
-async function insertFact(id: string, turnId: string, branchId: string, key: string, value: unknown = true) {
+async function insertFact(id: string, turnId: string, branchId: string, key: string, value: unknown = true, visibility = 'scene_observable') {
   await connection.client`insert into events (id, run_id, branch_id, turn_id, event_type, location_id, world_time, canonical_description,
     visibility_hints, salience, emotional_weight) values (${id}, 'run_1', ${branchId}, ${turnId}, 'test', 'location_1', now(),
     'No plot evidence in prose', '[]'::jsonb, 0, 0)`;
   await connection.client`insert into event_facts (id, event_id, key, value, visibility, source)
-    values (${id + ':fact'}, ${id}, ${key}, ${JSON.stringify(value)}::jsonb, 'world_truth', '{}'::jsonb)`;
+    values (${id + ':fact'}, ${id}, ${key}, ${JSON.stringify(value)}::jsonb, ${visibility}, ${JSON.stringify({ type: 'event', id, trigger: { type: 'player_enters_location', locationId: 'location_1' } })}::jsonb)`;
 }
 async function status(branchId = 'branch_1') {
   const [row] = await connection.client`select state, version from architect_state where run_id = 'run_1' and branch_id = ${branchId}`;
@@ -83,9 +84,9 @@ describe('plot.evaluate outbox projection', () => {
 
   it('changes authored active status only with matching canonical facts through the completed turn and atomically acknowledges', async () => {
     await insertTurn('turn_1', 'branch_1', 1);
-    await insertFact('event_1', 'turn_1', 'branch_1', 'vault_unlocked');
+    await insertFact('event_1', 'turn_1', 'branch_1', 'plot.vault.unlocked');
     await insertTurn('turn_2', 'branch_1', 2);
-    await insertFact('event_2', 'turn_2', 'branch_1', 'vault_destroyed');
+    await insertFact('event_2', 'turn_2', 'branch_1', 'plot.vault.destroyed');
     await expect(processPlotEvaluation(db, 'turn_2:plots', { runId: 'run_1', turnId: 'turn_2' })).rejects.toThrow('earlier branch turn');
     expect((await status()).state.plotStatuses.plot_1).toBe('active');
     await processPlotEvaluation(db, 'turn_1:plots', { runId: 'run_1', turnId: 'turn_1' });
@@ -102,7 +103,7 @@ describe('plot.evaluate outbox projection', () => {
 
   it('does not infer a fact from prose, false fact values, or another branch', async () => {
     await insertTurn('turn_3', 'branch_2', 1);
-    await insertFact('event_3', 'turn_3', 'branch_2', 'vault_unlocked', false);
+    await insertFact('event_3', 'turn_3', 'branch_2', 'plot.vault.unlocked', false);
     await processPlotEvaluation(db, 'turn_3:plots', { runId: 'run_1', turnId: 'turn_3' });
     expect((await status('branch_2')).state.plotStatuses.plot_1).toBe('active');
     expect((await status('branch_2')).state.plotEvidence.plot_1).toEqual([]);
@@ -113,9 +114,17 @@ describe('plot.evaluate outbox projection', () => {
     expect((await status('branch_2')).version).toBe(1);
   });
 
+  it('ignores private facts and prose-only legacy condition strings', async () => {
+    await insertTurn('turn_private', 'branch_2', 3);
+    await insertFact('event_private', 'turn_private', 'branch_2', 'plot.vault.unlocked', true, 'entity_private');
+    await processPlotEvaluation(db, 'turn_private:plots', { runId: 'run_1', turnId: 'turn_private' });
+    expect((await status('branch_2')).state.plotStatuses.plot_1).toBe('active');
+    expect((await status('branch_2')).state.plotEvidence.plot_1).toEqual([]);
+  });
+
   it('refuses to project a pending turn and leaves its outbox unprocessed', async () => {
-    await insertTurn('turn_5', 'branch_2', 3, 'running');
-    await insertFact('event_5', 'turn_5', 'branch_2', 'vault_unlocked');
+    await insertTurn('turn_5', 'branch_2', 4, 'running');
+    await insertFact('event_5', 'turn_5', 'branch_2', 'plot.vault.unlocked');
     await expect(processPlotEvaluation(db, 'turn_5:plots', { runId: 'run_1', turnId: 'turn_5' })).rejects.toThrow('completed turn');
     expect((await status('branch_2')).state.plotStatuses.plot_1).toBe('active');
     const [message] = await connection.client`select status from outbox where id = 'turn_5:plots'`;
