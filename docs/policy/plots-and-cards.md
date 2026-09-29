@@ -13,6 +13,8 @@ Valid transitions are:
 
 Deterministic preconditions and resolution conditions operate on canonical facts and require supporting event IDs. Narration wording alone cannot transition a point. Ambiguous cases require an architect proposal with evidence and policy validation.
 
+After a completed turn, the `plot.evaluate` outbox job evaluates the published revision's plot points against `event_facts` from completed turns on that branch. Only a matching fact key explicitly asserted with JSON `true` counts as evidence; its source event IDs are recorded on a legal status transition. Evaluation and outbox acknowledgement commit together, so retries do not replay a transition. Narrative text and event descriptions are never parsed as facts. Authored natural-language conditions do not transition automatically unless they match an explicitly asserted fact key; ambiguous conditions remain for the proposal workflow.
+
 ## Story-card mutation modes
 
 - `static`: no post-start mutation.

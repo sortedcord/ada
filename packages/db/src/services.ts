@@ -1,4 +1,4 @@
-import { and, eq, lt, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, lt, sql } from 'drizzle-orm';
 import {
   KnowledgePolicy,
   validateThoughtBatch,
@@ -460,12 +460,14 @@ export async function restoreSnapshot(
   return state;
 }
 
-export async function claimOutboxBatch(db: Database, limit = 50) {
+export async function claimOutboxBatch(db: Database, limit = 50, topics?: readonly string[]) {
+  if (topics?.length === 0) return [];
   return withTransactionRetry(db, async (tx) =>
     tx
       .select()
       .from(outbox)
-      .where(and(eq(outbox.status, 'pending'), lt(outbox.availableAt, new Date())))
+      .where(and(eq(outbox.status, 'pending'), lt(outbox.availableAt, new Date()), topics ? inArray(outbox.topic, [...topics]) : undefined))
+      .orderBy(asc(outbox.createdAt), asc(outbox.id))
       .limit(limit)
       .for('update', { skipLocked: true }),
   );

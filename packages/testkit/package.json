@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@ada/ai": "workspace:*",
+    "@ada/architect": "workspace:*",
     "@ada/config": "workspace:*",
     "@ada/domain": "workspace:*",
     "@ada/db": "workspace:*",

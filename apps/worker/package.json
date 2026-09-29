@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/turn-worker.d.ts",
       "import": "./dist/turn-worker.js"
+    },
+    "./plot-evaluation": {
+      "types": "./dist/plot-evaluation.d.ts",
+      "import": "./dist/plot-evaluation.js"
     }
   },
   "scripts": {

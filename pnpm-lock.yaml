@@ -502,6 +502,9 @@ importers:
       '@ada/ai':
         specifier: workspace:*
         version: link:../ai
+      '@ada/architect':
+        specifier: workspace:*
+        version: link:../architect
       '@ada/config':
         specifier: workspace:*
         version: link:../config

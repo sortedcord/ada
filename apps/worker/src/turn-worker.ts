@@ -54,6 +54,7 @@ import {
   turnStreamEvents,
   turns,
 } from '@ada/db';
+import { withTransactionRetry } from '@ada/db';
 import { z } from 'zod';
 
 const outputSchema = z.object({
@@ -432,53 +433,37 @@ export async function processTurn(
       attribution: { source: 'player', sourceIds: [turnId] },
     })
     .onConflictDoNothing();
-  const [architectRow] = await database
-    .select()
-    .from(architectState)
-    .where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId)))
-    .limit(1);
-  const currentArchitectState = architectRow?.state as
-    Parameters<typeof architectTick>[0] | undefined;
   const pacing = {
     tensionTarget: aggregate?.scenario?.config?.pacing?.tensionTarget ?? 0.5,
     interventionCooldownTurns: aggregate?.scenario?.config?.pacing?.interventionCooldownTurns ?? 3,
     interventionThreshold: aggregate?.scenario?.config?.pacing?.interventionThreshold ?? 0.7,
   };
-  const architectResult = currentArchitectState
-    ? architectTick(
-        currentArchitectState,
-        {
-          turn: turn.turnNumber,
-          turnsSinceSignificantChange: turn.turnNumber,
-          turnsSinceGoalProgress: turn.turnNumber,
-          repeatedPlayerIntents: 0,
-          repeatedNpcNoActions: 0,
-          activePlotsWithoutProgress: currentArchitectState.activePlotPoints.length
-            ? turn.turnNumber
-            : 0,
-          unresolvedHooks: currentArchitectState.openHooks.length,
-          dialogueOnlyStreak: turn.turnNumber,
-          sceneDuration: turn.turnNumber,
-        },
-        pacing,
-      )
-    : null;
-  const architectGuidance = architectResult?.shouldIntervene
-    ? [
-        'Offer an optional environmental pressure or investigative opportunity; preserve multiple player responses.',
-      ]
-    : [];
-  const guidanceCheck = validateArchitectGuidance(architectGuidance);
-  if (architectRow && architectResult && guidanceCheck.valid) {
-    await database
-      .update(architectState)
-      .set({
-        state: architectResult.state,
-        version: architectRow.version + 1,
-        updatedAt: new Date(),
-      })
-      .where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId)));
-  }
+  const architectPlanning = await withTransactionRetry(database, async (tx) => {
+    const [latest] = await tx.select().from(architectState)
+      .where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId))).for('update');
+    if (!latest) return null;
+    const snapshot = latest.state as Parameters<typeof architectTick>[0];
+    const result = architectTick(snapshot, {
+      turn: turn.turnNumber,
+      turnsSinceSignificantChange: turn.turnNumber,
+      turnsSinceGoalProgress: turn.turnNumber,
+      repeatedPlayerIntents: 0,
+      repeatedNpcNoActions: 0,
+      activePlotsWithoutProgress: snapshot.activePlotPoints.length ? turn.turnNumber : 0,
+      unresolvedHooks: snapshot.openHooks.length,
+      dialogueOnlyStreak: turn.turnNumber,
+      sceneDuration: turn.turnNumber,
+    }, pacing);
+    const guidance = result.shouldIntervene
+      ? ['Offer an optional environmental pressure or investigative opportunity; preserve multiple player responses.']
+      : [];
+    const guidanceCheck = validateArchitectGuidance(guidance);
+    if (guidanceCheck.valid) {
+      await tx.update(architectState).set({ state: result.state, version: latest.version + 1, updatedAt: new Date() })
+        .where(and(eq(architectState.runId, runId), eq(architectState.branchId, turn.branchId)));
+    }
+    return { result, snapshot, guidance: guidanceCheck.valid ? guidance : [] };
+  });
   await updateJob('running', 'ARCHITECT_PLANNED');
   await database
     .insert(turnStageResults)
@@ -488,14 +473,14 @@ export async function processTurn(
       stage: 'ARCHITECT_PLANNED',
       inputSnapshot: { runId, branchId: turn.branchId },
       validatedOutput: {
-        pacingAssessment: architectResult?.shouldIntervene
+        pacingAssessment: architectPlanning?.result.shouldIntervene
           ? 'stagnating_optional_pressure'
           : 'neutral',
-        stagnationScore: architectResult?.score ?? 0,
-        guidance: guidanceCheck.valid ? architectGuidance : [],
+        stagnationScore: architectPlanning?.result.score ?? 0,
+        guidance: architectPlanning?.guidance ?? [],
         activePlotPriorities:
-          currentArchitectState?.activePlotPoints.map((id) => ({ type: 'plot_point', id })) ?? [],
-        foreshadowingOptions: currentArchitectState?.futureBeats ?? [],
+          architectPlanning?.snapshot.activePlotPoints.map((id) => ({ type: 'plot_point', id })) ?? [],
+        foreshadowingOptions: architectPlanning?.snapshot.futureBeats ?? [],
         cooldownUpdates: [],
         forbiddenRevelations: ['Do not reveal privileged architect context or player thoughts.'],
       },

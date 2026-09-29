@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { stagnationScore, validateCardMutation, type PlotPoint, type StoryCard } from '@ada/domain';
+import { canTransitionPlot, stagnationScore, validateCardMutation, type PlotPoint, type StoryCard } from '@ada/domain';
 
 export const architectStateSchema = z.object({
   act: z.number().int().positive(),
@@ -88,14 +88,19 @@ export function validateArchitectGuidance(guidance: readonly string[]): { valid:
 
 export interface PlotEvaluation { status: 'unchanged' | 'available' | 'active' | 'resolved' | 'failed'; evidenceIds: string[]; reason: string; }
 export function evaluatePlotPoint(point: Pick<PlotPoint, 'status' | 'preconditions' | 'resolutionConditions' | 'forbiddenOutcomes'>, facts: ReadonlySet<string>, evidenceIds: readonly string[]): PlotEvaluation {
-  const preconditionsMet = point.preconditions.every((condition) => facts.has(condition));
+  if (!evidenceIds.length) return { status: 'unchanged', evidenceIds: [], reason: 'Deterministic evidence is insufficient.' };
+  const preconditionsMet = point.preconditions.length > 0 && point.preconditions.every((condition) => facts.has(condition));
   const resolved = point.resolutionConditions.length > 0 && point.resolutionConditions.every((condition) => facts.has(condition));
   const forbidden = point.forbiddenOutcomes.some((condition) => facts.has(condition));
-  if (resolved && evidenceIds.length) return { status: 'resolved', evidenceIds: [...evidenceIds], reason: 'All resolution conditions have canonical evidence.' };
-  if (forbidden && evidenceIds.length) return { status: 'failed', evidenceIds: [...evidenceIds], reason: 'A forbidden outcome has canonical evidence.' };
-  if (preconditionsMet && ['proposed', 'dormant', 'available'].includes(point.status)) return { status: 'active', evidenceIds: [...evidenceIds], reason: 'All preconditions have canonical evidence.' };
-  if (preconditionsMet && point.status === 'proposed') return { status: 'available', evidenceIds: [...evidenceIds], reason: 'Preconditions are satisfied.' };
-  return { status: 'unchanged', evidenceIds: [], reason: 'Deterministic evidence is insufficient.' };
+  if (forbidden && canTransitionPlot(point.status, 'failed'))
+    return { status: 'failed', evidenceIds: [...evidenceIds], reason: 'A forbidden outcome has canonical evidence.' };
+  if (resolved && canTransitionPlot(point.status, 'resolved'))
+    return { status: 'resolved', evidenceIds: [...evidenceIds], reason: 'All resolution conditions have canonical evidence.' };
+  if (preconditionsMet && canTransitionPlot(point.status, 'active'))
+    return { status: 'active', evidenceIds: [...evidenceIds], reason: 'All preconditions have canonical evidence.' };
+  if (preconditionsMet && canTransitionPlot(point.status, 'available'))
+    return { status: 'available', evidenceIds: [...evidenceIds], reason: 'Preconditions are satisfied.' };
+  return { status: 'unchanged', evidenceIds: [], reason: 'No legal evidence-backed transition.' };
 }
 
 export const suddenEventProposalSchema = z.object({
@@ -118,14 +123,18 @@ export function validateSuddenEventProposal(proposal: unknown, allowedSourceIds:
 }
 
 export function applyPlotEvaluation(state: ArchitectState, pointId: string, evaluation: PlotEvaluation): ArchitectState {
-  if (evaluation.status === 'unchanged') return state;
+  if (evaluation.status === 'unchanged' || state.plotStatuses[pointId] === evaluation.status) return state;
   const nextStatus = evaluation.status === 'available' ? 'available' : evaluation.status;
   const activePlotPoints = nextStatus === 'active'
     ? [...new Set([...state.activePlotPoints, pointId])]
     : state.activePlotPoints.filter((id) => id !== pointId);
+  const futureBeats = nextStatus === 'available'
+    ? [...new Set([...state.futureBeats, pointId])]
+    : state.futureBeats.filter((id) => id !== pointId);
   return architectStateSchema.parse({
     ...state,
     activePlotPoints,
+    futureBeats,
     plotStatuses: { ...state.plotStatuses, [pointId]: nextStatus },
     plotEvidence: { ...state.plotEvidence, [pointId]: [...new Set([...(state.plotEvidence[pointId] ?? []), ...evaluation.evidenceIds])] },
   });

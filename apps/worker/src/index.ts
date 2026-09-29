@@ -4,6 +4,7 @@ import { createDatabase, claimOutboxBatch, completeOutbox, failOutbox, jobRuns, 
 import { createLogger, noopTelemetry } from '@ada/observability';
 import { processTurn } from './turn-worker.js';
 import { processDialogueAttribution } from './dialogue-attribution.js';
+import { processPlotEvaluation } from './plot-evaluation.js';
 import { and, eq, inArray } from 'drizzle-orm';
 import { indexRetrievalChunk, type VisibilityScope } from '@ada/retrieval';
 
@@ -19,7 +20,7 @@ const queue = new Queue('turns', { connection });
 const dialogueQueue = new Queue('dialogue-attribution', { connection });
 
 async function processOutboxBatch(): Promise<void> {
-  const rows = await claimOutboxBatch(database.db, 25);
+  const rows = await claimOutboxBatch(database.db, 25, ['story-card.reindex', 'plot.evaluate']);
   for (const row of rows) {
     try {
       if (row.topic === 'story-card.reindex') {
@@ -33,8 +34,12 @@ async function processOutboxBatch(): Promise<void> {
             await indexRetrievalChunk(database.db, { id: `chunk:${documentId}:v${payload.version}`, documentId, sourceType: 'story_card', sourceId: card.id, text: `${card.title}: ${JSON.stringify(version.body)}`, scope: (version.scope || 'public_scenario') as VisibilityScope, keywords: [card.title, 'story-card'], recency: 1, salience: 0.7, metadata: { cardId: card.id, version: payload.version } });
           }
         }
+        await completeOutbox(database.db, row.id);
+      } else if (row.topic === 'plot.evaluate') {
+        await processPlotEvaluation(database.db, row.id, row.payload);
+      } else {
+        throw new Error(`Unsupported outbox topic: ${row.topic}`);
       }
-      await completeOutbox(database.db, row.id);
     } catch (error) {
       logger.error({ err: error, outboxId: row.id }, 'outbox processing failed');
       await failOutbox(database.db, row.id, new Date(Date.now() + 1_000));
