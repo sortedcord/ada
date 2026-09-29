@@ -141,6 +141,29 @@ describe('scenario and runtime schemas', () => {
     expect(invalid.errors.map((error) => error.path)).toContain('startLocationId');
   });
 
+  it('accepts an optional bounded player briefing only on playable entities', () => {
+    const player = entity('player_1', true);
+    expect(player.playerBriefing).toBeUndefined();
+    const briefing = {
+      background: 'A watchkeeper with a familiar harbor route.',
+      situation: 'The tide is rising around the pier.',
+      possibleLeads: ['Ask about the signal light.', 'Inspect the mooring ropes.'],
+    };
+    expect(entitySchema.parse({ ...player, playerBriefing: briefing }).playerBriefing).toEqual(briefing);
+    expect(entitySchema.safeParse({ ...entity('npc_1', false), playerBriefing: briefing }).success).toBe(false);
+    expect(entitySchema.safeParse({ ...player, playerBriefing: { ...briefing, background: 'x'.repeat(5_001) } }).success).toBe(false);
+    expect(entitySchema.safeParse({ ...player, playerBriefing: { ...briefing, possibleLeads: [''] } }).success).toBe(false);
+    expect(entitySchema.safeParse({ ...player, playerBriefing: { ...briefing, privateDescription: 'not player-safe' } }).success).toBe(false);
+    const aggregate = {
+      scenario: scenario(), entities: [player, entity('npc_1', false)], relationships: [],
+      locations: [location('location_1')], locationEdges: [], storyCards: [], storyCardLinks: [],
+      plotArcs: [], plotPoints: [],
+    };
+    expect(validateScenarioAggregate({ ...aggregate, entities: [{ ...player, playerBriefing: briefing }, entity('npc_1', false)] }).valid).toBe(true);
+    const invalid = validateScenarioAggregate({ ...aggregate, entities: [player, { ...entity('npc_1', false), playerBriefing: briefing }] });
+    expect(invalid.errors.map((issue) => issue.path)).toContain('entities.npc_1.playerBriefing');
+  });
+
   it('rejects cycles in location hierarchy and player inner thoughts', () => {
     const result = validateScenarioAggregate({
       scenario: scenario(),

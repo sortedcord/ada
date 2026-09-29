@@ -83,6 +83,15 @@
         "kind": "character",
         "tags": ["surveyor", "returnee", "former-registry"],
         "publicDescription": "Tomas Vale returns to Veyr as a salvage surveyor with a brass case of measuring chains and a reputation for noticing where damp has entered a wall. Seven years ago he worked nights in the Tide Registry. He left before anyone could decide whether he had failed the city or merely failed to be brave in it.",
+        "playerBriefing": {
+          "background": "You are Tomas Vale, a former Tide Registry clerk who left Veyr after the Night of Three Bells seven years ago. You now work as a salvage surveyor. People who knew you may remember your departure differently, and you do not owe anyone a confession on demand.",
+          "situation": "Someone has nailed a brass tally-tab with your old clerk mark and a current service number to the former Registry door. A king tide is four nights away. You can decide whether the tab is a warning, a summons, or something to set aside while you attend to the floodworks and people affected by them.",
+          "possibleLeads": [
+            "Examine the tally-tab and its current service number.",
+            "Ask someone who knows the Registry or the floodworks what the mark means.",
+            "Leave the tab for now and attend to the coming tide."
+          ]
+        },
         "privateDescription": "Tomas changed the arrival time of the third warning bell in the official ledger from 01:42 to 02:00. He did it after Dorian Voss told him that a true record would expose both Nera Quill and Tomas’s younger brother Eli to prosecution. The lie did not create the flood, but it made the dead easier to blame. Tomas kept a carbon copy of the original page, then tore the time column out when he could not bear to look at it. At 01:36 on the flood night, Nera sent a runner to the Registry with one sentence: “The south mark is already under.” Tomas read it, filed the scrap inside his brass case, and did not answer. The unsent station letter is separate: an apology he wrote days later and never posted.",
         "history": "Tomas was raised above his mother’s stationery stall in South Silt, where every family kept some relationship with water: ferries, pumps, drains, laundry lines, or graveyards. He learned survey work from Dorian Voss because numbers made him useful without requiring him to choose a side. During the Night of Three Bells, he was a junior registrar, old enough to understand the order and frightened enough to obey the man who gave it. Since then he has worked on collapsed docks in towns where nobody knows his name. The summons that brings him back is not official: a brass tally-tab bearing his old clerk mark was nailed to the former registry door.",
         "historicalEvents": [

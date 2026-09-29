@@ -794,6 +794,26 @@ function RunsPage(): React.JSX.Element {
             </div>
           )}
 
+          {scene.data?.orientation && (
+            <section aria-labelledby="player-orientation-title" className="mt-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/5 p-4 md:p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <BookOpen aria-hidden="true" className="w-4 h-4 text-indigo-400" />
+                <h2 id="player-orientation-title" className="font-semibold">Your starting context · {scene.data.orientation.characterName}</h2>
+              </div>
+              {scene.data.orientation.background && <p className="text-sm leading-relaxed">{scene.data.orientation.background}</p>}
+              {scene.data.orientation.situation && <p className="text-sm leading-relaxed">{scene.data.orientation.situation}</p>}
+              {scene.data.orientation.possibleLeads.length > 0 && (
+                <div className="text-sm">
+                  <p className="font-medium">Some places to start, if you want:</p>
+                  <ul className="list-disc pl-5 mt-1 space-y-1 text-muted-foreground">
+                    {scene.data.orientation.possibleLeads.map((lead) => <li key={lead}>{lead}</li>)}
+                  </ul>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">These are possibilities, not required objectives. You decide what to do or say.</p>
+            </section>
+          )}
+
           {/* Direct Full-Screen Transcript Feed */}
           <div className="flex-1 space-y-6 pt-4">
             {timeline.isPending && (

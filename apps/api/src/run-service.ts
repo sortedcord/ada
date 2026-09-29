@@ -19,6 +19,7 @@ import {
 } from '@ada/db';
 import { randomUUID } from 'node:crypto';
 import type { Queue } from 'bullmq';
+import type { Entity } from '@ada/domain';
 
 export class RunService {
   constructor(
@@ -117,8 +118,20 @@ export class RunService {
           publicDescription?: string;
           personality?: string[];
           playable?: boolean;
+          playerBriefing?: Entity['playerBriefing'];
         }>
       | undefined;
+    const playerEntity = aggEntities?.find((entity) => entity.id === run.playerEntityId);
+    const briefing = playerEntity?.playable ? playerEntity.playerBriefing : undefined;
+    const publicBackground = playerEntity?.playable ? playerEntity.publicDescription : undefined;
+    const orientation = briefing || publicBackground
+      ? {
+          characterName: playerEntity?.name ?? playerEntity?.id ?? run.playerEntityId,
+          background: briefing?.background ?? publicBackground ?? '',
+          situation: briefing?.situation ?? '',
+          possibleLeads: briefing?.possibleLeads ?? [],
+        }
+      : null;
     const authoredLocations = new Map(
       ((rev?.aggregate as { locations?: Array<{ id: string; name: string }> } | undefined)?.locations ?? [])
         .map((location) => [location.id, location.name]),
@@ -174,6 +187,7 @@ export class RunService {
       runId,
       branchId: run.activeBranchId,
       playerEntityId: run.playerEntityId,
+      orientation,
       worldTime: run.worldTime,
       locationNames,
       currentLocationName,

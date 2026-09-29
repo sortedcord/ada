@@ -83,6 +83,15 @@
         "kind": "character",
         "tags": ["media-studies", "junior", "transfer"],
         "publicDescription": "Eli Mendoza is a twenty-one-year-old transfer student in Northbridge College’s media studies program. He works evening shifts in the Media Lab, knows where every adapter has gone missing, and has spent a year becoming useful enough that people forget he is still new here. His capstone is an audio walk through the campus and the adjacent neighborhood.",
+        "playerBriefing": {
+          "background": "You are Eli Mendoza, a transfer student and Media Lab worker. Maya is your capstone partner: you built early versions of the audio walk together, then stopped answering her messages after a disagreement about consent. You have not listened to the voice note she sent afterward.",
+          "situation": "The Media Lab loses overnight access soon, and the remaining Sound Booth B session matters to both your audio walk and Maya's work. Lucia at the Harlow garden has asked what the recording is for and what it can offer the people being recorded. You can decide what to record, what to ask Maya, and whether to respond to Lucia; the booking is not automatically yours.",
+          "possibleLeads": [
+            "Check the final session booking and ask Maya what she needs from it.",
+            "Review what your recorder has captured before deciding whether to keep recording.",
+            "Reply to Lucia about the garden recordings, or wait until you can offer a clear answer."
+          ]
+        },
         "privateDescription": "Last winter, Eli used a departmental equipment account to lend a high-quality recorder to his younger sister’s community center after their own equipment was stolen. The account was later reconciled, but Eli quietly altered the checkout time so the discrepancy would look like a clerical error. Professor Shah noticed and chose not to report him. Eli does not know whether that was mercy, leverage, or both. He has also kept the unsent voice note Maya left after he stopped answering her messages during the same week.",
         "history": "Eli grew up helping his mother translate utility bills for neighbors and learned audio editing because it made people’s stories feel less disposable. He transferred to Northbridge after two years at a community college, arriving with enough credits to be technically a junior and none of the easy friendships that make campus feel navigable. He is good at listening in the edit room and bad at explaining why he goes silent when someone wants something personal. His audio walk began as a portfolio piece, then Lucia asked whether it could include the neighborhood garden that the university calls “underutilized land.”",
         "historicalEvents": [

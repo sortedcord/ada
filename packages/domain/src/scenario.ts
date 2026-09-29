@@ -65,6 +65,12 @@ export const scenarioSchema = z.object({
 });
 export type Scenario = z.infer<typeof scenarioSchema>;
 
+export const playerBriefingSchema = z.object({
+  background: boundedText(5_000),
+  situation: boundedText(5_000),
+  possibleLeads: z.array(boundedText(500)).max(20),
+}).strict();
+
 export const entitySchema = z
   .object({
     id: idSchema,
@@ -77,6 +83,7 @@ export const entitySchema = z
     publicDescription: z.string().max(10_000),
     privateDescription: z.string().max(10_000),
     history: z.string().max(30_000).default(''),
+    playerBriefing: playerBriefingSchema.optional(),
     historicalEvents: z
       .array(
         z.object({
@@ -119,6 +126,12 @@ export const entitySchema = z
         code: z.ZodIssueCode.custom,
         path: ['cognitive'],
         message: 'playable entities must be cognitive',
+      });
+    if (entity.playerBriefing && !entity.playable)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['playerBriefing'],
+        message: 'player briefing is only permitted on playable entities',
       });
   });
 export type Entity = z.infer<typeof entitySchema>;
@@ -452,6 +465,26 @@ export function validateScenarioAggregate(aggregate: ScenarioAggregate): Scenari
         resourceId: entity.id,
         section: 'entities',
       });
+    if (entity.playerBriefing !== undefined) {
+      if (!entity.playable)
+        issue('error', {
+          path: `entities.${entity.id}.playerBriefing`,
+          message: 'player briefing is only permitted on playable entities',
+          severity: 'error',
+          resourceId: entity.id,
+          section: 'entities',
+        });
+      const parsed = playerBriefingSchema.safeParse(entity.playerBriefing);
+      if (!parsed.success)
+        for (const problem of parsed.error.issues)
+          issue('error', {
+            path: `entities.${entity.id}.playerBriefing${problem.path.length ? `.${problem.path.join('.')}` : ''}`,
+            message: problem.message,
+            severity: 'error',
+            resourceId: entity.id,
+            section: 'entities',
+          });
+    }
   }
   for (const relationship of aggregate.relationships) {
     if (relationship.revisionId !== aggregate.scenario.revisionId)

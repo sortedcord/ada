@@ -160,7 +160,7 @@ export const api = {
     }>(`/runs/${encodeURIComponent(id)}/journal`),
   getTimeline: (id: string) => request<TurnRecord[]>(`/runs/${encodeURIComponent(id)}/timeline`),
   getScene: (id: string) =>
-    request<{ runId: string; branchId: string; worldTime?: string; currentLocationName: string; locationNames: Record<string, string>; entities: unknown[]; locations: unknown[] }>(
+    request<{ runId: string; branchId: string; worldTime?: string; currentLocationName: string; locationNames: Record<string, string>; orientation: { characterName: string; background: string; situation: string; possibleLeads: string[] } | null; entities: unknown[]; locations: unknown[] }>(
       `/runs/${encodeURIComponent(id)}/scene`,
     ),
   getRun: (id: string) =>
